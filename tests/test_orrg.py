@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import copy
 import math
+import os
 
 import pytest
 import torch
@@ -515,6 +516,54 @@ def test_residual_noise_breaks_symmetry_without_breaking_losslessness():
     # gradient to act on.
     assert expert_diversity(model) > 0.0
     assert float(orthogonality_loss(model, margin=0.5)) < 0.25
+
+
+def test_checkpoint_resume_matches_uninterrupted_run(tmp_path):
+    torch.manual_seed(0)
+    batches = []
+    for i in range(6):
+        gen = torch.Generator().manual_seed(100 + i)
+        ids = torch.randint(0, VOCAB, (2, 8), generator=gen)
+        batches.append({"input_ids": ids, "labels": torch.roll(ids, -1, dims=1)})
+
+    def fresh():
+        torch.manual_seed(0)
+        return build_model("llama")
+
+    def cfg(path, *, every=10, resume=False, trace_every=0):
+        return TrainConfig(
+            lr=1e-3,
+            optimizer="adamw",
+            bf16=False,
+            checkpoint_path=path,
+            checkpoint_every=every,
+            resume=resume,
+            trace_every=trace_every,
+        )
+
+    ckpt = str(tmp_path / "run.pt")
+    at10 = str(tmp_path / "at10.pt")
+
+    reference = fresh()
+    train(reference, batches, 20, cfg(ckpt))
+    expected = [p.detach().clone() for p in reference.parameters()]
+
+    second = fresh()
+
+    def copy_at_ten(step):
+        if step == 10:
+            import shutil
+
+            shutil.copy(ckpt, at10)
+
+    train(second, batches, 20, cfg(ckpt, trace_every=10), trace=copy_at_ten)
+    assert os.path.exists(at10)
+
+    resumed = fresh()
+    train(resumed, batches, 20, cfg(at10, resume=True))
+
+    for want, got in zip(expected, resumed.parameters()):
+        assert torch.allclose(want, got, atol=1e-6, rtol=1e-5)
 
 
 def test_scaled_residual_init_trades_exactness_for_function():

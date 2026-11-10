@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import itertools
 import math
+import os
 import time
 from dataclasses import dataclass
 from typing import Callable, Iterable, Mapping
@@ -38,6 +39,9 @@ class TrainConfig:
     optimizer: str = "adamw"  # "adamw" (fp32 states, 8 bytes/param) | "adafactor"
     log_every: int = 50
     trace_every: int = 0  # call the trace hook every N steps (0 = never)
+    checkpoint_path: str | None = None
+    checkpoint_every: int = 0  # save every N steps (0 = never)
+    resume: bool = False  # continue from checkpoint_path when it exists
 
 
 def moe_layers(model: nn.Module) -> list[nn.Module]:
@@ -187,6 +191,32 @@ def evaluate_loss(
     return total / max(count, 1)
 
 
+def _save_checkpoint(
+    path: str,
+    model: nn.Module,
+    optimizer: torch.optim.Optimizer,
+    scheduler: torch.optim.lr_scheduler.LRScheduler,
+    step: int,
+) -> None:
+    """Atomically save trainable weights, optimizer/scheduler state and RNG.
+
+    Only trainable parameters are stored: frozen skeleton blocks are rebuilt
+    bit-exactly from the seed at conversion, so they do not need to be copied.
+    """
+
+    payload = {
+        "step": step,
+        "model": {name: p.detach().cpu() for name, p in model.named_parameters() if p.requires_grad},
+        "optim": optimizer.state_dict(),
+        "sched": scheduler.state_dict(),
+        "torch_rng": torch.get_rng_state(),
+        "cuda_rng": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
+    }
+    tmp = f"{path}.tmp"
+    torch.save(payload, tmp)
+    os.replace(tmp, path)
+
+
 def train(
     model: nn.Module,
     batches: Iterable[Mapping],
@@ -212,14 +242,39 @@ def train(
         # Adafactor has no momentum/beta1 to cycle.
         cycle_momentum=cfg.optimizer == "adamw",
     )
+    start_step = 0
+    if cfg.resume and cfg.checkpoint_path and os.path.exists(cfg.checkpoint_path):
+        payload = torch.load(cfg.checkpoint_path, map_location=device, weights_only=False)
+        expected = {name for name, p in model.named_parameters() if p.requires_grad}
+        if set(payload["model"]) != expected:
+            raise RuntimeError(
+                f"checkpoint {cfg.checkpoint_path} does not match this model's trainable parameters"
+            )
+        model.load_state_dict(payload["model"], strict=False)
+        optimizer.load_state_dict(payload["optim"])
+        scheduler.load_state_dict(payload["sched"])
+        torch.set_rng_state(payload["torch_rng"])
+        if payload.get("cuda_rng") is not None and torch.cuda.is_available():
+            torch.cuda.set_rng_state_all(payload["cuda_rng"])
+        start_step = int(payload["step"])
+        if start_step >= steps:
+            raise ValueError(
+                f"checkpoint is at step {start_step}, which is not before the budget {steps}"
+            )
+        if log:
+            log(f"    {tag} resuming from step {start_step}/{steps}")
+
     model.train()
     losses: list[float] = []
     distill_values: list[float] = []
     orth_values: list[float] = []
     started = time.time()
 
-    stream = _infinite(batches)
-    for step, batch in enumerate(itertools.islice(stream, steps)):
+    # Skip the data stream to the saved step: generation is deterministic, so a
+    # resumed run sees exactly the batches the uninterrupted run would have seen.
+    stream = itertools.islice(_infinite(batches), start_step, steps)
+    for offset, batch in enumerate(stream):
+        step = start_step + offset
         if cfg.router_distill_coef > 0:
             active = cfg.distill_every <= 1 or step % cfg.distill_every == 0
             set_router_distill(model, cfg.router_distill_coef if active else 0.0)
@@ -250,6 +305,8 @@ def train(
                 orth_values.append(pressed)
 
         losses.append(float(loss.detach()))
+        if cfg.checkpoint_path and cfg.checkpoint_every and (step + 1) % cfg.checkpoint_every == 0:
+            _save_checkpoint(cfg.checkpoint_path, model, optimizer, scheduler, step + 1)
         if trace is not None and cfg.trace_every and (step + 1) % cfg.trace_every == 0:
             trace(step + 1)
         if log and cfg.log_every and (step + 1) % cfg.log_every == 0:
@@ -266,6 +323,6 @@ def train(
         "distill_mean": sum(distill_values) / len(distill_values) if distill_values else None,
         "orth_mean": sum(orth_values) / len(orth_values) if orth_values else None,
         "seconds": elapsed,
-        "seconds_per_step": elapsed / max(steps, 1),
+        "seconds_per_step": elapsed / max(len(losses), 1),
         "trainable_params": sum(p.numel() for p in params),
     }

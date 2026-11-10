@@ -233,6 +233,15 @@ with no dead experts and a 0.002-nat loss cost. Direction and magnitude are
 independent controls, and neither — nor both — improves loss at this budget.
 Details: `reports/P1-INTERACTION.md`.
 
+### Checkpointing multi-hour runs
+
+`train()` can save every N steps and resume from the last save: trainable
+weights, optimizer and OneCycle state, and RNG are written atomically to
+`checkpoint_path`. With `--resume --ckpt-every 250`, `experiments/p1_real.py`
+skips the deterministic data stream to the saved step, so a resumed run sees
+exactly the batches the uninterrupted run would have seen. A restart costs at
+most N steps instead of the whole arm; completed arms delete their checkpoint.
+
 ## Honest limitations
 
 The toy-scale experiment is a method smoke test, not evidence about 9B models.

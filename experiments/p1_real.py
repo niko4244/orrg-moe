@@ -262,6 +262,7 @@ def run_arm(args, name, cfg, freeze, tokens, seed, val_batches, train_extra=None
         )
         print(f"    trace {step} val={val:.4f}{extra}", flush=True)
 
+    ckpt = str(Path("experiments/results") / f"ckpt_{name}.pt")
     train_cfg = TrainConfig(
         lr=args.lr,
         router_distill_coef=cfg.router_distill_coef if cfg is not None else 0.0,
@@ -270,6 +271,9 @@ def run_arm(args, name, cfg, freeze, tokens, seed, val_batches, train_extra=None
         optimizer=args.optimizer,
         log_every=args.log_every,
         trace_every=args.trace_every,
+        checkpoint_path=ckpt,
+        checkpoint_every=args.ckpt_every,
+        resume=args.resume,
         **(train_extra or {}),
     )
     if args.trace_every:
@@ -309,6 +313,9 @@ def run_arm(args, name, cfg, freeze, tokens, seed, val_batches, train_extra=None
             else None
         ),
     }
+    # A finished arm must not be resumed into a second pass.
+    if os.path.exists(ckpt):
+        os.remove(ckpt)
     del model
     torch.cuda.empty_cache()
     return row
@@ -336,6 +343,8 @@ def main() -> None:
     parser.add_argument("--distill-target-temp", type=float, default=0.25)
     parser.add_argument("--residual-noise", type=float, default=0.02)
     parser.add_argument("--down-init-scale", type=float, default=0.05)
+    parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--ckpt-every", type=int, default=250)
     parser.add_argument("--arms", nargs="*", default=None)
     parser.add_argument("--max-chars", type=int, default=6_000_000)
     parser.add_argument("--out", default="experiments/results/p1_real.json")
