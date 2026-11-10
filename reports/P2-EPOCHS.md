@@ -50,8 +50,8 @@ JSONs land at:
 * `experiments/results/p2_epochs_orrg_orth_mag.json`
 
 The answer to "does residual capacity pay once dense saturates" is the comparison
-of those endpoints against 3.0171. **It is not yet measured**, and this report
-will be updated when they land.
+of those endpoints against 3.0171; the Result section below records it as the arm
+files land.
 
 ## Checkpoint/resume verification
 
@@ -73,6 +73,12 @@ so checkpoints were validated on the live run, not only in unit tests:
   RNG states to CPU on load (`055dd93`); the resumed arm runs on the fixed code.
 * A resumed arm skips the fresh-model `trace 0`, so its trace starts at the
   checkpoint step rather than reporting an untrained step 0.
+
+## Result: two-epoch comparison
+
+<!-- P2-RESULT:START -->
+_Pending: waiting for `p2_epochs_orrg_all.json` and `p2_epochs_orrg_orth_mag.json`._
+<!-- P2-RESULT:END -->
 
 ## Reproduce
 
