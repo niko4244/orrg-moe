@@ -276,7 +276,9 @@ def run_arm(args, name, cfg, freeze, tokens, seed, val_batches, train_extra=None
         resume=args.resume,
         **(train_extra or {}),
     )
-    if args.trace_every:
+    # On resume the checkpoint carries the real step count, so a fresh-model
+    # trace at step 0 would be misleading.
+    if args.trace_every and not (args.resume and Path(ckpt).exists()):
         record(0)
     stats = train(
         model,

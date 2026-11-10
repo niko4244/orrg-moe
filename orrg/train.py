@@ -253,9 +253,11 @@ def train(
         model.load_state_dict(payload["model"], strict=False)
         optimizer.load_state_dict(payload["optim"])
         scheduler.load_state_dict(payload["sched"])
-        torch.set_rng_state(payload["torch_rng"])
+        # map_location moves every saved tensor to the target device, including
+        # the RNG byte states; set_rng_state requires them on the CPU.
+        torch.set_rng_state(payload["torch_rng"].cpu())
         if payload.get("cuda_rng") is not None and torch.cuda.is_available():
-            torch.cuda.set_rng_state_all(payload["cuda_rng"])
+            torch.cuda.set_rng_state_all([s.cpu() for s in payload["cuda_rng"]])
         start_step = int(payload["step"])
         if start_step >= steps:
             raise ValueError(
