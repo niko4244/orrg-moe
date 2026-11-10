@@ -1,0 +1,251 @@
+{
+  "args": {
+    "steps": 300,
+    "seed_steps": 400,
+    "seeds": 2,
+    "hidden": 128,
+    "inter": 384,
+    "layers": 3,
+    "heads": 4,
+    "seq": 96,
+    "batch": 32,
+    "lr": 0.0003,
+    "out": "experiments/results/toy_scale.json"
+  },
+  "rows": [
+    {
+      "seed": 0,
+      "arm": "dense_continued",
+      "seed_val": {
+        "prose": 1.3091422644528476,
+        "code": 0.7855830192565918,
+        "math": 1.5413177609443665,
+        "overall": 1.2120143482179353
+      },
+      "val": {
+        "prose": 0.9938180554996837,
+        "code": 0.5938713333823464,
+        "math": 1.4288928627967834,
+        "overall": 1.0055274172262711
+      },
+      "conversion": null,
+      "trainable_params": 672640,
+      "total_params": 672640,
+      "metrics": {},
+      "active_params": 672640
+    },
+    {
+      "seed": 0,
+      "arm": "naive_upcycle",
+      "seed_val": {
+        "prose": 1.3091422644528476,
+        "code": 0.7855830192565918,
+        "math": 1.5413177609443665,
+        "overall": 1.2120143482179353
+      },
+      "val": {
+        "prose": 1.197748216715726,
+        "code": 0.7358250455422835,
+        "math": 1.5072592973709107,
+        "overall": 1.1469441865429735
+      },
+      "conversion": {
+        "kl": 0.12828388810157776,
+        "max_abs": 4.241214752197266,
+        "relative_max_abs": 0.5582746549745201,
+        "top1_agreement": 0.8046875
+      },
+      "trainable_params": 1152792,
+      "total_params": 1383064,
+      "metrics": {
+        "load_imbalance": 0.0890842080116272,
+        "dead_experts": 0,
+        "router_entropy": 0.9617356657981873,
+        "expert_diversity": 0.028017565608024597,
+        "layers": 3
+      },
+      "active_params": 1029400
+    },
+    {
+      "seed": 0,
+      "arm": "orrg_growth",
+      "seed_val": {
+        "prose": 1.3091422644528476,
+        "code": 0.7855830192565918,
+        "math": 1.5413177609443665,
+        "overall": 1.2120143482179353
+      },
+      "val": {
+        "prose": 1.2008950493552468,
+        "code": 0.7400710365988992,
+        "math": 1.5098501563072204,
+        "overall": 1.1502720807537887
+      },
+      "conversion": {
+        "kl": 0.0,
+        "max_abs": 3.933906555175781e-06,
+        "relative_max_abs": 5.178234192585902e-07,
+        "top1_agreement": 1.0
+      },
+      "trainable_params": 710424,
+      "total_params": 1383064,
+      "metrics": {
+        "load_imbalance": 0.2033420205116272,
+        "dead_experts": 0,
+        "router_entropy": 0.8943481842676798,
+        "expert_diversity": 0.055815150340398155,
+        "layers": 3
+      },
+      "active_params": 1029400
+    },
+    {
+      "seed": 0,
+      "arm": "orrg_growth_all",
+      "seed_val": {
+        "prose": 1.3091422644528476,
+        "code": 0.7855830192565918,
+        "math": 1.5413177609443665,
+        "overall": 1.2120143482179353
+      },
+      "val": {
+        "prose": 0.9895687807690013,
+        "code": 0.5950331687927246,
+        "math": 1.4242553114891052,
+        "overall": 1.002952420350277
+      },
+      "conversion": {
+        "kl": 0.0,
+        "max_abs": 3.933906555175781e-06,
+        "relative_max_abs": 5.178234192585902e-07,
+        "top1_agreement": 1.0
+      },
+      "trainable_params": 1383064,
+      "total_params": 1383064,
+      "metrics": {
+        "load_imbalance": 0.16362849871317545,
+        "dead_experts": 0,
+        "router_entropy": 0.9452319542566935,
+        "expert_diversity": 0.04042638341585795,
+        "layers": 3
+      },
+      "active_params": 1029400
+    },
+    {
+      "seed": 1,
+      "arm": "dense_continued",
+      "seed_val": {
+        "prose": 1.3492261279713025,
+        "code": 0.8055020354010842,
+        "math": 1.5558173179626464,
+        "overall": 1.2368484937783444
+      },
+      "val": {
+        "prose": 1.046354272148826,
+        "code": 0.5978359146551653,
+        "math": 1.4241390109062195,
+        "overall": 1.022776399236737
+      },
+      "conversion": null,
+      "trainable_params": 672640,
+      "total_params": 672640,
+      "metrics": {},
+      "active_params": 672640
+    },
+    {
+      "seed": 1,
+      "arm": "naive_upcycle",
+      "seed_val": {
+        "prose": 1.3492261279713025,
+        "code": 0.8055020354010842,
+        "math": 1.5558173179626464,
+        "overall": 1.2368484937783444
+      },
+      "val": {
+        "prose": 1.2710106372833252,
+        "code": 0.7557371367107738,
+        "math": 1.5071489334106445,
+        "overall": 1.1779655691349145
+      },
+      "conversion": {
+        "kl": 0.15384817123413086,
+        "max_abs": 4.902680397033691,
+        "relative_max_abs": 0.6434568258580776,
+        "top1_agreement": 0.7526041865348816
+      },
+      "trainable_params": 1152792,
+      "total_params": 1383064,
+      "metrics": {
+        "load_imbalance": 0.17502172787984213,
+        "dead_experts": 0,
+        "router_entropy": 0.9587365388870239,
+        "expert_diversity": 0.027556156118710835,
+        "layers": 3
+      },
+      "active_params": 1029400
+    },
+    {
+      "seed": 1,
+      "arm": "orrg_growth",
+      "seed_val": {
+        "prose": 1.3492261279713025,
+        "code": 0.8055020354010842,
+        "math": 1.5558173179626464,
+        "overall": 1.2368484937783444
+      },
+      "val": {
+        "prose": 1.2800796248696067,
+        "code": 0.7601564851674166,
+        "math": 1.5099997639656066,
+        "overall": 1.1834119580008766
+      },
+      "conversion": {
+        "kl": 0.0,
+        "max_abs": 3.337860107421875e-06,
+        "relative_max_abs": 4.380805387965864e-07,
+        "top1_agreement": 1.0
+      },
+      "trainable_params": 710424,
+      "total_params": 1383064,
+      "metrics": {
+        "load_imbalance": 0.2391493320465088,
+        "dead_experts": 0,
+        "router_entropy": 0.9046018520991007,
+        "expert_diversity": 0.0570294459660848,
+        "layers": 3
+      },
+      "active_params": 1029400
+    },
+    {
+      "seed": 1,
+      "arm": "orrg_growth_all",
+      "seed_val": {
+        "prose": 1.3492261279713025,
+        "code": 0.8055020354010842,
+        "math": 1.5558173179626464,
+        "overall": 1.2368484937783444
+      },
+      "val": {
+        "prose": 1.0377703254873103,
+        "code": 0.5957692048766396,
+        "math": 1.4165534853935242,
+        "overall": 1.016697671919158
+      },
+      "conversion": {
+        "kl": 0.0,
+        "max_abs": 3.337860107421875e-06,
+        "relative_max_abs": 4.380805387965864e-07,
+        "top1_agreement": 1.0
+      },
+      "trainable_params": 1383064,
+      "total_params": 1383064,
+      "metrics": {
+        "load_imbalance": 0.16069879134496054,
+        "dead_experts": 0,
+        "router_entropy": 0.942823052406311,
+        "expert_diversity": 0.041388178865114846,
+        "layers": 3
+      },
+      "active_params": 1029400
+    }
+  ]
+}

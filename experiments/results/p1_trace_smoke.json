@@ -1,0 +1,73 @@
+{
+  "args": {
+    "steps": 3,
+    "seeds": 1,
+    "seq": 64,
+    "batch": 2,
+    "lr": 0.0002,
+    "bias_rate": 0.0,
+    "distill_coef": 0.1,
+    "distill_tokens": 32,
+    "optimizer": "adafactor",
+    "cluster_tokens": 512,
+    "shared": 2,
+    "groups": 4,
+    "variants": 3,
+    "log_every": 1,
+    "trace_every": 2,
+    "arms": [
+      "orrg_distill"
+    ],
+    "max_chars": 6000000,
+    "out": "experiments/results/p1_trace_smoke.json"
+  },
+  "rows": [
+    {
+      "seed": 0,
+      "arm": "orrg_distill",
+      "val_before": 3.7172237038612366,
+      "val_after": 3.666081875562668,
+      "delta": -0.051141828298568726,
+      "conversion": {
+        "kl": 0.0,
+        "max_abs": 0.00014352798461914062,
+        "relative_max_abs": 5.250556558803177e-06,
+        "top1_agreement": 1.0
+      },
+      "trainable_params": 676701376,
+      "total_params": 676701376,
+      "active_params": 519384256,
+      "seconds_per_step": 4.086378177007039,
+      "metrics": {
+        "load_imbalance": 0.27294921875,
+        "dead_experts": 0,
+        "router_entropy": 0.9980401899665594,
+        "expert_diversity": 9.406358003616333e-08,
+        "layers": 32
+      },
+      "trace": [
+        {
+          "step": 0,
+          "val": 3.7172237038612366,
+          "imbalance": 0.28759765625,
+          "dead": 0,
+          "diversity": 0.0,
+          "entropy": 0.9979570973664522,
+          "residual_share": 0.0,
+          "distill": null
+        },
+        {
+          "step": 2,
+          "val": 3.6655388474464417,
+          "imbalance": 0.29541015625,
+          "dead": 0,
+          "diversity": 9.406358003616333e-08,
+          "entropy": 0.9978843927383423,
+          "residual_share": 0.0023465963478916767,
+          "distill": 0.6941991616040468
+        }
+      ],
+      "clustering": null
+    }
+  ]
+}

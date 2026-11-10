@@ -1,0 +1,63 @@
+{
+  "args": {
+    "steps": 5,
+    "seeds": 1,
+    "seq": 256,
+    "batch": 4,
+    "lr": 0.0002,
+    "bias_rate": 0.0,
+    "distill_coef": 0.1,
+    "cluster_tokens": 512,
+    "shared": 2,
+    "groups": 4,
+    "variants": 3,
+    "log_every": 0,
+    "arms": [
+      "dense_continued",
+      "orrg_all"
+    ],
+    "max_chars": 6000000,
+    "out": "experiments/results/p1_smoke.json"
+  },
+  "rows": [
+    {
+      "seed": 0,
+      "arm": "dense_continued",
+      "val_before": 3.0256547033786774,
+      "val_after": 2.9081775546073914,
+      "delta": -0.11747714877128601,
+      "conversion": null,
+      "trainable_params": 361821120,
+      "total_params": 361821120,
+      "active_params": null,
+      "seconds_per_step": 0.36113996505737306,
+      "metrics": {},
+      "clustering": null
+    },
+    {
+      "seed": 0,
+      "arm": "orrg_all",
+      "val_before": 3.025813728570938,
+      "val_after": 2.903378874063492,
+      "delta": -0.12243485450744629,
+      "conversion": {
+        "kl": 3.929156999760153e-10,
+        "max_abs": 0.00011396408081054688,
+        "relative_max_abs": 3.873500987400404e-06,
+        "top1_agreement": 1.0
+      },
+      "trainable_params": 676701376,
+      "total_params": 676701376,
+      "active_params": 519384256,
+      "seconds_per_step": 22.405109786987303,
+      "metrics": {
+        "load_imbalance": 0.292388916015625,
+        "dead_experts": 0,
+        "router_entropy": 0.9972436800599098,
+        "expert_diversity": 6.565824151039124e-08,
+        "layers": 32
+      },
+      "clustering": null
+    }
+  ]
+}

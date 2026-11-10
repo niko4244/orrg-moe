@@ -1,0 +1,143 @@
+{
+  "args": {
+    "steps": 800,
+    "seeds": 1,
+    "seq": 256,
+    "batch": 4,
+    "lr": 0.0002,
+    "bias_rate": 0.0,
+    "distill_coef": 0.1,
+    "distill_tokens": 128,
+    "optimizer": "adafactor",
+    "cluster_tokens": 512,
+    "shared": 2,
+    "groups": 4,
+    "variants": 3,
+    "log_every": 50,
+    "trace_every": 100,
+    "arms": [
+      "orrg_all"
+    ],
+    "max_chars": 6000000,
+    "out": "experiments/results/p1_long_orrg_all.json"
+  },
+  "rows": [
+    {
+      "seed": 0,
+      "arm": "orrg_all",
+      "val_before": 3.025813728570938,
+      "val_after": 2.8288930654525757,
+      "delta": -0.19692066311836243,
+      "conversion": {
+        "kl": 3.929156999760153e-10,
+        "max_abs": 0.00011396408081054688,
+        "relative_max_abs": 3.873500987400404e-06,
+        "top1_agreement": 1.0
+      },
+      "trainable_params": 676701376,
+      "total_params": 676701376,
+      "active_params": 519384256,
+      "seconds_per_step": 3.4243915298581125,
+      "metrics": {
+        "load_imbalance": 0.203277587890625,
+        "dead_experts": 0,
+        "router_entropy": 0.9972470328211784,
+        "expert_diversity": 0.00040527060627937317,
+        "layers": 32
+      },
+      "trace": [
+        {
+          "step": 0,
+          "val": 3.025813728570938,
+          "imbalance": 0.291717529296875,
+          "dead": 0,
+          "diversity": 0.0,
+          "entropy": 0.9973610881716013,
+          "residual_share": 0.0,
+          "distill": null
+        },
+        {
+          "step": 100,
+          "val": 2.8344067335128784,
+          "imbalance": 0.1885986328125,
+          "dead": 0,
+          "diversity": 0.00011612009257078171,
+          "entropy": 0.997914670035243,
+          "residual_share": 0.023339736713731313,
+          "distill": null
+        },
+        {
+          "step": 200,
+          "val": 2.8595566153526306,
+          "imbalance": 0.1517333984375,
+          "dead": 0,
+          "diversity": 0.00023047253489494324,
+          "entropy": 0.9981256555765867,
+          "residual_share": 0.03225078916938604,
+          "distill": null
+        },
+        {
+          "step": 300,
+          "val": 2.8721522092819214,
+          "imbalance": 0.13507080078125,
+          "dead": 0,
+          "diversity": 0.0003155362792313099,
+          "entropy": 0.9984004534780979,
+          "residual_share": 0.0372681185162919,
+          "distill": null
+        },
+        {
+          "step": 400,
+          "val": 2.85904198884964,
+          "imbalance": 0.164276123046875,
+          "dead": 0,
+          "diversity": 0.0003682933747768402,
+          "entropy": 0.9979879073798656,
+          "residual_share": 0.0400067379569208,
+          "distill": null
+        },
+        {
+          "step": 500,
+          "val": 2.8424081206321716,
+          "imbalance": 0.176910400390625,
+          "dead": 0,
+          "diversity": 0.00039427634328603745,
+          "entropy": 0.9977136962115765,
+          "residual_share": 0.041382539699977045,
+          "distill": null
+        },
+        {
+          "step": 600,
+          "val": 2.836620330810547,
+          "imbalance": 0.17340087890625,
+          "dead": 0,
+          "diversity": 0.00040320539847016335,
+          "entropy": 0.9976301845163107,
+          "residual_share": 0.04174908559078195,
+          "distill": null
+        },
+        {
+          "step": 700,
+          "val": 2.828301638364792,
+          "imbalance": 0.16876220703125,
+          "dead": 0,
+          "diversity": 0.00040509551763534546,
+          "entropy": 0.9975389558821917,
+          "residual_share": 0.041841924766593895,
+          "distill": null
+        },
+        {
+          "step": 800,
+          "val": 2.8288930654525757,
+          "imbalance": 0.182464599609375,
+          "dead": 0,
+          "diversity": 0.00040527060627937317,
+          "entropy": 0.9974170941859484,
+          "residual_share": 0.04182409056351583,
+          "distill": null
+        }
+      ],
+      "clustering": null
+    }
+  ]
+}

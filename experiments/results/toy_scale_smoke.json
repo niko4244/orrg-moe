@@ -1,0 +1,102 @@
+{
+  "args": {
+    "steps": 120,
+    "seed_steps": 250,
+    "seeds": 1,
+    "hidden": 128,
+    "inter": 384,
+    "layers": 3,
+    "heads": 4,
+    "seq": 96,
+    "batch": 32,
+    "lr": 0.0003,
+    "out": "experiments/results/toy_scale_smoke.json"
+  },
+  "rows": [
+    {
+      "seed": 0,
+      "arm": "dense_continued",
+      "seed_val": {
+        "prose": 2.089895551854914,
+        "code": 1.3826204321601174,
+        "math": 1.8019179224967956,
+        "overall": 1.7581446355039425
+      },
+      "val": {
+        "prose": 1.4900786551562222,
+        "code": 0.876312645998868,
+        "math": 1.5840807199478149,
+        "overall": 1.3168240070343018
+      },
+      "conversion": null,
+      "trainable_params": 672640,
+      "total_params": 672640,
+      "metrics": {},
+      "active_params": 672640
+    },
+    {
+      "seed": 0,
+      "arm": "naive_upcycle",
+      "seed_val": {
+        "prose": 2.089895551854914,
+        "code": 1.3826204321601174,
+        "math": 1.8019179224967956,
+        "overall": 1.7581446355039425
+      },
+      "val": {
+        "prose": 1.830612605268305,
+        "code": 1.2007220441644841,
+        "math": 1.78284010887146,
+        "overall": 1.6047249194347497
+      },
+      "conversion": {
+        "kl": 0.07360543310642242,
+        "max_abs": 3.995786190032959,
+        "relative_max_abs": 0.6396034013678769,
+        "top1_agreement": 0.8307291865348816
+      },
+      "trainable_params": 1152792,
+      "total_params": 1383064,
+      "metrics": {
+        "load_imbalance": 0.2502170403798421,
+        "dead_experts": 0,
+        "router_entropy": 0.9371365507443746,
+        "expert_diversity": 0.019617209831873577,
+        "layers": 3
+      },
+      "active_params": 1029400
+    },
+    {
+      "seed": 0,
+      "arm": "orrg_growth",
+      "seed_val": {
+        "prose": 2.089895551854914,
+        "code": 1.3826204321601174,
+        "math": 1.8019179224967956,
+        "overall": 1.7581446355039425
+      },
+      "val": {
+        "prose": 1.8404383876106956,
+        "code": 1.214307730848139,
+        "math": 1.7816653966903686,
+        "overall": 1.612137171716401
+      },
+      "conversion": {
+        "kl": -2.9556033176447727e-09,
+        "max_abs": 2.6226043701171875e-06,
+        "relative_max_abs": 4.197989070970225e-07,
+        "top1_agreement": 1.0
+      },
+      "trainable_params": 710424,
+      "total_params": 1383064,
+      "metrics": {
+        "load_imbalance": 0.3885633945465088,
+        "dead_experts": 0,
+        "router_entropy": 0.8617596626281738,
+        "expert_diversity": 0.041827683647473655,
+        "layers": 3
+      },
+      "active_params": 1029400
+    }
+  ]
+}
