@@ -53,6 +53,27 @@ The answer to "does residual capacity pay once dense saturates" is the compariso
 of those endpoints against 3.0171. **It is not yet measured**, and this report
 will be updated when they land.
 
+## Checkpoint/resume verification
+
+The 2,660-step arms are long enough that a crash must not silently restart them,
+so checkpoints were validated on the live run, not only in unit tests:
+
+* `orrg_all` wrote `experiments/results/ckpt_orrg_all.pt` at step 250 (2.7 GB:
+  1,602 trainable tensors, Adafactor state, OneCycle state, torch and CUDA RNG
+  states).
+* The arm was then killed by PID and relaunched with `--resume --ckpt-every 250`.
+  The log prints `resuming from step 250/2660`, and the next trace (step 300) is
+  `val=2.9042`, continuing the pre-kill trend (2.8091 at 100, 2.8656 at 200).
+* A separate-process test outside the live run (tiny model, interrupted at step 3
+  of 6, resumed in a fresh interpreter) reproduces the uninterrupted final
+  parameters with `max_abs_diff 0.0`.
+* The first live resume attempt exposed a real bug: `map_location=device` moved
+  the saved CPU RNG byte states to CUDA and `torch.set_rng_state` rejected them
+  (`TypeError: RNG state must be a torch.ByteTensor`). Fixed by normalizing both
+  RNG states to CPU on load (`055dd93`); the resumed arm runs on the fixed code.
+* A resumed arm skips the fresh-model `trace 0`, so its trace starts at the
+  checkpoint step rather than reporting an untrained step 0.
+
 ## Reproduce
 
 ```bash
