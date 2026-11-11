@@ -135,7 +135,49 @@ so checkpoints were validated on the live run, not only in unit tests:
 ## Result: two-epoch comparison
 
 <!-- P2-RESULT:START -->
-_Pending: waiting for `p2_epochs_orrg_all.json` and `p2_epochs_orrg_orth_mag.json`._
+
+Compared against the dense two-epoch endpoint of **3.0171** at matched steps, schedule and data (2,660 steps x batch 4 x seq 256 = 2.72M tokens).
+
+| arm | val before | val after | Δ vs dense (neg = better) | dead experts | imbalance | diversity | residual share | orth | s/step |
+|---|---|---|---|---|---|---|---|---|---|
+| dense | 3.0257 | 3.0171 | – | – | – | – | – | – | 0.46 |
+| orrg_all | 3.0258 | 3.0370 | +0.0199 | 14 | 0.423 | 0.0014 | 0.0669 | 0.2486 | 8.21 |
+| orrg_orth_mag | 3.0314 | 3.0354 | +0.0182 | 0 | 0.367 | 0.4308 | 0.1188 | 0.0081 | 3.79 |
+
+**Verdict.** Neither arm beats dense (3.0171): `orrg_all` +0.0199, `orrg_orth_mag` +0.0182. Residual capacity still does not pay, so the extra parameters buy nothing at this data budget. Read the endpoint as a late-training regime, not as either model's best: dense bottoms out at 2.8039 (step 100) and gives back 0.2132 nats by the endpoint; the arms' minima are `orrg_all` 2.9042 (step 300), `orrg_orth_mag` 2.8095 (step 100). With one seed and a 0.005-nat margin, the sign is the result and the size is indicative.
+
+| step | dense | orrg_all | orrg_orth_mag |
+|---|---|---|---|
+| 0 | 3.0257 | – | 3.0314 |
+| 100 | 2.8039 | – | 2.8095 |
+| 200 | 2.8575 | – | 2.8667 |
+| 300 | 2.8864 | 2.9042 | 2.9029 |
+| 400 | 2.8932 | 2.9063 | 2.9045 |
+| 500 | 2.9042 | 2.9170 | 2.9164 |
+| 600 | 2.9248 | 2.9400 | 2.9380 |
+| 700 | 2.9179 | 2.9366 | 2.9273 |
+| 800 | 2.9324 | 2.9529 | 2.9469 |
+| 900 | 2.9448 | 2.9630 | 2.9570 |
+| 1000 | 2.9453 | 2.9605 | 2.9569 |
+| 1100 | 2.9404 | 2.9590 | 2.9536 |
+| 1200 | 2.9879 | 3.0101 | 3.0046 |
+| 1300 | 2.9428 | 2.9585 | 2.9568 |
+| 1400 | 2.9547 | 2.9689 | 2.9658 |
+| 1500 | 2.9709 | 2.9858 | 2.9913 |
+| 1600 | 2.9764 | 2.9923 | 2.9921 |
+| 1700 | 2.9960 | 3.0072 | 3.0100 |
+| 1800 | 2.9807 | 2.9967 | 2.9962 |
+| 1900 | 2.9986 | 3.0161 | 3.0146 |
+| 2000 | 2.9887 | 3.0051 | 3.0066 |
+| 2100 | 2.9959 | 3.0094 | 3.0121 |
+| 2200 | 2.9995 | 3.0157 | 3.0149 |
+| 2300 | 3.0198 | 3.0401 | 3.0400 |
+| 2400 | 3.0181 | 3.0385 | 3.0364 |
+| 2500 | 3.0217 | 3.0407 | 3.0396 |
+| 2600 | 3.0173 | 3.0368 | 3.0349 |
+
+Context: at the 819k-token rung `orrg_all` trailed dense by 0.0085 nats (2.8289 vs 2.8204). That rung ran a shorter total schedule, so the movement between rungs is indicative rather than a clean data-scaling curve.
+
 <!-- P2-RESULT:END -->
 
 ## Reproduce
