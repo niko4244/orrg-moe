@@ -1,0 +1,324 @@
+{
+  "args": {
+    "steps": 2660,
+    "seeds": 1,
+    "seq": 256,
+    "batch": 4,
+    "lr": 0.0002,
+    "bias_rate": 0.0,
+    "distill_coef": 0.1,
+    "distill_tokens": 128,
+    "optimizer": "adafactor",
+    "cluster_tokens": 512,
+    "shared": 2,
+    "groups": 4,
+    "variants": 3,
+    "log_every": 100,
+    "trace_every": 100,
+    "orth_step": 3e-05,
+    "orth_margin": 0.5,
+    "distill_target_temp": 0.25,
+    "residual_noise": 0.02,
+    "down_init_scale": 0.05,
+    "resume": true,
+    "ckpt_every": 250,
+    "arms": [
+      "orrg_all"
+    ],
+    "max_chars": 6000000,
+    "out": "experiments/results/p2_epochs_orrg_all.json"
+  },
+  "rows": [
+    {
+      "seed": 0,
+      "arm": "orrg_all",
+      "val_before": 3.025813728570938,
+      "val_after": 3.036997079849243,
+      "delta": 0.011183351278305054,
+      "conversion": {
+        "kl": 3.929156999760153e-10,
+        "max_abs": 0.00011396408081054688,
+        "relative_max_abs": 3.873500987400404e-06,
+        "top1_agreement": 1.0
+      },
+      "trainable_params": 676701376,
+      "total_params": 676701376,
+      "active_params": 519384256,
+      "seconds_per_step": 8.21289234161377,
+      "metrics": {
+        "load_imbalance": 0.4234619140625,
+        "dead_experts": 14,
+        "router_entropy": 0.9606737326830626,
+        "expert_diversity": 0.0013728137128055096,
+        "layers": 32
+      },
+      "trace": [
+        {
+          "step": 300,
+          "val": 2.9041543304920197,
+          "imbalance": 0.13287353515625,
+          "dead": 0,
+          "diversity": 0.0003344602882862091,
+          "entropy": 0.9984030295163393,
+          "residual_share": 0.03803511648548988,
+          "orth": 0.24966564774513245,
+          "distill": null
+        },
+        {
+          "step": 400,
+          "val": 2.9063006937503815,
+          "imbalance": 0.156280517578125,
+          "dead": 0,
+          "diversity": 0.00045929010957479477,
+          "entropy": 0.9981650672852993,
+          "residual_share": 0.04410762428846632,
+          "orth": 0.24954092502593994,
+          "distill": null
+        },
+        {
+          "step": 500,
+          "val": 2.916985183954239,
+          "imbalance": 0.157257080078125,
+          "dead": 0,
+          "diversity": 0.0005784849636256695,
+          "entropy": 0.9980616979300976,
+          "residual_share": 0.04904410644028486,
+          "orth": 0.2494218349456787,
+          "distill": null
+        },
+        {
+          "step": 600,
+          "val": 2.940013140439987,
+          "imbalance": 0.152008056640625,
+          "dead": 0,
+          "diversity": 0.0006886771880090237,
+          "entropy": 0.9981501027941704,
+          "residual_share": 0.053161912406185965,
+          "orth": 0.24931180477142334,
+          "distill": null
+        },
+        {
+          "step": 700,
+          "val": 2.936605393886566,
+          "imbalance": 0.16162109375,
+          "dead": 0,
+          "diversity": 0.0007918663322925568,
+          "entropy": 0.9979542810469866,
+          "residual_share": 0.05700556880176414,
+          "orth": 0.24920877814292908,
+          "distill": null
+        },
+        {
+          "step": 800,
+          "val": 2.9529240429401398,
+          "imbalance": 0.168182373046875,
+          "dead": 0,
+          "diversity": 0.0008872430771589279,
+          "entropy": 0.9976528137922287,
+          "residual_share": 0.05998919466471445,
+          "orth": 0.2491135597229004,
+          "distill": null
+        },
+        {
+          "step": 900,
+          "val": 2.9630174934864044,
+          "imbalance": 0.171783447265625,
+          "dead": 0,
+          "diversity": 0.0009740120731294155,
+          "entropy": 0.9970117658376694,
+          "residual_share": 0.06286667494824927,
+          "orth": 0.24902693927288055,
+          "distill": null
+        },
+        {
+          "step": 1000,
+          "val": 2.9604949057102203,
+          "imbalance": 0.2042236328125,
+          "dead": 0,
+          "diversity": 0.001050521619617939,
+          "entropy": 0.9963253270834684,
+          "residual_share": 0.06514601328836224,
+          "orth": 0.24895060062408447,
+          "distill": null
+        },
+        {
+          "step": 1100,
+          "val": 2.958951711654663,
+          "imbalance": 0.208526611328125,
+          "dead": 0,
+          "diversity": 0.0011176667176187038,
+          "entropy": 0.9958841744810343,
+          "residual_share": 0.06666174795275352,
+          "orth": 0.24888360500335693,
+          "distill": null
+        },
+        {
+          "step": 1200,
+          "val": 3.010073482990265,
+          "imbalance": 0.249542236328125,
+          "dead": 0,
+          "diversity": 0.0011752867139875889,
+          "entropy": 0.9936246462166309,
+          "residual_share": 0.06768263465178923,
+          "orth": 0.24882610142230988,
+          "distill": null
+        },
+        {
+          "step": 1300,
+          "val": 2.95853129029274,
+          "imbalance": 0.26885986328125,
+          "dead": 0,
+          "diversity": 0.0012225979007780552,
+          "entropy": 0.9929444249719381,
+          "residual_share": 0.06895079984212975,
+          "orth": 0.24877890944480896,
+          "distill": null
+        },
+        {
+          "step": 1400,
+          "val": 2.9688873887062073,
+          "imbalance": 0.293701171875,
+          "dead": 0,
+          "diversity": 0.0012611458078026772,
+          "entropy": 0.9901105426251888,
+          "residual_share": 0.06943471764288087,
+          "orth": 0.24874046444892883,
+          "distill": null
+        },
+        {
+          "step": 1500,
+          "val": 2.985779285430908,
+          "imbalance": 0.324676513671875,
+          "dead": 0,
+          "diversity": 0.0012914477847516537,
+          "entropy": 0.9871550127863884,
+          "residual_share": 0.06940422944772083,
+          "orth": 0.24871022999286652,
+          "distill": null
+        },
+        {
+          "step": 1600,
+          "val": 2.9923386573791504,
+          "imbalance": 0.34014892578125,
+          "dead": 0,
+          "diversity": 0.001315114088356495,
+          "entropy": 0.9816546943038702,
+          "residual_share": 0.06911001941044043,
+          "orth": 0.24868664145469666,
+          "distill": null
+        },
+        {
+          "step": 1700,
+          "val": 3.00724059343338,
+          "imbalance": 0.363494873046875,
+          "dead": 1,
+          "diversity": 0.0013335729017853737,
+          "entropy": 0.9801633656024933,
+          "residual_share": 0.06891114634183795,
+          "orth": 0.24866822361946106,
+          "distill": null
+        },
+        {
+          "step": 1800,
+          "val": 2.9967466592788696,
+          "imbalance": 0.382843017578125,
+          "dead": 2,
+          "diversity": 0.0013466081582009792,
+          "entropy": 0.9759982600808144,
+          "residual_share": 0.06861485691206422,
+          "orth": 0.24865522980690002,
+          "distill": null
+        },
+        {
+          "step": 1900,
+          "val": 3.0160504579544067,
+          "imbalance": 0.386383056640625,
+          "dead": 3,
+          "diversity": 0.001355986576527357,
+          "entropy": 0.9724023751914501,
+          "residual_share": 0.06826590618501603,
+          "orth": 0.2486458718776703,
+          "distill": null
+        },
+        {
+          "step": 2000,
+          "val": 3.0050611793994904,
+          "imbalance": 0.394989013671875,
+          "dead": 7,
+          "diversity": 0.0013623442500829697,
+          "entropy": 0.9709409717470407,
+          "residual_share": 0.06788258432599449,
+          "orth": 0.2486395388841629,
+          "distill": null
+        },
+        {
+          "step": 2100,
+          "val": 3.009437680244446,
+          "imbalance": 0.40728759765625,
+          "dead": 5,
+          "diversity": 0.0013668914325535297,
+          "entropy": 0.9685708489269018,
+          "residual_share": 0.06753777031810287,
+          "orth": 0.24863499402999878,
+          "distill": null
+        },
+        {
+          "step": 2200,
+          "val": 3.0157476365566254,
+          "imbalance": 0.41619873046875,
+          "dead": 6,
+          "diversity": 0.0013696611858904362,
+          "entropy": 0.9658083971589804,
+          "residual_share": 0.06726567848270161,
+          "orth": 0.24863223731517792,
+          "distill": null
+        },
+        {
+          "step": 2300,
+          "val": 3.040133446455002,
+          "imbalance": 0.423004150390625,
+          "dead": 11,
+          "diversity": 0.0013713887892663479,
+          "entropy": 0.962844155728817,
+          "residual_share": 0.06711574781736719,
+          "orth": 0.24863052368164062,
+          "distill": null
+        },
+        {
+          "step": 2400,
+          "val": 3.0385147035121918,
+          "imbalance": 0.422637939453125,
+          "dead": 13,
+          "diversity": 0.0013723154552280903,
+          "entropy": 0.9623090326786041,
+          "residual_share": 0.06687359484543003,
+          "orth": 0.2486295849084854,
+          "distill": null
+        },
+        {
+          "step": 2500,
+          "val": 3.0406818985939026,
+          "imbalance": 0.4219970703125,
+          "dead": 9,
+          "diversity": 0.0013727135956287384,
+          "entropy": 0.9570948593318462,
+          "residual_share": 0.0668817035821071,
+          "orth": 0.24862919747829437,
+          "distill": null
+        },
+        {
+          "step": 2600,
+          "val": 3.0368487536907196,
+          "imbalance": 0.41864013671875,
+          "dead": 11,
+          "diversity": 0.0013728062622249126,
+          "entropy": 0.9599672593176365,
+          "residual_share": 0.06693777397607403,
+          "orth": 0.2486291080713272,
+          "distill": null
+        }
+      ],
+      "clustering": null
+    }
+  ]
+}
