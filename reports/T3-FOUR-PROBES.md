@@ -95,9 +95,13 @@ prove each shape wins or expose it; `BATCHED_BELOW_ROWS = 4,096` in the shipped 
 | decode_b64 | 0.40× | 0.40× |
 <!-- END serving-table -->
 
-Run-to-run spread is 4–20% on the fused arm (worst cell: b64 prefill, 54.2k–65.1k)
-and under 5% on both dense arms, so the ratio brackets above are meaningful but
-any single-shot number from the earlier harness over-read differences under 10%.
+The spread is uneven: 6% at b64 prefill on the fused arm but 30–50% on the small-batch
+cells (prefill b1 2.4k–3.7k), where a step is short enough for the clock ramp to
+matter. Ratios are therefore taken per repeat, and the batched-vs-grouped comparison
+runs its grouped twin immediately after the batched arm: arm order alone accounted for
+0.12 of spread between identical configurations when the twins sat at opposite ends of
+the sweep, and 0.05 once they were adjacent. `render_report.py` prints that noise floor
+and refuses to pass a batched shape more than two points under it.
 
 **Verdict: the prefill gap was mostly implementation, and so was half of the decode
 gap.** Fused dispatch beats the reference path by 1.9–5.7× at k=1 and 2.6–10.3× at
