@@ -27,7 +27,15 @@ import torch.nn.functional as F
 # instead two batched matmuls (shards uniform, residual segments padded to a fixed
 # capacity), which is 0.48-0.93x the time up to ~25k rows and 1.4-1.9x above it as
 # the padding waste grows (reports/T3-FOUR-PROBES.md 1f).
-BATCHED_BELOW_ROWS = 32_768
+# Measured, not derived: the layer probe puts the batched path ahead to ~24.6k rows,
+# but on the full harness model prefill b8 (12,288 rows at k=1, 16,384 at k=2) already
+# loses 12% and 45% to the grouped path, while every decode shape and prefill b1
+# (<=2,048 rows) wins. The threshold is therefore set from model-level data, just
+# above the largest shape that wins.
+BATCHED_BELOW_ROWS = 4_096
+# ...and not below this either: decode b1 packs 12-16 rows, where the gather/scatter
+# prologue costs more than the launches it removes (0.86x end to end).
+MIN_BATCHED_ROWS = 64
 
 
 def grouped_mm(a: torch.Tensor, b: torch.Tensor, offs: torch.Tensor) -> torch.Tensor:
@@ -185,7 +193,7 @@ class FusedDispatch:
     def forward(self, flat: torch.Tensor) -> torch.Tensor:
         tokens = flat.shape[0]
         packed, offs, rows_sorted, scales_sorted = self._prepare(flat)
-        if packed.shape[0] <= BATCHED_BELOW_ROWS:
+        if MIN_BATCHED_ROWS <= packed.shape[0] <= BATCHED_BELOW_ROWS:
             return self._batched(tokens, packed, offs, rows_sorted, scales_sorted)
         return self._grouped(tokens, packed, offs, rows_sorted, scales_sorted)
 

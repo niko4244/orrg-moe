@@ -112,7 +112,9 @@ def main() -> int:
             x = torch.randn(tokens, HIDDEN, device=DEVICE, dtype=torch.bfloat16)
             grouped, batched = timed_pair(lambda: layer(x), lambda: batched_forward(state, x))
             capacity = residual_capacity(tokens, state.k)
-            rows[tokens] = {"grouped_ms": grouped, "batched_ms": batched, "capacity": capacity}
+            packed_rows = tokens * (len(state.shards) + state.k * state.groups)
+            rows[tokens] = {"grouped_ms": grouped, "batched_ms": batched,
+                           "capacity": capacity, "rows": packed_rows}
             print(f"| {tokens} | {grouped:.3f} ms | {batched:.3f} ms | {batched / grouped:.2f} |")
 
     out = Path("experiments/results/batched_dispatch.json")

@@ -29,6 +29,7 @@ from pathlib import Path
 import torch
 from transformers import LlamaConfig, LlamaForCausalLM
 
+import orrg.dispatch as orrg_dispatch
 from orrg import MoEConfig, convert_model
 
 HIDDEN, INTER, LAYERS, HEADS, VOCAB = 768, 3072, 8, 8, 8192
@@ -169,16 +170,36 @@ def main() -> int:
         f"(+{extra/1e6:.1f}M, +{100*extra/active[1]:.1f}%)", flush=True,
     )
 
-    # Discard one full sweep: the first model touched on each shape otherwise
-    # measures the GPU clock ramp.
-    for model in models.values():
-        sweep(model)
+    # Every fused arm is also measured with the batched small-row path disabled, so
+    # the report can compare both dispatches on identical weights. The threshold is
+    # read from the library at call time, so a temporary override is enough.
+    shipped = orrg_dispatch.BATCHED_BELOW_ROWS
+    # Each grouped twin sits immediately after its batched arm: arm order is the
+    # sweep's main bias (clock ramp and allocator state drift within a round), and
+    # adjacent arms see nearly the same conditions.
+    arms = []
+    for name, model in models.items():
+        arms.append((name, model, None))
+        if name.startswith("fused_"):
+            arms.append((f"{name}_grouped", model, 0))
+
+    def sweep_arm(model, threshold):
+        orrg_dispatch.BATCHED_BELOW_ROWS = shipped if threshold is None else threshold
+        try:
+            return sweep(model)
+        finally:
+            orrg_dispatch.BATCHED_BELOW_ROWS = shipped
+
+    # Discard one full sweep: the first arm touched on each shape otherwise measures
+    # the GPU clock ramp.
+    for _, model, threshold in arms:
+        sweep_arm(model, threshold)
     print("warm-up sweep done", flush=True)
 
-    samples: dict[str, list[dict[str, float]]] = {name: [] for name in models}
+    samples: dict[str, list[dict[str, float]]] = {name: [] for name, _, _ in arms}
     for repeat in range(REPEATS):
-        for name, model in models.items():
-            samples[name].append(sweep(model))
+        for name, model, threshold in arms:
+            samples[name].append(sweep_arm(model, threshold))
             torch.cuda.empty_cache()
         print(f"repeat {repeat + 1}/{REPEATS} done", flush=True)
 
@@ -195,7 +216,7 @@ def main() -> int:
             for key in keys
         }
 
-    names = list(models)
+    names = [name for name, _, _ in arms]
     print("\n| metric | " + " | ".join(names) + " |")
     print("|---" * (len(names) + 1) + "|")
     for key in keys:
@@ -205,10 +226,12 @@ def main() -> int:
         ) + " |")
 
     pairs = [
+        ("fused_k1", "fused_k1_grouped"), ("fused_k2", "fused_k2_grouped"),
         ("fused_k1", "python_k1"), ("fused_k2", "python_k2"),
         ("fused_k1", "dense_active_k1"), ("fused_k2", "dense_active_k2"),
         ("fused_k1", "dense_total"), ("fused_k2", "dense_total"),
         ("fused_k2", "fused_k1"),
+        ("fused_k2_grouped", "fused_k1_grouped"),
     ]
     print("\nratios (median of 3 repeats [min-max]):")
     for a, b in pairs:
@@ -226,6 +249,9 @@ def main() -> int:
         "params": params,
         "active": {str(k): v for k, v in active.items()},
         "repeats": REPEATS,
+        "batched_below_rows": shipped,
+        "min_batched_rows": orrg_dispatch.MIN_BATCHED_ROWS,
+        "prefill_seq": PREFILL_SEQ,
         "stats": stats,
         "ratios": {f"{a}_over_{b}": ratio(a, b) for a, b in pairs},
         "samples": samples,

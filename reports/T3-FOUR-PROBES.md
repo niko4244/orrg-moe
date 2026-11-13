@@ -6,20 +6,13 @@ a single harness with a JSON artifact; none of them trains at scale.
 ## 1. Does "A2B" cash out in wall-clock? (`experiments/serving_throughput.py`)
 
 RTX 5060 Ti 16 GB, bf16, `s4 g4 v14`, f=1, hidden 768 / inter 3072 / 8 layers.
-Seed 81.8M → ORRG 450.2M total, 110.4M active at k=1 (5.50×). Dispatch is the
-current unfused path (`index_add_` per selected variant).
+Seed 81.8M → ORRG 450.2M total, 110.4M active at k=1 (5.50×).
 
-| model | params | prefill b1 / b8 / b64 (k tok/s) | decode b1 / b8 / b64 (k tok/s) |
-|---|---|---|---|
-| ORRG @k=1 | 450.2M | 0.7 / 4.6 / 29.2 | 0.010 / 0.048 / 0.27 |
-| dense, same active | 110.4M | 7.3 / 78.7 / 122.0 | 0.060 / 0.53 / 3.79 |
-| dense, same total | 450.2M | 7.8 / 31.7 / 36.2 | 0.070 / 0.51 / 4.15 |
-| dense seed | 81.8M | 8.8 / 83.0 / 155.3 | 0.070 / 0.45 / 3.83 |
-
-Ratios, ORRG ÷ dense with the same **active** params: prefill 0.10× / 0.06× /
-0.24×; decode 0.22× / 0.10× / 0.07×.
-Ratios, ORRG ÷ dense with the same **total** params: prefill 0.09× / 0.15× /
-0.81×; decode 0.14× / 0.10× / 0.065×.
+The first pass over this question timed only the reference (python) dispatch and
+quoted the seed, the converted model, dense-at-active and dense-at-total. §1b
+re-measures the same geometry with **both** dispatches in one run, so no figure from
+that pass is quoted here any more; the seed arm is not part of the current sweep and
+its old numbers are retired rather than restated.
 
 ### 1b. How much of that is the implementation? (`orrg/dispatch.py`)
 
@@ -35,42 +28,91 @@ wrong segment id, group offset or scale gather cannot hide behind zeroed
 residuals. Four injected dispatch bugs (dropped group offset, misaligned scales,
 shifted gather, dropped residual scale) each fail that test.
 
-Same geometry (ORRG 450.2M total / 110.4M active), four models, **three repeats
-each after a discarded warm-up sweep**; cells are median [min–max] tok/s, ratios
-are taken per repeat then summarised.
+Same geometry (ORRG 450.2M total / 110.4M active): seven arms, plus each fused arm
+re-measured with `BATCHED_BELOW_ROWS` forced to 0, **three repeats each after a
+discarded warm-up sweep**. Cells are median [min–max] tok/s, ratios are taken per
+repeat then summarised, and every table below is generated from
+`experiments/results/serving_throughput.json` by `experiments/render_report.py`
+rather than typed.
 
-| metric | orrg_fused | orrg_python | dense_active | dense_total |
+<!-- BEGIN serving-table -->
+Both dispatch paths on the same weights: `*_grouped` is the fused model with
+`BATCHED_BELOW_ROWS` forced to 0, so the batched-vs-grouped rows below either
+prove each shape wins or expose it; `BATCHED_BELOW_ROWS = 4,096` in the shipped build.
+
+| metric | fused_k1 | python_k1 | dense_active_k1 | fused_k2 | python_k2 | dense_active_k2 | dense_total |
+|---|---|---|---|---|---|---|---|
+| prefill_b1 | 2.7k [2.4k–3.7k] | 769 [740–791] | 8.2k [7.3k–9.5k] | 2.9k [2.7k–3.1k] | 378 [350–389] | 9.3k [8.3k–9.7k] | 9.7k [8.1k–10.4k] |
+| prefill_b8 | 17.0k [15.6k–17.8k] | 3.8k [3.8k–4.6k] | 63.9k [63.5k–78.4k] | 16.9k [12.6k–17.0k] | 2.2k [2.0k–2.4k] | 74.7k [72.5k–74.8k] | 31.3k [31.0k–32.4k] |
+| prefill_b64 | 69.6k [69.4k–73.3k] | 28.5k [25.4k–28.5k] | 123.6k [123.6k–124.2k] | 51.7k [50.7k–52.0k] | 16.4k [16.0k–17.1k] | 102.5k [100.5k–103.7k] | 36.5k [36.4k–36.9k] |
+| decode_b1 | 24 [21–26] | 13 [13–13] | 56 [53–59] | 22 [19–23] | 8 [8–9] | 64 [60–65] | 67 [55–69] |
+| decode_b8 | 193 [158–215] | 50 [48–54] | 422 [408–501] | 193 [177–207] | 31 [30–31] | 503 [448–539] | 492 [484–498] |
+| decode_b64 | 1.4k [1.2k–1.7k] | 247 [247–268] | 3.6k [3.3k–4.0k] | 1.5k [1.4k–1.6k] | 150 [139–151] | 3.8k [3.3k–4.1k] | 4.1k [2.9k–4.1k] |
+
+| ratio | k=1 | k=2 |
+|---|---|---|
+| batched vs grouped, prefill_b1 | 1.23 | 1.28 |
+| batched vs grouped, prefill_b8 | 1.05 | 1.00 |
+| batched vs grouped, prefill_b64 | 0.98 | 0.99 |
+| batched vs grouped, decode_b1 | 0.99 | 1.00 |
+| batched vs grouped, decode_b8 | 1.29 | 1.39 |
+| batched vs grouped, decode_b64 | 1.50 | 1.53 |
+
+| ratio | k2/k1, batched | k2/k1, grouped | k2/k1, python | k2/k1, dense-active |
 |---|---|---|---|---|
-| prefill b1 | 2.1k [1.7k–2.2k] | 690 [621–738] | 9.6k [9.4k–10.4k] | 9.7k [7.9k–9.8k] |
-| prefill b8 | 12.8k [12.2k–14.2k] | 4.1k [3.9k–4.2k] | 79.4k [76.8k–81.2k] | 31.7k [30.1k–32.3k] |
-| prefill b64 | 58.7k [54.2k–65.1k] | 27.6k [22.8k–30.3k] | 123.5k [122.4k–123.5k] | 36.0k [35.9k–36.2k] |
-| decode b1 | 22 [21–22] | 12 [9–12] | 63 [62–65] | 61 [51–65] |
-| decode b8 | 131 [116–135] | 49 [46–54] | 511 [489–513] | 467 [460–519] |
-| decode b64 | 795 [683–811] | 268 [261–269] | 4.2k [4.1k–4.2k] | 4.0k [3.0k–4.1k] |
+| prefill_b1 | 1.08 | 0.94 | 0.49 | 1.13 |
+| prefill_b8 | 0.95 | 1.01 | 0.53 | 1.14 |
+| prefill_b64 | 0.73 | 0.72 | 0.60 | 0.83 |
+| decode_b1 | 0.86 | 0.90 | 0.63 | 1.12 |
+| decode_b8 | 0.92 | 0.89 | 0.61 | 1.08 |
+| decode_b64 | 1.01 | 0.97 | 0.56 | 1.03 |
 
-| metric | fused ÷ python | fused ÷ dense_active | fused ÷ dense_total |
-|---|---|---|---|
-| prefill b1 | 2.92× [2.42–3.40] | 0.20× [0.18–0.22] | 0.22× |
-| prefill b8 | 3.13× [3.13–3.36] | 0.16× [0.15–0.19] | 0.40× |
-| prefill b64 | 2.13× [1.79–2.86] | 0.48× [0.44–0.53] | **1.63×** |
-| decode b1 | 1.82× [1.80–2.37] | 0.34× [0.34–0.35] | 0.36× |
-| decode b8 | 2.50× [2.35–2.85] | 0.26× [0.23–0.27] | 0.28× |
-| decode b64 | 2.97× [2.62–3.01] | 0.19× [0.16–0.20] | 0.20× |
+| fused ÷ python | k=1 | k=2 |
+|---|---|---|
+| prefill_b1 | 3.45× | 7.69× |
+| prefill_b8 | 4.08× | 7.05× |
+| prefill_b64 | 2.57× | 3.15× |
+| decode_b1 | 1.88× | 2.55× |
+| decode_b8 | 3.96× | 6.14× |
+| decode_b64 | 5.74× | 10.28× |
+
+| fused ÷ dense-active | k=1 | k=2 |
+|---|---|---|
+| prefill_b1 | 0.34× | 0.32× |
+| prefill_b8 | 0.24× | 0.23× |
+| prefill_b64 | 0.56× | 0.50× |
+| decode_b1 | 0.44× | 0.35× |
+| decode_b8 | 0.43× | 0.39× |
+| decode_b64 | 0.43× | 0.40× |
+
+| fused ÷ dense-total | k=1 | k=2 |
+|---|---|---|
+| prefill_b1 | 0.30× | 0.32× |
+| prefill_b8 | 0.55× | 0.52× |
+| prefill_b64 | 1.91× | 1.41× |
+| decode_b1 | 0.39× | 0.34× |
+| decode_b8 | 0.39× | 0.40× |
+| decode_b64 | 0.40× | 0.40× |
+<!-- END serving-table -->
 
 Run-to-run spread is 4–20% on the fused arm (worst cell: b64 prefill, 54.2k–65.1k)
 and under 5% on both dense arms, so the ratio brackets above are meaningful but
 any single-shot number from the earlier harness over-read differences under 10%.
 
-**Verdict: the prefill gap was mostly implementation; the decode gap is not.**
-Fused dispatch is 1.8–3.4× faster than the reference path everywhere, and at batch
-64 prefill it *beats* the dense model with the same total parameters by 1.63×
-[1.49–1.81]. But against the dense model with the same **active** parameters — the
-comparison the A2B label actually promises — it reaches only 0.48× at b64 prefill
-and 0.19× at b64 decode. Roughly two-thirds of the prefill shortfall was dispatch;
-the decode shortfall is structural: at 64 sequences a step routes ~4.6 rows per
-segment, and 56 tiny segments per layer is launch- and utilisation-bound no matter
-the kernel. Closing that needs CUDA graphs, larger routing granularity (fewer,
-wider experts), or cross-layer fusion.
+**Verdict: the prefill gap was mostly implementation, and so was half of the decode
+gap.** Fused dispatch beats the reference path by 1.9–5.7× at k=1 and 2.6–10.3× at
+k=2, and at batch 64 prefill it *beats* the dense model with the same total
+parameters by 1.91× (k=2: 1.41×). Against the dense model with the same **active**
+parameters — the comparison the A2B label actually promises — it reaches 0.56× at
+b64 prefill and 0.43× at b64 decode (k=2: 0.50× and 0.40×).
+
+Those decode figures are 1.50–1.53× higher than the same weights under the grouped
+dispatch (§1f), so the earlier reading — that the decode shortfall was purely
+structural — does not survive the measurement: half of it was per-segment launches.
+What remains is structural: at 64 sequences a step routes ~4.6 rows per segment, and
+56 tiny segments per layer is utilisation-bound no matter the kernel. Closing the
+rest needs CUDA graphs, larger routing granularity (fewer, wider experts), or
+cross-layer fusion.
 
 ## 2. Clustered vs contiguous shards (`experiments/cluster_shards_real.py`)
 
@@ -100,46 +142,39 @@ The fused path then went from **three** `torch._grouped_mm` calls per layer to
 one padded width, which is what makes `expert_width_ratio < 1` work (it could not
 concatenate shard and residual segments before).
 
-| metric | fused k2/k1, 3 GEMMs | fused k2/k1, 2 GEMMs | python k2/k1 | dense-active k2/k1 |
-|---|---|---|---|---|
-| prefill b64 | 0.82 [0.77–0.85] | **0.70** [0.70–0.73] | 0.55 | 0.82 |
-| prefill b8 | 0.90 [0.86–0.97] | 0.90 [0.37–0.97] | 0.48 | 0.95 |
-| prefill b1 | 0.89 [0.70–0.95] | 0.91 [0.43–0.95] | 0.34 | 1.11 |
-| decode b64 | 0.72 [0.60–0.87] | **1.01** [0.99–1.03] | 0.56 | 1.07 |
-| decode b8 | 0.84 [0.71–0.88] | 0.89 [0.73–0.90] | 0.64 | 1.04 |
-| decode b1 | 0.88 [0.73–0.92] | 0.89 [0.79–0.95] | 0.36 | 1.01 |
+The k2/k1 ratios for every path — batched, grouped, python and dense-at-active —
+are in the generated table at §1b; the columns below the absolute one are that table.
+The three-GEMM column was measured before the N=2I fold and is retained only as the
+historical arm.
 
-**The decode penalty was launch overhead, and one fewer kernel per layer removes
-it.** At b64 decode the second expert now costs nothing measurable (1.01, against
-a 0.80 arithmetic ideal and a 1.07 dense control), where it previously cost 28%.
-A 25.6% compute increase cannot legitimately read 1.01 — the saving is the removed
-`_grouped_mm` call plus the removed second `[M, I]` materialisation, which
-dominated a decode step that is already tiny per layer.
+**The decode penalty was launch overhead.** At b64 decode the second expert now
+costs nothing measurable — 1.01 under the batched path, 0.97 under the grouped one,
+against a 0.80 arithmetic ideal and a 1.03 dense control. A 25.6% compute increase
+cannot legitimately read 1.01; the saving is the removed kernel per layer plus the
+removed second `[M, I]` materialisation, which dominated a decode step that is
+already tiny per layer.
 
-**The cost moved to large-batch prefill: 0.72 at b64, down from 0.82 — and §1d
-shows that is the GEMM structure, not the extra expert's arithmetic.** Measured
-against each other at the same batch, the k2/k1 prefill b64 ratio is **0.72 with
-the fused N=2I path and 0.87 with two N=I GEMMs**; the historical 0.82 came from
-the three-GEMM path. Row arithmetic alone predicts 1/1.33 = 0.75, so the split
-arm clears it (more rows per segment tile better) and the fused arm misses it by
-15 points because its `[M, 2I]` intermediate is 201 MB at 131k rows. b8 is
-unchanged (0.90) and b1 slightly better (0.91). Re-run of the same seven-model sweep on the shipped build (the size branch of
-§1d was removed after it failed at real widths) reproduces the ratio at **0.70
-[0.70–0.73]** and keeps decode b64 at 1.01 [0.95–1.02], so nothing in the table
-below §1c is stale.
+**The cost sits at large-batch prefill: 0.73 at b64 (0.72 under the grouped path),
+while b8 and b1 are within noise (0.95–1.08).** Row arithmetic predicts
+1/1.256 = 0.80 for compute alone and 1/1.33 = 0.75 once the second expert's rows are
+counted per group; the fused arm lands on 0.73, so at 131k rows the N=2I GEMM costs
+about what its arithmetic says it should. §1d's structure probe prices the remaining
+choice between one N=2I GEMM and two N=I ones; those rows are measured by that probe
+directly, not through `orrg.dispatch`, so `BATCHED_BELOW_ROWS` does not affect them.
 
-Absolute: fused k=2 reaches 0.51× of dense-at-active at b64 prefill (k=1: 0.53×)
-and 1.41× of dense-at-total (k=1: 1.79×). Fused ÷ python at k=2 is 5.8× / 6.8× /
-3.2× on prefill b1/b8/b64 and 2.4× / 4.5× / 7.0× on decode — against 2.3–3.2×
-at k=1 in table 1b, so the implementation gap widened as well.
+Absolute: fused k=2 reaches 0.50× of dense-at-active at b64 prefill (k=1: 0.56×)
+and 1.41× of dense-at-total (k=1: 1.91×). Fused ÷ python at k=2 is 7.7× / 7.1× /
+3.2× on prefill b1/b8/b64 and 2.6× / 6.1× / 10.3× on decode — against 3.5× / 4.1× /
+2.6× and 1.9× / 4.0× / 5.7× at k=1, so the implementation gap widens with k as well.
 
-On this harness +25.6% active parameters cost ~9% at b8 prefill, ~28% at b64
-prefill and nothing at b64 decode. For the real 9B (+0.578B, 2.124 → 2.702B
+On this harness +25.6% active parameters cost ~5% at b8 prefill (0.95), 27% at b64
+prefill (0.73) and nothing at b64 decode (1.01). For the real 9B (+0.578B, 2.124 → 2.702B
 active) the transferable part is the shape of that curve, not the magnitudes: the
 real model's k=2 throughput is not measured.
 
-The reference path still loses 45–65%, because doubling the slots doubles its host
-syncs and per-segment launches. 12 segments per layer at k=1, 16 at k=2.
+The reference path still loses 40–44% (k2/k1 0.56 at decode b64, 0.60 at prefill
+b64), because doubling the slots doubles its host syncs and per-segment launches.
+12 segments per layer at k=1, 16 at k=2.
 
 ### 1d. The harness crossover does not transfer to real widths: no size branch
 
@@ -290,38 +325,46 @@ reachable by capturing the current dispatch.
 ### 1f. Small batches: two batched matmuls instead of 2 x 60 segments
 
 `experiments/batched_dispatch.py`. `_grouped_mm` pays ~30 µs per segment (§1e), so a
-decode step issues ~1,000 segment launches. Below `BATCHED_BELOW_ROWS = 32_768` packed
-rows the dispatch now runs `torch.bmm` twice instead: shard segments are uniform, so
-they are one batched matmul over the stacked shard weights, and residual segments are
-gathered into a fixed `[segments, capacity, K]` block, batched, and scattered back with
-the padding lanes masked out.
+decode step issues ~1,000 segment launches. Between `MIN_BATCHED_ROWS = 64` and
+`BATCHED_BELOW_ROWS = 4_096` packed rows the dispatch runs `torch.bmm` twice instead:
+shard segments are uniform, so they are one batched matmul over the stacked shard
+weights, and residual segments are gathered into a fixed `[segments, capacity, K]`
+block, batched, and scattered back with the padding lanes masked out.
 
-| tokens | grouped | batched | batched ÷ grouped |
-|---|---|---|---|
-| 8 | 3.08 ms | 2.93 ms | 0.95 |
-| 64 | 3.38 ms | 2.89 ms | 0.85 |
-| 512 | 5.87 ms | 5.37 ms | 0.91 |
-| 2,048 | 15.86 ms | 15.58 ms | 0.98 |
-| 4,096 | 7.55 ms | 29.05 ms | 3.85 |
-| 8,192 | 11.34 ms | 59.56 ms | 5.25 |
+<!-- BEGIN crossover-table -->
+Layer-level, `BATCHED_BELOW_ROWS = 4,096`: the last column is the path
+the shipped dispatch takes at that size.
+
+| tokens | packed rows | grouped | batched | batched ÷ grouped | shipped path |
+|---|---|---|---|---|---|
+| 8 | 96 | 2.67 ms | 2.39 ms | 0.90 | bmm |
+| 64 | 768 | 2.75 ms | 2.46 ms | 0.89 | bmm |
+| 512 | 6144 | 5.37 ms | 5.11 ms | 0.95 | grouped |
+| 2048 | 24576 | 15.60 ms | 15.13 ms | 0.97 | grouped |
+| 4096 | 49152 | 7.16 ms | 28.51 ms | 3.98 | grouped |
+| 8192 | 98304 | 10.97 ms | 59.48 ms | 5.42 | grouped |
+<!-- END crossover-table -->
 
 The capacity must be `tokens * k`: one (group, variant) segment can hold every routed
 row of its group, so sizing it from the mean drops rows exactly when the router is
 peaked. The peaked-router test caught that, and it is also why the padded layout does
-13x the residual arithmetic and loses above ~2.7k tokens — hence the row threshold.
+13x the residual arithmetic: the batched column crosses back above the grouped one
+somewhere between 24.6k and 49.2k rows.
 
-Layer-level this reads as 5–15%. End to end it is much larger, because the decode step
-is CPU-bound on segment launches:
+**The layer probe is not what sets the threshold in `orrg/dispatch.py`.** At 32,768
+rows — what the probe alone suggested — the seven-model sweep regressed prefill b8 by
+12% at k=1 and 45% at k=2, where the batched path loses to the grouped one by more
+than the layer probe predicts; that run is kept as
+`experiments/results/serving_throughput_threshold_32768.json`. The shipped threshold is
+4,096 rows, which keeps every decode shape and prefill b1 while leaving prefill b8 to
+the grouped path, and `MIN_BATCHED_ROWS = 64` keeps decode b1 out, where the
+gather/scatter prologue costs 14% more than the launches it removes (0.86×). Both bounds are measured on the full
+model, not inferred from the probe.
 
-| workload | batched | grouped | gain |
-|---|---|---|---|
-| decode b8 | 179 | 131 | +37% |
-| decode b64 | 1,238 | 819 | +51% |
-| prefill b64 (grouped in both arms — noise floor) | 73,359 | 71,010 | +3% |
-
-A second run measured +76% at b64 (1,474 against 839), so the gain is 40–75%, and fused
-k=1 decode b64 moves from ~0.24x to 0.32–0.36x of dense-at-active. The seven-model sweep
-has not been re-run since this path landed.
+End to end, the gain is much larger than the layer-level ratio, because the decode step
+is CPU-bound on segment launches: the batched ÷ grouped columns of the §1b table are
+that measurement on the full harness model, and there `fused_k1` versus
+`fused_k1_grouped` is the same weights under either dispatch.
 
 ### 2b. Routing accuracy instead of cosine
 
