@@ -2,40 +2,46 @@
   "device": "NVIDIA GeForce RTX 5060 Ti",
   "rows": {
     "8": {
-      "grouped_ms": 2.6671359539031982,
-      "batched_ms": 2.3880319595336914,
-      "capacity": 8,
-      "rows": 96
+      "grouped_ms": 2.9444799423217773,
+      "batched_ms": 1.7868479490280151,
+      "rows": 96,
+      "capacity": 8
     },
     "64": {
-      "grouped_ms": 2.7480640411376953,
-      "batched_ms": 2.4592959880828857,
-      "capacity": 64,
-      "rows": 768
+      "grouped_ms": 4.24729585647583,
+      "batched_ms": 1.819551944732666,
+      "rows": 768,
+      "capacity": 64
     },
     "512": {
-      "grouped_ms": 5.36627197265625,
-      "batched_ms": 5.112192153930664,
-      "capacity": 512,
-      "rows": 6144
+      "grouped_ms": 4.415487766265869,
+      "batched_ms": 4.315008163452148,
+      "rows": 6144,
+      "capacity": 512
+    },
+    "1024": {
+      "grouped_ms": 4.494112014770508,
+      "batched_ms": 7.288991928100586,
+      "rows": 12288,
+      "capacity": 1024
     },
     "2048": {
-      "grouped_ms": 15.595904350280762,
-      "batched_ms": 15.126015663146973,
-      "capacity": 2048,
-      "rows": 24576
+      "grouped_ms": 4.896448135375977,
+      "batched_ms": 14.200736045837402,
+      "rows": 24576,
+      "capacity": 2048
     },
     "4096": {
-      "grouped_ms": 7.1550397872924805,
-      "batched_ms": 28.51046371459961,
-      "capacity": 4096,
-      "rows": 49152
+      "grouped_ms": 5.627776145935059,
+      "batched_ms": 27.70147132873535,
+      "rows": 49152,
+      "capacity": 4096
     },
     "8192": {
-      "grouped_ms": 10.967616081237793,
-      "batched_ms": 59.48486328125,
-      "capacity": 8192,
-      "rows": 98304
+      "grouped_ms": 8.922464370727539,
+      "batched_ms": 57.38636779785156,
+      "rows": 98304,
+      "capacity": 8192
     }
   }
 }

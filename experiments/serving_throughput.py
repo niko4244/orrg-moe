@@ -174,21 +174,20 @@ def main() -> int:
     # the report can compare both dispatches on identical weights. The threshold is
     # read from the library at call time, so a temporary override is enough.
     shipped = orrg_dispatch.BATCHED_BELOW_ROWS
-    # Each grouped twin sits immediately after its batched arm: arm order is the
-    # sweep's main bias (clock ramp and allocator state drift within a round), and
-    # adjacent arms see nearly the same conditions.
+    # Every fused shape is measured on a real batched arm and a real grouped arm, on
+    # the same weights, next to each other: arm order is the sweep's main bias (clock
+    # ramp, allocator state), and adjacent arms see nearly the same conditions. The
+    # shipped arm stays so the tables can show what serving actually does.
     arms = []
     for name, model in models.items():
         arms.append((name, model, None))
         if name.startswith("fused_"):
-            arms.append((f"{name}_grouped", model, 0))
+            arms.append((f"{name}_batched", model, "batched"))
+            arms.append((f"{name}_grouped", model, "grouped"))
 
-    def sweep_arm(model, threshold):
-        orrg_dispatch.BATCHED_BELOW_ROWS = shipped if threshold is None else threshold
-        try:
+    def sweep_arm(model, forced):
+        with orrg_dispatch.force_path(forced):
             return sweep(model)
-        finally:
-            orrg_dispatch.BATCHED_BELOW_ROWS = shipped
 
     # Discard one full sweep: the first arm touched on each shape otherwise measures
     # the GPU clock ramp.
@@ -226,6 +225,7 @@ def main() -> int:
         ) + " |")
 
     pairs = [
+        ("fused_k1_batched", "fused_k1_grouped"), ("fused_k2_batched", "fused_k2_grouped"),
         ("fused_k1", "fused_k1_grouped"), ("fused_k2", "fused_k2_grouped"),
         ("fused_k1", "python_k1"), ("fused_k2", "python_k2"),
         ("fused_k1", "dense_active_k1"), ("fused_k2", "dense_active_k2"),

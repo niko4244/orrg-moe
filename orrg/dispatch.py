@@ -18,6 +18,8 @@ the option for other geometries rather than silently falling back.
 
 from __future__ import annotations
 
+import contextlib
+
 import torch
 import torch.nn.functional as F
 
@@ -32,10 +34,41 @@ import torch.nn.functional as F
 # loses 12% and 45% to the grouped path, while every decode shape and prefill b1
 # (<=2,048 rows) wins. The threshold is therefore set from model-level data, just
 # above the largest shape that wins.
+# Which path a packed size takes: the single source of truth for the gate, so a
+# measurement can force a path without reproducing the decision.
+_FORCE_PATH: str | None = None
+
+
 BATCHED_BELOW_ROWS = 4_096
 # ...and not below this either: decode b1 packs 12-16 rows, where the gather/scatter
 # prologue costs more than the launches it removes (0.86x end to end).
 MIN_BATCHED_ROWS = 64
+
+
+def path_for(rows: int) -> str:
+    """The dispatch path a packed row count takes in the shipped build."""
+
+    if _FORCE_PATH is not None:
+        return _FORCE_PATH
+    return "batched" if MIN_BATCHED_ROWS <= rows <= BATCHED_BELOW_ROWS else "grouped"
+
+
+@contextlib.contextmanager
+def force_path(name: str | None):
+    """Diagnostic only: pin a path so a sweep can price shapes the gate excludes.
+
+    Serving never sets this; it exists so the report can measure batched and grouped
+    on the same shape instead of inferring one of them.
+    """
+
+    global _FORCE_PATH
+    if name not in (None, "batched", "grouped"):
+        raise ValueError(f"unknown dispatch path {name!r}")
+    previous, _FORCE_PATH = _FORCE_PATH, name
+    try:
+        yield
+    finally:
+        _FORCE_PATH = previous
 
 
 def grouped_mm(a: torch.Tensor, b: torch.Tensor, offs: torch.Tensor) -> torch.Tensor:
@@ -193,7 +226,7 @@ class FusedDispatch:
     def forward(self, flat: torch.Tensor) -> torch.Tensor:
         tokens = flat.shape[0]
         packed, offs, rows_sorted, scales_sorted = self._prepare(flat)
-        if MIN_BATCHED_ROWS <= packed.shape[0] <= BATCHED_BELOW_ROWS:
+        if path_for(packed.shape[0]) == "batched":
             return self._batched(tokens, packed, offs, rows_sorted, scales_sorted)
         return self._grouped(tokens, packed, offs, rows_sorted, scales_sorted)
 
