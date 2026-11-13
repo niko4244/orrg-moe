@@ -205,7 +205,6 @@ class FusedDispatch:
         contribution = torch.zeros_like(skeleton, dtype=acc)
         residual_rows = packed[n_shards * tokens :]
         if residual_rows.shape[0]:
-            segments = gate_w.shape[0] - n_shards
             # offs is cumulative over the shard segments then the residual ones, so
             # subtracting the shard total gives residual-relative segment ends. No
             # host sync anywhere: the capacity comes from the token count.

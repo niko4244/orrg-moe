@@ -27,7 +27,7 @@ import torch
 import torch.nn.functional as F
 
 from experiments.harness import DEVICE, HIDDEN, build_layer, timed_pair
-from orrg.dispatch import grouped_mm
+
 
 TOKENS = (8, 64, 512, 2048, 4096, 8192)
 TOL = 2e-2
