@@ -22,10 +22,31 @@ import torch
 import torch.nn.functional as F
 
 
+# ``_grouped_mm`` costs ~30 us per segment whatever the rows, so a decode step
+# pays for ~1,000 segment launches. Below this many packed rows the dispatch is
+# instead two batched matmuls (shards uniform, residual segments padded to a fixed
+# capacity), which is 0.48-0.93x the time up to ~25k rows and 1.4-1.9x above it as
+# the padding waste grows (reports/T3-FOUR-PROBES.md 1f).
+BATCHED_BELOW_ROWS = 32_768
+
+
 def grouped_mm(a: torch.Tensor, b: torch.Tensor, offs: torch.Tensor) -> torch.Tensor:
     """``torch._grouped_mm(a [M, K], b [S, K, N], offs)`` with cumulative offsets."""
 
     return torch._grouped_mm(a, b, offs=offs)
+
+
+def residual_capacity(tokens: int, k: int) -> int:
+    """Rows per residual segment in the batched layout.
+
+    A single (group, variant) segment can hold every routed row of that group, so
+    the only statically safe capacity is ``tokens * k``. Sizing it from the mean
+    would be smaller and cheaper, but it is wrong exactly when the router is
+    peaked: the surplus rows would be dropped rather than routed. Finding the real
+    maximum needs a host sync, which is the cost this path exists to avoid.
+    """
+
+    return max(1, tokens * k)
 
 
 class FusedDispatch:
@@ -42,6 +63,25 @@ class FusedDispatch:
         self.sources = self.shards + [m for group in self.residuals for m in group]
         self._cache = None
         self._key = None
+        self._halves = None
+        self._halves_key = None
+
+    def _split_halves(self):
+        """Contiguous gate/up halves of the stacked weights, for the batched path.
+
+        ``_stacked()`` is what refreshes ``_key`` after an in-place weight change, so
+        it must run before the cache check: reading ``_key`` first would compare two
+        stale keys after ``copy_``/an optimizer step and serve outdated halves.
+        """
+
+        gate_up = self._stacked()[0]
+        if self._halves is None or self._halves_key != self._key:
+            width = gate_up.shape[-1] // 2
+            self._halves = (
+                gate_up[..., :width].contiguous(), gate_up[..., width:].contiguous(),
+            )
+            self._halves_key = self._key
+        return self._halves
     def _stacked(self):
         """Stacked [S, H, I] / [S, I, H] weights, rebuilt when a weight changes."""
 
@@ -91,6 +131,8 @@ class FusedDispatch:
             torch.cat([sd, rd]),
         )
         self._key = key
+        self._halves = None
+        self._halves_key = None
         return self._cache
 
     def _prepare(self, flat: torch.Tensor):
@@ -142,14 +184,63 @@ class FusedDispatch:
 
     def forward(self, flat: torch.Tensor) -> torch.Tensor:
         tokens = flat.shape[0]
-        acc = torch.float32 if flat.dtype in (torch.bfloat16, torch.float16) else flat.dtype
-        n_shards = len(self.shards)
-
         packed, offs, rows_sorted, scales_sorted = self._prepare(flat)
+        if packed.shape[0] <= BATCHED_BELOW_ROWS:
+            return self._batched(tokens, packed, offs, rows_sorted, scales_sorted)
+        return self._grouped(tokens, packed, offs, rows_sorted, scales_sorted)
+
+    def _batched(self, tokens, packed, offs, rows_sorted, scales_sorted):
+        """Two batched matmuls: shards as one bmm, residual segments padded to capacity."""
+
+        acc = torch.float32 if packed.dtype in (torch.bfloat16, torch.float16) else packed.dtype
+        n_shards = len(self.shards)
+        gate_w, up_w = self._split_halves()
+        _, down_w = self._stacked()
+
+        shard_rows = packed[: n_shards * tokens].view(n_shards, tokens, -1)
+        shard_gate = torch.bmm(shard_rows, gate_w[:n_shards])
+        shard_up = torch.bmm(shard_rows, up_w[:n_shards])
+        skeleton = torch.bmm(F.silu(shard_gate) * shard_up, down_w[:n_shards]).sum(0).to(acc)
+
+        contribution = torch.zeros_like(skeleton, dtype=acc)
+        residual_rows = packed[n_shards * tokens :]
+        if residual_rows.shape[0]:
+            segments = gate_w.shape[0] - n_shards
+            # offs is cumulative over the shard segments then the residual ones, so
+            # subtracting the shard total gives residual-relative segment ends. No
+            # host sync anywhere: the capacity comes from the token count.
+            ends = offs[n_shards:].to(torch.long) - offs[n_shards - 1].to(torch.long)
+            starts = torch.cat([
+                torch.zeros(1, dtype=torch.long, device=packed.device), ends[:-1],
+            ])
+            lanes = torch.arange(residual_capacity(tokens, self.k),
+                                 device=packed.device)
+            positions = (starts.unsqueeze(1) + lanes.unsqueeze(0)).clamp(
+                0, residual_rows.shape[0] - 1,
+            )
+            valid = lanes.unsqueeze(0) < (ends - starts).clamp(min=0).unsqueeze(1)
+
+            gathered = residual_rows[positions]
+            gate = torch.bmm(gathered, gate_w[n_shards:])
+            up = torch.bmm(gathered, up_w[n_shards:])
+            out = torch.bmm(F.silu(gate) * up, down_w[n_shards:])
+            weight = torch.where(valid, scales_sorted[positions],
+                                 torch.zeros((), dtype=acc, device=packed.device))
+            contribution.index_add_(
+                0, rows_sorted[positions].reshape(-1),
+                (out.to(acc) * weight.unsqueeze(-1)).reshape(-1, contribution.shape[-1]),
+            )
+        return (skeleton + contribution).to(packed.dtype)
+
+    def _grouped(self, tokens, packed, offs, rows_sorted, scales_sorted):
+        """Two grouped GEMMs: one N=2I for gate/up, one for down."""
+
+        acc = torch.float32 if packed.dtype in (torch.bfloat16, torch.float16) else packed.dtype
+        n_shards = len(self.shards)
         gate_up_w, down_w = self._stacked()
-        # One N=2I GEMM. Two N=I GEMMs only pay on the synthetic harness, where a
-        # segment is 384 wide; at the real 1120 they are 8-18% slower above 200 MB
-        # (reports/T3-FOUR-PROBES.md 1d), so there is no size branch.
+        # Two N=I GEMMs only pay on the synthetic harness, where a segment is 384
+        # wide; at the real 1120 they are 8-18% slower above 200 MB of intermediate
+        # (reports/T3-FOUR-PROBES.md 1d), so the gate/up split is fixed at N=2I.
         gate_up = grouped_mm(packed, gate_up_w, offs)
         gate, up = gate_up.chunk(2, dim=-1)
         out = grouped_mm(F.silu(gate) * up, down_w, offs)
@@ -158,4 +249,4 @@ class FusedDispatch:
         residual = out[n_shards * tokens :]
         contribution = torch.zeros_like(skeleton, dtype=acc)
         contribution.index_add_(0, rows_sorted, residual * scales_sorted.unsqueeze(-1))
-        return (skeleton + contribution).to(flat.dtype)
+        return (skeleton + contribution).to(packed.dtype)

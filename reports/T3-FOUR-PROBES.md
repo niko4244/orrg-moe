@@ -287,6 +287,42 @@ or an ATen path that takes a device-resident schedule), or fewer segments: 52 of
 the 60 per layer are residual experts, one per (group, variant). Neither is
 reachable by capturing the current dispatch.
 
+### 1f. Small batches: two batched matmuls instead of 2 x 60 segments
+
+`experiments/batched_dispatch.py`. `_grouped_mm` pays ~30 µs per segment (§1e), so a
+decode step issues ~1,000 segment launches. Below `BATCHED_BELOW_ROWS = 32_768` packed
+rows the dispatch now runs `torch.bmm` twice instead: shard segments are uniform, so
+they are one batched matmul over the stacked shard weights, and residual segments are
+gathered into a fixed `[segments, capacity, K]` block, batched, and scattered back with
+the padding lanes masked out.
+
+| tokens | grouped | batched | batched ÷ grouped |
+|---|---|---|---|
+| 8 | 3.08 ms | 2.93 ms | 0.95 |
+| 64 | 3.38 ms | 2.89 ms | 0.85 |
+| 512 | 5.87 ms | 5.37 ms | 0.91 |
+| 2,048 | 15.86 ms | 15.58 ms | 0.98 |
+| 4,096 | 7.55 ms | 29.05 ms | 3.85 |
+| 8,192 | 11.34 ms | 59.56 ms | 5.25 |
+
+The capacity must be `tokens * k`: one (group, variant) segment can hold every routed
+row of its group, so sizing it from the mean drops rows exactly when the router is
+peaked. The peaked-router test caught that, and it is also why the padded layout does
+13x the residual arithmetic and loses above ~2.7k tokens — hence the row threshold.
+
+Layer-level this reads as 5–15%. End to end it is much larger, because the decode step
+is CPU-bound on segment launches:
+
+| workload | batched | grouped | gain |
+|---|---|---|---|
+| decode b8 | 179 | 131 | +37% |
+| decode b64 | 1,238 | 819 | +51% |
+| prefill b64 (grouped in both arms — noise floor) | 73,359 | 71,010 | +3% |
+
+A second run measured +76% at b64 (1,474 against 839), so the gain is 40–75%, and fused
+k=1 decode b64 moves from ~0.24x to 0.32–0.36x of dense-at-active. The seven-model sweep
+has not been re-run since this path landed.
+
 ### 2b. Routing accuracy instead of cosine
 
 The group-output cosine saturated (0.037 clustered vs 0.040 contiguous) because

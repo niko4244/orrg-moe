@@ -1,0 +1,35 @@
+{
+  "device": "NVIDIA GeForce RTX 5060 Ti",
+  "rows": {
+    "8": {
+      "grouped_ms": 3.0759999752044678,
+      "batched_ms": 2.925152063369751,
+      "capacity": 8
+    },
+    "64": {
+      "grouped_ms": 3.3840959072113037,
+      "batched_ms": 2.888416051864624,
+      "capacity": 64
+    },
+    "512": {
+      "grouped_ms": 5.873439788818359,
+      "batched_ms": 5.3703999519348145,
+      "capacity": 512
+    },
+    "2048": {
+      "grouped_ms": 15.860544204711914,
+      "batched_ms": 15.575360298156738,
+      "capacity": 2048
+    },
+    "4096": {
+      "grouped_ms": 7.547520160675049,
+      "batched_ms": 29.051904678344727,
+      "capacity": 4096
+    },
+    "8192": {
+      "grouped_ms": 11.341856002807617,
+      "batched_ms": 59.5582389831543,
+      "capacity": 8192
+    }
+  }
+}

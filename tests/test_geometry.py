@@ -549,6 +549,37 @@ def test_fused_dispatch_handles_large_token_counts():
     )
 
 
+@pytest.mark.parametrize("threshold", [0, 10**9])
+def test_fused_dispatch_batched_and_grouped_paths_agree(threshold, monkeypatch):
+    """The small-batch batched path and the grouped path must compute the same thing."""
+
+    import copy
+
+    import orrg.dispatch as dispatch
+
+    monkeypatch.setattr(dispatch, "BATCHED_BELOW_ROWS", threshold)
+    ids = probe_ids(47)
+    base = build_model()
+    reference = copy.deepcopy(base)
+    fused = copy.deepcopy(base)
+    cfg = growth_cfg(
+        top_residuals=2,
+        router=RouterConfig(group_top_k=2),
+        residual_init="copy",
+    )
+    convert_model(reference, cfg, probe=ids)
+    converted, _ = convert_model(fused, replace(cfg, dispatch="fused"), probe=ids)
+    _randomise_routing(reference, 15)
+    _randomise_routing(converted, 15)
+    reference.eval()
+    converted.eval()
+    assert torch.allclose(
+        _logits(converted, ids), _logits(reference, ids), rtol=1e-4, atol=1e-4
+    )
+    took_batched = any(layer._fused._halves is not None for layer in moe_layers(converted))
+    assert took_batched is (threshold > 0), f"threshold {threshold}: batched={took_batched}"
+
+
 def test_fused_dispatch_handles_skeleton_only():
     """top_residuals=0 skips routing; the fused path must skip it too."""
 
