@@ -22,15 +22,6 @@ import torch
 import torch.nn.functional as F
 
 
-# One N=2I gate/up GEMM beats two N=I ones by 10-21% while the [M, 2I]
-# intermediate stays small; above ~150-200 MB the split form wins by 1-9%
-# (reports/T3-FOUR-PROBES.md 1d). 190 MB is where every measured k=1 shape still
-# prefers fused (151 MB: 0.90x) and every k=2 shape of that size or larger does
-# not (151 MB: 1.02x, 201 MB: 1.09x). Bytes, not rows, because the cost tracks the
-# materialised buffer, and the width depends on how the FFN was split.
-SPLIT_ABOVE_BYTES = 190_000_000
-
-
 def grouped_mm(a: torch.Tensor, b: torch.Tensor, offs: torch.Tensor) -> torch.Tensor:
     """``torch._grouped_mm(a [M, K], b [S, K, N], offs)`` with cumulative offsets."""
 
@@ -51,21 +42,6 @@ class FusedDispatch:
         self.sources = self.shards + [m for group in self.residuals for m in group]
         self._cache = None
         self._key = None
-        self._split = None
-        self._split_key = None
-
-    def _split_stacks(self):
-        """Contiguous halves of the gate/up stack, for the large-intermediate path."""
-
-        if self._split is None or self._split_key != self._key:
-            gate_up = self._stacked()[0]
-            width = gate_up.shape[-1] // 2
-            self._split = (
-                gate_up[..., :width].contiguous(), gate_up[..., width:].contiguous(),
-            )
-            self._split_key = self._key
-        return self._split
-
     def _stacked(self):
         """Stacked [S, H, I] / [S, I, H] weights, rebuilt when a weight changes."""
 
@@ -115,8 +91,6 @@ class FusedDispatch:
             torch.cat([sd, rd]),
         )
         self._key = key
-        self._split = None
-        self._split_key = None
         return self._cache
 
     def _prepare(self, flat: torch.Tensor):
@@ -173,13 +147,11 @@ class FusedDispatch:
 
         packed, offs, rows_sorted, scales_sorted = self._prepare(flat)
         gate_up_w, down_w = self._stacked()
-        if packed.shape[0] * gate_up_w.shape[-1] * packed.element_size() > SPLIT_ABOVE_BYTES:
-            gate_w, up_w = self._split_stacks()
-            gate = grouped_mm(packed, gate_w, offs)
-            up = grouped_mm(packed, up_w, offs)
-        else:
-            gate_up = grouped_mm(packed, gate_up_w, offs)
-            gate, up = gate_up.chunk(2, dim=-1)
+        # One N=2I GEMM. Two N=I GEMMs only pay on the synthetic harness, where a
+        # segment is 384 wide; at the real 1120 they are 8-18% slower above 200 MB
+        # (reports/T3-FOUR-PROBES.md 1d), so there is no size branch.
+        gate_up = grouped_mm(packed, gate_up_w, offs)
+        gate, up = gate_up.chunk(2, dim=-1)
         out = grouped_mm(F.silu(gate) * up, down_w, offs)
 
         skeleton = out[: n_shards * tokens].view(n_shards, tokens, -1).sum(0).to(acc)

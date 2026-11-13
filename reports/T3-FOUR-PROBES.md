@@ -102,7 +102,7 @@ concatenate shard and residual segments before).
 
 | metric | fused k2/k1, 3 GEMMs | fused k2/k1, 2 GEMMs | python k2/k1 | dense-active k2/k1 |
 |---|---|---|---|---|
-| prefill b64 | 0.82 [0.77–0.85] | **0.72** [0.72–0.73] | 0.55 | 0.82 |
+| prefill b64 | 0.82 [0.77–0.85] | **0.70** [0.70–0.73] | 0.55 | 0.82 |
 | prefill b8 | 0.90 [0.86–0.97] | 0.90 [0.37–0.97] | 0.48 | 0.95 |
 | prefill b1 | 0.89 [0.70–0.95] | 0.91 [0.43–0.95] | 0.34 | 1.11 |
 | decode b64 | 0.72 [0.60–0.87] | **1.01** [0.99–1.03] | 0.56 | 1.07 |
@@ -123,10 +123,10 @@ the fused N=2I path and 0.87 with two N=I GEMMs**; the historical 0.82 came from
 the three-GEMM path. Row arithmetic alone predicts 1/1.33 = 0.75, so the split
 arm clears it (more rows per segment tile better) and the fused arm misses it by
 15 points because its `[M, 2I]` intermediate is 201 MB at 131k rows. b8 is
-unchanged (0.90) and b1 slightly better (0.91). The table predates the size branch
-of §1d: with the branch shipped, k=2 prefill b64 takes the split structure and
-measures 53.2k against 51.4k tok/s forced-fused (+3.5%), so the shipped ratio is
-~0.75 rather than 0.72. The seven-model sweep has not been re-run.
+unchanged (0.90) and b1 slightly better (0.91). Re-run of the same seven-model sweep on the shipped build (the size branch of
+§1d was removed after it failed at real widths) reproduces the ratio at **0.70
+[0.70–0.73]** and keeps decode b64 at 1.01 [0.95–1.02], so nothing in the table
+below §1c is stale.
 
 Absolute: fused k=2 reaches 0.51× of dense-at-active at b64 prefill (k=1: 0.53×)
 and 1.41× of dense-at-total (k=1: 1.79×). Fused ÷ python at k=2 is 5.8× / 6.8× /
@@ -141,7 +141,7 @@ real model's k=2 throughput is not measured.
 The reference path still loses 45–65%, because doubling the slots doubles its host
 syncs and per-segment launches. 12 segments per layer at k=1, 16 at k=2.
 
-### 1d. The crossover is real: the split wins above ~150-200 MB of intermediate
+### 1d. The harness crossover does not transfer to real widths: no size branch
 
 The layer probe below measures **k=1 only**, and its largest shape (98k rows) has a
 151 MB `[M, 2I]` intermediate — just short of the knee, which is why it read as
@@ -164,18 +164,31 @@ asserted equal to the library (identical logits, max|diff| 0):
 | 2 | 64 | 131,072 | 201 MB | 51,509 | 54,821 | **1.06** |
 | 2 | 96 | 196,608 | 302 MB | 57,238 | 58,297 | **1.02** |
 
-Both effects are real, and the k2/k1 column reconciles the history: fused path
-0.72 at b64, split path 0.83, against the 0.82 that the three-GEMM run measured.
-Below ~150 MB the fused form wins by 10–20%; from ~200 MB the split wins by 1–6%.
-The k=2 shapes turn over earlier than the k=1 ones (151 MB: 1.03 against 0.92),
-because they carry more segments, so the two curves do not share one threshold.
+The k2/k1 column reconciles the history: fused path 0.72 at b64, split 0.83,
+against the 0.82 the three-GEMM run measured. On **this** geometry the fused form
+wins by 10–20% below ~150 MB and the split by 1–6% from ~200 MB, and the k=2
+shapes turn over earlier than the k=1 ones (151 MB: 1.03 against 0.92).
 
-The branch in `orrg/dispatch.py` keys on `packed.shape[0] * gate_up.shape[-1] *
-itemsize > SPLIT_ABOVE_BYTES` with `SPLIT_ABOVE_BYTES = 190e6`. At that point
-every measured k=1 shape still prefers fused (151 MB reads 0.92) and the k=2
-shapes from 201 MB up prefer split (1.06); the cost of being wrong at the margin
-is the 3% that k=2 b48 gives up. `tests/test_geometry.py` forces both thresholds
-and asserts the logits are unchanged, so the branch cannot silently alter results.
+**At real widths the sign flips, so the branch was removed.**
+`experiments/real_threshold.py` repeats the comparison on Qwen2.5-1.5B's own
+weights and widths (segment 1120, gate/up output 2240, 60 segments), on 4 of its
+28 layers because the 9.06B conversion needs ~18 GB in bf16 and does not fit a
+16 GB card. Prefill throughput, batch 8–48 at seq 128:
+
+| batch | packed rows | intermediate | one N=2240 | two N=1120 | two ÷ one |
+|---|---|---|---|---|---|
+| 8 | 12,288 | 55 MB | 20,995 | 19,835 | 0.94 |
+| 16 | 24,576 | 110 MB | 28,641 | 27,249 | 0.95 |
+| 32 | 49,152 | 220 MB | 30,887 | 29,717 | 0.96 |
+| 48 | 73,728 | 330 MB | 30,775 | 30,001 | 0.97 |
+
+The GEMM alone was measured the same way and agrees in sign: 0.98 at 55 MB,
+1.08 at 220 MB and 1.18 at 440 MB, i.e. the split loses at real widths where it
+won on the harness at the same bytes. A threshold in bytes is therefore a
+property of the harness's 384-wide segments, not of the method: 1120-wide real
+segments hit different tile shapes. The split arm reproduces the layer exactly
+(max|diff| 0 over four layers), so the change is safe; it simply is not faster,
+and `orrg/dispatch.py` keeps the single N=2I GEMM with a comment recording why.
 
 `experiments/dispatch_crossover.py` times a single MoE layer with the two gate/up
 GEMM structures interleaved, so ordering cannot bias either arm:

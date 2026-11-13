@@ -26,7 +26,6 @@ import torch.nn.functional as F
 from experiments.harness import (
     DEVICE, GROUPS, HIDDEN, SHARED, VARIANTS, build_model, moe_layers,
 )
-import orrg.dispatch as dispatch_mod
 from orrg import MoEConfig, convert_model
 from orrg.dispatch import grouped_mm
 
@@ -93,10 +92,6 @@ def main() -> int:
                         top_residuals=k, hidden_size=HIDDEN, dispatch="fused")
         model, _ = convert_model(build_model(max_pos=PREFILL_SEQ + 8), cfg, verify=False)
         models[k] = model
-        # Force the library's own structure choice out of the way: it switches to
-        # two GEMMs above 1.4 GB, which would make the two arms identical exactly
-        # where the comparison matters.
-        dispatch_mod.SPLIT_ABOVE_BYTES = 10**12
         with torch.no_grad():  # one forward builds every layer's fused state
             model(input_ids=ids_by_batch[BATCH], use_cache=False)
         layers = moe_layers(model)
