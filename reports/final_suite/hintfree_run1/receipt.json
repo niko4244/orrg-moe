@@ -1,0 +1,385 @@
+{
+  "run": "hintfree_run1",
+  "model": "claude-spark-x2.6-local",
+  "thinking": "disabled",
+  "temperature": 0.0,
+  "max_tokens": 3000,
+  "protocol": "function-replacement + bounded self-repair",
+  "max_attempts_per_task": 6,
+  "feedback_limit_chars": 5000,
+  "contract": "You are fixing one bug in a real repository.\nRules:\n1. Read the issue and the file excerpt; change only what the issue requires.\n2. Preserve public behavior unrelated to the bug.\n3. Return a complete, syntactically valid replacement for the target function.\n4. Every branch of a conditional that computes a value must assign that value.\n5. Keep the function's public signature and documented behavior.",
+  "contract_sha256": "59ae47551fd8584b8e9fc3aa8351a7b0f9c96b24d4f05fc17583124e1208b523",
+  "system": "You are a senior Python engineer fixing a bug in a real open-source repository. Return the complete replacement function in one ```python code block. Do not include prose or explanation.",
+  "system_sha256": "a27b8c0187460571d65608283c8e213152343dd2e5abc3bede518e33eed95171",
+  "per_repo": {
+    "boltons": {
+      "passed": 9,
+      "cases": 17,
+      "failed": [
+        "dt_to_timestamp_fraction",
+        "frac_1_digit_5",
+        "frac_2_digits_05",
+        "frac_3_digits_851",
+        "frac_4_digits_0001",
+        "frac_leading_zero_051",
+        "frac_overprecise_truncates",
+        "isoformat_milliseconds"
+      ],
+      "apply_ok": true,
+      "touched": [
+        "isoparse"
+      ],
+      "attempts": 6,
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "passed": 9,
+          "failed": [
+            "dt_to_timestamp_fraction",
+            "frac_1_digit_5",
+            "frac_2_digits_05",
+            "frac_3_digits_851",
+            "frac_4_digits_0001",
+            "frac_leading_zero_051",
+            "frac_overprecise_truncates",
+            "isoformat_milliseconds"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 2,
+          "passed": 9,
+          "failed": [
+            "dt_to_timestamp_fraction",
+            "frac_1_digit_5",
+            "frac_2_digits_05",
+            "frac_3_digits_851",
+            "frac_4_digits_0001",
+            "frac_leading_zero_051",
+            "frac_overprecise_truncates",
+            "isoformat_milliseconds"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 3,
+          "passed": 9,
+          "failed": [
+            "dt_to_timestamp_fraction",
+            "frac_1_digit_5",
+            "frac_2_digits_05",
+            "frac_3_digits_851",
+            "frac_4_digits_0001",
+            "frac_leading_zero_051",
+            "frac_overprecise_truncates",
+            "isoformat_milliseconds"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 4,
+          "passed": 9,
+          "failed": [
+            "dt_to_timestamp_fraction",
+            "frac_1_digit_5",
+            "frac_2_digits_05",
+            "frac_3_digits_851",
+            "frac_4_digits_0001",
+            "frac_leading_zero_051",
+            "frac_overprecise_truncates",
+            "isoformat_milliseconds"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 5,
+          "passed": 9,
+          "failed": [
+            "dt_to_timestamp_fraction",
+            "frac_1_digit_5",
+            "frac_2_digits_05",
+            "frac_3_digits_851",
+            "frac_4_digits_0001",
+            "frac_leading_zero_051",
+            "frac_overprecise_truncates",
+            "isoformat_milliseconds"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 6,
+          "passed": 9,
+          "failed": [
+            "dt_to_timestamp_fraction",
+            "frac_1_digit_5",
+            "frac_2_digits_05",
+            "frac_3_digits_851",
+            "frac_4_digits_0001",
+            "frac_leading_zero_051",
+            "frac_overprecise_truncates",
+            "isoformat_milliseconds"
+          ],
+          "apply_ok": true
+        }
+      ]
+    },
+    "toolz": {
+      "passed": 4,
+      "cases": 17,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_func_keyword",
+        "toolz/tests/test_inspect_args.py::test_has_keywords",
+        "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+        "toolz/tests/test_inspect_args.py::test_has_varargs",
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_is_arity",
+        "toolz/tests/test_inspect_args.py::test_is_partial",
+        "toolz/tests/test_inspect_args.py::test_is_valid",
+        "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+        "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_num_required_args"
+      ],
+      "apply_ok": true,
+      "touched": [
+        "_check_sigspec"
+      ],
+      "attempts": 6,
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "passed": 4,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_func_keyword",
+            "toolz/tests/test_inspect_args.py::test_has_keywords",
+            "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+            "toolz/tests/test_inspect_args.py::test_has_varargs",
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_is_arity",
+            "toolz/tests/test_inspect_args.py::test_is_partial",
+            "toolz/tests/test_inspect_args.py::test_is_valid",
+            "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+            "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_num_required_args"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 2,
+          "passed": 4,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_func_keyword",
+            "toolz/tests/test_inspect_args.py::test_has_keywords",
+            "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+            "toolz/tests/test_inspect_args.py::test_has_varargs",
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_is_arity",
+            "toolz/tests/test_inspect_args.py::test_is_partial",
+            "toolz/tests/test_inspect_args.py::test_is_valid",
+            "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+            "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_num_required_args"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 3,
+          "passed": 4,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_func_keyword",
+            "toolz/tests/test_inspect_args.py::test_has_keywords",
+            "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+            "toolz/tests/test_inspect_args.py::test_has_varargs",
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_is_arity",
+            "toolz/tests/test_inspect_args.py::test_is_partial",
+            "toolz/tests/test_inspect_args.py::test_is_valid",
+            "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+            "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_num_required_args"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 4,
+          "passed": 4,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_func_keyword",
+            "toolz/tests/test_inspect_args.py::test_has_keywords",
+            "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+            "toolz/tests/test_inspect_args.py::test_has_varargs",
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_is_arity",
+            "toolz/tests/test_inspect_args.py::test_is_partial",
+            "toolz/tests/test_inspect_args.py::test_is_valid",
+            "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+            "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_num_required_args"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 5,
+          "passed": 4,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_func_keyword",
+            "toolz/tests/test_inspect_args.py::test_has_keywords",
+            "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+            "toolz/tests/test_inspect_args.py::test_has_varargs",
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_is_arity",
+            "toolz/tests/test_inspect_args.py::test_is_partial",
+            "toolz/tests/test_inspect_args.py::test_is_valid",
+            "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+            "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_num_required_args"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 6,
+          "passed": 4,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_func_keyword",
+            "toolz/tests/test_inspect_args.py::test_has_keywords",
+            "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+            "toolz/tests/test_inspect_args.py::test_has_varargs",
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_is_arity",
+            "toolz/tests/test_inspect_args.py::test_is_partial",
+            "toolz/tests/test_inspect_args.py::test_is_valid",
+            "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+            "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_num_required_args"
+          ],
+          "apply_ok": true
+        }
+      ]
+    },
+    "more-itertools": {
+      "passed": 14,
+      "cases": 16,
+      "failed": [
+        "tests/test_more.py::SplitIntoTests::test_bool_in_sizes",
+        "tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+      ],
+      "apply_ok": true,
+      "touched": [
+        "split_into"
+      ],
+      "attempts": 6,
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "passed": 14,
+          "failed": [
+            "tests/test_more.py::SplitIntoTests::test_bool_in_sizes",
+            "tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 2,
+          "passed": 14,
+          "failed": [
+            "tests/test_more.py::SplitIntoTests::test_bool_in_sizes",
+            "tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 3,
+          "passed": 14,
+          "failed": [
+            "tests/test_more.py::SplitIntoTests::test_bool_in_sizes",
+            "tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 4,
+          "passed": 14,
+          "failed": [
+            "tests/test_more.py::SplitIntoTests::test_bool_in_sizes",
+            "tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 5,
+          "passed": 14,
+          "failed": [
+            "tests/test_more.py::SplitIntoTests::test_bool_in_sizes",
+            "tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 6,
+          "passed": 14,
+          "failed": [
+            "tests/test_more.py::SplitIntoTests::test_bool_in_sizes",
+            "tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+          ],
+          "apply_ok": true
+        }
+      ]
+    }
+  },
+  "total_passed": 27,
+  "total_cases": 50,
+  "initial_prompt_sha256": {
+    "boltons": "fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9",
+    "toolz": "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60",
+    "more-itertools": "be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad"
+  },
+  "initial_prompt_bytes": {
+    "boltons": 3657,
+    "toolz": 1810,
+    "more-itertools": 3282
+  },
+  "function_sha256": {
+    "boltons": "b3c26d6ec08f25d0af0230c1422014f0ca874b51d9488e5ac5eba1481d8ad9c6",
+    "toolz": "b0260eeb664b33f83ac06d5688bed40dc2a66f601f75dea7a7337267f92959f1",
+    "more-itertools": "0d265ddc6f774388abf3aac384716d0eea2bcfe4d0c0649090bfe25b8b6352ec"
+  },
+  "attempt_prompt_sha256": {
+    "boltons": [
+      "fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9",
+      "8a295a279e380c51575e4159076c715085210f0956ebcc1bb7c359df598b2762",
+      "ef47a71dbf6e38a6563e95010291454179da0fd0be21d28030380225ea0a80d0",
+      "2a8a8e1a64a8cf786a6df5666f55c980ae30756c7e92b50aa745eaa05a491543",
+      "79320a946af3710793d6d4928e04121b1ec4c79a6fdaedd094a250369fa474f6",
+      "07a51d2555408ce2d09d86c4c970a6e30bd5ac00ced68724830885500f4bdf5c"
+    ],
+    "toolz": [
+      "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60",
+      "c100e10d710f0fff85799142fb7a90eaa8996f219acc89dd2fa0c65c40e19bf2",
+      "057df0d9c5ffc1367ec3f78ff0388ed3a0034332d228d96f64ba5faab19ae3a5",
+      "56bc1f176d9269821dbcc9ca665cfad2984fc66bb063a089e1ba030b2cffd438",
+      "dd080854a3a2012881807c11721b19cf723e221da8d2edca031d6c25a6236cd4",
+      "a12c887e1783821f649bdfc35ffab7e902dabf217e1ba4247171e9ee5251ec77"
+    ],
+    "more-itertools": [
+      "be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad",
+      "e88f056c0d43f32ec087f78ed022ddcd0341d7e97fa5aa31f51728f1222de46d",
+      "d3d6223b3692d1ce7310686065c34577bd4b826d8335e545ae3572c35ed95be8",
+      "298ac37850e6e32bd483dbd3f240fd09a17205a23e1127723911d3a0f4e8102d",
+      "66c002f51c7cc1f32162f72b61ee291a9ded444c4928fe05d415b5e70ae18090",
+      "577f4a893104afad29a35382a7b96b0f201458ca41c0551bf2a485e3ac50e01d"
+    ]
+  }
+}

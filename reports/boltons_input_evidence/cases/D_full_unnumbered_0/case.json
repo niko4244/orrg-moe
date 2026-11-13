@@ -1,0 +1,124 @@
+{
+  "variant": "D_full_unnumbered",
+  "sample": 0,
+  "excerpt_range": [
+    60,
+    154
+  ],
+  "numbered": false,
+  "issue_kind": "precise",
+  "prompt_sha256": "5d61bfcdea131ce588c0da8a41ee6dadd1afeb8a325f9d0ea9c902fce5806a67",
+  "prompt_bytes": 4789,
+  "issue_sha256": "7e8cad915038d935db0fef9b0ac1f0258fc1848c56dcc1595002a3b2019f0ce1",
+  "response_sha256": "a0b078f67a79f192133374b46fe44da452b95a775c588b45218626aedd8254b7",
+  "response_bytes": 1031,
+  "diff_sha256": "3b7970be3a5a9e3fd5046ba7486b6ddb86b005f48d9f18abf95a4344065ba9c6",
+  "stop_reason": "end_turn",
+  "usage": {
+    "input_tokens": 1582,
+    "output_tokens": 365,
+    "cache_read_input_tokens": 84
+  },
+  "latency_s": 214.4,
+  "error": null,
+  "apply_ok": true,
+  "apply_error": "",
+  "changed_files": [],
+  "touched_functions": [],
+  "patch": "",
+  "prompt.txt": "You are fixing one bug in a real repository.\nRules:\n1. Read the issue and the file excerpt; change only what the issue requires.\n2. Preserve public behavior unrelated to the bug.\n3. The diff must apply cleanly to the repository at the stated path.\n4. Every branch of a conditional that computes a value must assign that value.\n5. Return only the diff, no prose or fences.\n\n## Issue\n\n`isoparse` in `boltons/timeutils.py` mishandles fractional seconds.\n\n`isoparse('1970-01-01T00:00:00.851')` must produce microsecond 851000 (851\nthousandths of a second), but it produces 851. The fractional digits after the\ndecimal point are a decimal fraction of one second and must be scaled to\nmicroseconds: one digit means tenths, three digits mean thousandths, six digits\nmean millionths.\n\nMore than six fractional digits must truncate to microsecond precision instead\nof raising `ValueError: microsecond must be in 0..999999`; for example\n`.123456789` must produce microsecond 123456.\n\nPlain timestamps with no fraction, and timezone suffixes such as `Z` and\n`+05:30`, must keep working unchanged.\n\n## Repository context\n\nRepository: boltons\nFile: boltons/timeutils.py\n\n```python\n\n# For legacy compatibility.\n# boltons used to offer an implementation of total_seconds for Python <2.7\ntotal_seconds = timedelta.total_seconds\n\n\ndef dt_to_timestamp(dt):\n    \"\"\"Converts from a :class:`~datetime.datetime` object to an integer\n    timestamp, suitable interoperation with :func:`time.time` and\n    other `Epoch-based timestamps`.\n\n    .. _Epoch-based timestamps: https://en.wikipedia.org/wiki/Unix_time\n\n    >>> timestamp = int(time.time())\n    >>> utc_dt = datetime.fromtimestamp(timestamp, timezone.utc)\n    >>> timestamp - dt_to_timestamp(utc_dt)\n    0.0\n\n    ``dt_to_timestamp`` supports both timezone-aware and na\u00efve\n    :class:`~datetime.datetime` objects. Note that it assumes na\u00efve\n    datetime objects are implied UTC, such as those generated with\n    :meth:`datetime.datetime.utcnow`. If your datetime objects are\n    local time, such as those generated with\n    :meth:`datetime.datetime.now`, first convert it using the\n    :meth:`datetime.datetime.replace` method with ``tzinfo=``\n    :class:`LocalTZ` object in this module, then pass the result of\n    that to ``dt_to_timestamp``.\n\n    A datetime is na\u00efve when its :meth:`~datetime.datetime.utcoffset`\n    returns ``None``, even if it has a ``tzinfo`` object.\n    \"\"\"\n    if dt.utcoffset() is not None:\n        td = dt - EPOCH_AWARE\n    else:\n        td = dt.replace(tzinfo=timezone.utc) - EPOCH_AWARE\n    return timedelta.total_seconds(td)\n\n\n_NONDIGIT_RE = re.compile(r'\\D')\n_ISO_TZ_RE = re.compile(r'(Z|[+-]\\d{2}:?\\d{2}(?::?\\d{2}(?:\\.\\d+)?)?)$')\n\n\ndef isoparse(iso_str):\n    \"\"\"Parses the limited subset of `ISO8601-formatted time`_ strings as\n    returned by :meth:`datetime.datetime.isoformat`.\n\n    >>> epoch_dt = datetime.fromtimestamp(0, timezone.utc).replace(tzinfo=None)\n    >>> iso_str = epoch_dt.isoformat()\n    >>> print(iso_str)\n    1970-01-01T00:00:00\n    >>> isoparse(iso_str)\n    datetime.datetime(1970, 1, 1, 0, 0)\n\n    >>> utcnow = datetime.now(timezone.utc).replace(tzinfo=None)\n    >>> utcnow == isoparse(utcnow.isoformat())\n    True\n\n    For further datetime parsing, see the `iso8601`_ package for strict\n    ISO parsing and `dateutil <https://pypi.python.org/pypi/python-dateutil>`__\n    package for loose parsing and more.\n\n    .. _ISO8601-formatted time: https://en.wikipedia.org/wiki/ISO_8601\n    .. _iso8601: https://pypi.python.org/pypi/iso8601\n\n    >>> isoparse('1970-01-01T00:00:00.851')\n    datetime.datetime(1970, 1, 1, 0, 0, 0, 851000)\n\n    Timezone suffixes (``Z``, ``+HH:MM``, ``-HHMM``, and so on) yield\n    timezone-aware datetimes, so aware\n    :meth:`~datetime.datetime.isoformat` output round-trips, too.\n\n    >>> isoparse('1970-01-01T00:00:00+05:30')\n    datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=19800)))\n    >>> aware_now = datetime.now(timezone.utc)\n    >>> aware_now == isoparse(aware_now.isoformat())\n    True\n\n    \"\"\"\n    tzinfo = None\n    tz_match = _ISO_TZ_RE.search(iso_str)\n    if tz_match:\n        iso_str = iso_str[:tz_match.start()]\n        tz = tz_match.group(1)\n        if tz == 'Z':\n            tzinfo = timezone.utc\n        else:\n            digits = tz[1:].replace(':', '').split('.')[0]\n            hh, mm = int(digits[0:2]), int(digits[2:4])\n            ss = int(digits[4:6] or 0)\n            sign = -1 if tz[0] == '-' else 1\n            tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,\n                                               seconds=ss))\n    parts = _NONDIGIT_RE.split(iso_str)\n    dt_args = [int(p) for p in parts]\n    return datetime(*dt_args, tzinfo=tzinfo)\n```\n\nReturn only the unified diff that fixes the issue.",
+  "response.txt": "```diff\n--- a/boltons/timeutils.py\n+++ b/boltons/timeutils.py\n@@ -120,6 +120,10 @@ def isoparse(iso_str):\n     tzinfo = None\n     tz_match = _ISO_TZ_RE.search(iso_str)\n     if tz_match:\n         iso_str = iso_str[:tz_match.start()]\n         tz = tz_match.group(1)\n         if tz == 'Z':\n             tzinfo = timezone.utc\n         else:\n             digits = tz[1:].replace(':', '').split('.')[0]\n             hh, mm = int(digits[0:2]), int(digits[2:4])\n             ss = int(digits[4:6] or 0)\n             sign = -1 if tz[0] == '-' else 1\n             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,\n                                                seconds=ss))\n+    if '.' in iso_str:\n+        frac = iso_str.split('.', 1)[1]\n+        if len(frac) > 6:\n+            frac = frac[:6]\n+        micro = int(frac.ljust(6, '0')[:6])\n+        iso_str = iso_str[:iso_str.index('.')] + f'{micro:06d}'\n     parts = _NONDIGIT_RE.split(iso_str)\n     dt_args = [int(p) for p in parts]\n     return datetime(*dt_args, tzinfo=tzinfo)\n```",
+  "thinking.txt": "",
+  "diff.txt": "--- a/boltons/timeutils.py\n+++ b/boltons/timeutils.py\n@@ -120,6 +120,10 @@ def isoparse(iso_str):\n     tzinfo = None\n     tz_match = _ISO_TZ_RE.search(iso_str)\n     if tz_match:\n         iso_str = iso_str[:tz_match.start()]\n         tz = tz_match.group(1)\n         if tz == 'Z':\n             tzinfo = timezone.utc\n         else:\n             digits = tz[1:].replace(':', '').split('.')[0]\n             hh, mm = int(digits[0:2]), int(digits[2:4])\n             ss = int(digits[4:6] or 0)\n             sign = -1 if tz[0] == '-' else 1\n             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,\n                                                seconds=ss))\n+    if '.' in iso_str:\n+        frac = iso_str.split('.', 1)[1]\n+        if len(frac) > 6:\n+            frac = frac[:6]\n+        micro = int(frac.ljust(6, '0')[:6])\n+        iso_str = iso_str[:iso_str.index('.')] + f'{micro:06d}'\n     parts = _NONDIGIT_RE.split(iso_str)\n     dt_args = [int(p) for p in parts]\n     return datetime(*dt_args, tzinfo=tzinfo)\n",
+  "excerpt.txt": "\n# For legacy compatibility.\n# boltons used to offer an implementation of total_seconds for Python <2.7\ntotal_seconds = timedelta.total_seconds\n\n\ndef dt_to_timestamp(dt):\n    \"\"\"Converts from a :class:`~datetime.datetime` object to an integer\n    timestamp, suitable interoperation with :func:`time.time` and\n    other `Epoch-based timestamps`.\n\n    .. _Epoch-based timestamps: https://en.wikipedia.org/wiki/Unix_time\n\n    >>> timestamp = int(time.time())\n    >>> utc_dt = datetime.fromtimestamp(timestamp, timezone.utc)\n    >>> timestamp - dt_to_timestamp(utc_dt)\n    0.0\n\n    ``dt_to_timestamp`` supports both timezone-aware and na\u00efve\n    :class:`~datetime.datetime` objects. Note that it assumes na\u00efve\n    datetime objects are implied UTC, such as those generated with\n    :meth:`datetime.datetime.utcnow`. If your datetime objects are\n    local time, such as those generated with\n    :meth:`datetime.datetime.now`, first convert it using the\n    :meth:`datetime.datetime.replace` method with ``tzinfo=``\n    :class:`LocalTZ` object in this module, then pass the result of\n    that to ``dt_to_timestamp``.\n\n    A datetime is na\u00efve when its :meth:`~datetime.datetime.utcoffset`\n    returns ``None``, even if it has a ``tzinfo`` object.\n    \"\"\"\n    if dt.utcoffset() is not None:\n        td = dt - EPOCH_AWARE\n    else:\n        td = dt.replace(tzinfo=timezone.utc) - EPOCH_AWARE\n    return timedelta.total_seconds(td)\n\n\n_NONDIGIT_RE = re.compile(r'\\D')\n_ISO_TZ_RE = re.compile(r'(Z|[+-]\\d{2}:?\\d{2}(?::?\\d{2}(?:\\.\\d+)?)?)$')\n\n\ndef isoparse(iso_str):\n    \"\"\"Parses the limited subset of `ISO8601-formatted time`_ strings as\n    returned by :meth:`datetime.datetime.isoformat`.\n\n    >>> epoch_dt = datetime.fromtimestamp(0, timezone.utc).replace(tzinfo=None)\n    >>> iso_str = epoch_dt.isoformat()\n    >>> print(iso_str)\n    1970-01-01T00:00:00\n    >>> isoparse(iso_str)\n    datetime.datetime(1970, 1, 1, 0, 0)\n\n    >>> utcnow = datetime.now(timezone.utc).replace(tzinfo=None)\n    >>> utcnow == isoparse(utcnow.isoformat())\n    True\n\n    For further datetime parsing, see the `iso8601`_ package for strict\n    ISO parsing and `dateutil <https://pypi.python.org/pypi/python-dateutil>`__\n    package for loose parsing and more.\n\n    .. _ISO8601-formatted time: https://en.wikipedia.org/wiki/ISO_8601\n    .. _iso8601: https://pypi.python.org/pypi/iso8601\n\n    >>> isoparse('1970-01-01T00:00:00.851')\n    datetime.datetime(1970, 1, 1, 0, 0, 0, 851000)\n\n    Timezone suffixes (``Z``, ``+HH:MM``, ``-HHMM``, and so on) yield\n    timezone-aware datetimes, so aware\n    :meth:`~datetime.datetime.isoformat` output round-trips, too.\n\n    >>> isoparse('1970-01-01T00:00:00+05:30')\n    datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=19800)))\n    >>> aware_now = datetime.now(timezone.utc)\n    >>> aware_now == isoparse(aware_now.isoformat())\n    True\n\n    \"\"\"\n    tzinfo = None\n    tz_match = _ISO_TZ_RE.search(iso_str)\n    if tz_match:\n        iso_str = iso_str[:tz_match.start()]\n        tz = tz_match.group(1)\n        if tz == 'Z':\n            tzinfo = timezone.utc\n        else:\n            digits = tz[1:].replace(':', '').split('.')[0]\n            hh, mm = int(digits[0:2]), int(digits[2:4])\n            ss = int(digits[4:6] or 0)\n            sign = -1 if tz[0] == '-' else 1\n            tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,\n                                               seconds=ss))\n    parts = _NONDIGIT_RE.split(iso_str)\n    dt_args = [int(p) for p in parts]\n    return datetime(*dt_args, tzinfo=tzinfo)",
+  "cases": [
+    {
+      "case": "basic_epoch",
+      "status": "PASSED",
+      "detail": ""
+    },
+    {
+      "case": "frac_3_digits_851",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "frac_leading_zero_051",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "frac_6_digits_000001",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "frac_overprecise_truncates",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "frac_1_digit_5",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "frac_2_digits_05",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "frac_4_digits_0001",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "isoformat_milliseconds",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "isoformat_microseconds",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "isoformat_default",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "tz_zulu",
+      "status": "PASSED",
+      "detail": ""
+    },
+    {
+      "case": "tz_offset_plus_0530",
+      "status": "PASSED",
+      "detail": ""
+    },
+    {
+      "case": "tz_offset_with_fraction",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "tz_aware_isoformat_roundtrip",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    },
+    {
+      "case": "tz_invalid_offset_raises",
+      "status": "PASSED",
+      "detail": ""
+    },
+    {
+      "case": "dt_to_timestamp_fraction",
+      "status": "FAILED",
+      "detail": "ValueError: second must be in 0..59"
+    }
+  ],
+  "passed": 4,
+  "total": 17,
+  "test_output.txt": "[\n {\n  \"case\": \"basic_epoch\",\n  \"status\": \"PASSED\",\n  \"detail\": \"\"\n },\n {\n  \"case\": \"frac_3_digits_851\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"frac_leading_zero_051\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"frac_6_digits_000001\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"frac_overprecise_truncates\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"frac_1_digit_5\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"frac_2_digits_05\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"frac_4_digits_0001\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"isoformat_milliseconds\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"isoformat_microseconds\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"isoformat_default\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"tz_zulu\",\n  \"status\": \"PASSED\",\n  \"detail\": \"\"\n },\n {\n  \"case\": \"tz_offset_plus_0530\",\n  \"status\": \"PASSED\",\n  \"detail\": \"\"\n },\n {\n  \"case\": \"tz_offset_with_fraction\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"tz_aware_isoformat_roundtrip\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n },\n {\n  \"case\": \"tz_invalid_offset_raises\",\n  \"status\": \"PASSED\",\n  \"detail\": \"\"\n },\n {\n  \"case\": \"dt_to_timestamp_fraction\",\n  \"status\": \"FAILED\",\n  \"detail\": \"ValueError: second must be in 0..59\"\n }\n]"
+}

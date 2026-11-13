@@ -1,0 +1,128 @@
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. The diff must apply cleanly to the repository at the stated path.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Return only the diff, no prose or fences.
+
+## Issue
+
+The ISO-8601 parser `isoparse` mishandles fractional seconds.
+
+`isoparse('1970-01-01T00:00:00.851')` returns a datetime whose microsecond
+field is 851 instead of 851000: the fraction is being read as whole
+microseconds rather than as a decimal fraction of a second. Inputs with more
+than six fractional digits (for example `.123456789`) raise
+`ValueError: microsecond must be in 0..999999` instead of truncating to
+microsecond precision.
+
+`dt_to_timestamp` must return the correct epoch seconds for these fractional
+ISO-8601 timestamps once parsing is fixed.
+
+Fix the ISO-8601 fractional-second handling in `boltons/timeutils.py`.
+
+## Repository context
+
+Repository: boltons
+File: boltons/timeutils.py
+
+```python
+  60| 
+  61| # For legacy compatibility.
+  62| # boltons used to offer an implementation of total_seconds for Python <2.7
+  63| total_seconds = timedelta.total_seconds
+  64| 
+  65| 
+  66| def dt_to_timestamp(dt):
+  67|     """Converts from a :class:`~datetime.datetime` object to an integer
+  68|     timestamp, suitable interoperation with :func:`time.time` and
+  69|     other `Epoch-based timestamps`.
+  70| 
+  71|     .. _Epoch-based timestamps: https://en.wikipedia.org/wiki/Unix_time
+  72| 
+  73|     >>> timestamp = int(time.time())
+  74|     >>> utc_dt = datetime.fromtimestamp(timestamp, timezone.utc)
+  75|     >>> timestamp - dt_to_timestamp(utc_dt)
+  76|     0.0
+  77| 
+  78|     ``dt_to_timestamp`` supports both timezone-aware and naïve
+  79|     :class:`~datetime.datetime` objects. Note that it assumes naïve
+  80|     datetime objects are implied UTC, such as those generated with
+  81|     :meth:`datetime.datetime.utcnow`. If your datetime objects are
+  82|     local time, such as those generated with
+  83|     :meth:`datetime.datetime.now`, first convert it using the
+  84|     :meth:`datetime.datetime.replace` method with ``tzinfo=``
+  85|     :class:`LocalTZ` object in this module, then pass the result of
+  86|     that to ``dt_to_timestamp``.
+  87| 
+  88|     A datetime is naïve when its :meth:`~datetime.datetime.utcoffset`
+  89|     returns ``None``, even if it has a ``tzinfo`` object.
+  90|     """
+  91|     if dt.utcoffset() is not None:
+  92|         td = dt - EPOCH_AWARE
+  93|     else:
+  94|         td = dt.replace(tzinfo=timezone.utc) - EPOCH_AWARE
+  95|     return timedelta.total_seconds(td)
+  96| 
+  97| 
+  98| _NONDIGIT_RE = re.compile(r'\D')
+  99| _ISO_TZ_RE = re.compile(r'(Z|[+-]\d{2}:?\d{2}(?::?\d{2}(?:\.\d+)?)?)$')
+ 100| 
+ 101| 
+ 102| def isoparse(iso_str):
+ 103|     """Parses the limited subset of `ISO8601-formatted time`_ strings as
+ 104|     returned by :meth:`datetime.datetime.isoformat`.
+ 105| 
+ 106|     >>> epoch_dt = datetime.fromtimestamp(0, timezone.utc).replace(tzinfo=None)
+ 107|     >>> iso_str = epoch_dt.isoformat()
+ 108|     >>> print(iso_str)
+ 109|     1970-01-01T00:00:00
+ 110|     >>> isoparse(iso_str)
+ 111|     datetime.datetime(1970, 1, 1, 0, 0)
+ 112| 
+ 113|     >>> utcnow = datetime.now(timezone.utc).replace(tzinfo=None)
+ 114|     >>> utcnow == isoparse(utcnow.isoformat())
+ 115|     True
+ 116| 
+ 117|     For further datetime parsing, see the `iso8601`_ package for strict
+ 118|     ISO parsing and `dateutil <https://pypi.python.org/pypi/python-dateutil>`__
+ 119|     package for loose parsing and more.
+ 120| 
+ 121|     .. _ISO8601-formatted time: https://en.wikipedia.org/wiki/ISO_8601
+ 122|     .. _iso8601: https://pypi.python.org/pypi/iso8601
+ 123| 
+ 124|     >>> isoparse('1970-01-01T00:00:00.851')
+ 125|     datetime.datetime(1970, 1, 1, 0, 0, 0, 851000)
+ 126| 
+ 127|     Timezone suffixes (``Z``, ``+HH:MM``, ``-HHMM``, and so on) yield
+ 128|     timezone-aware datetimes, so aware
+ 129|     :meth:`~datetime.datetime.isoformat` output round-trips, too.
+ 130| 
+ 131|     >>> isoparse('1970-01-01T00:00:00+05:30')
+ 132|     datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=19800)))
+ 133|     >>> aware_now = datetime.now(timezone.utc)
+ 134|     >>> aware_now == isoparse(aware_now.isoformat())
+ 135|     True
+ 136| 
+ 137|     """
+ 138|     tzinfo = None
+ 139|     tz_match = _ISO_TZ_RE.search(iso_str)
+ 140|     if tz_match:
+ 141|         iso_str = iso_str[:tz_match.start()]
+ 142|         tz = tz_match.group(1)
+ 143|         if tz == 'Z':
+ 144|             tzinfo = timezone.utc
+ 145|         else:
+ 146|             digits = tz[1:].replace(':', '').split('.')[0]
+ 147|             hh, mm = int(digits[0:2]), int(digits[2:4])
+ 148|             ss = int(digits[4:6] or 0)
+ 149|             sign = -1 if tz[0] == '-' else 1
+ 150|             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+ 151|                                                seconds=ss))
+ 152|     parts = _NONDIGIT_RE.split(iso_str)
+ 153|     dt_args = [int(p) for p in parts]
+ 154|     return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Return only the unified diff that fixes the issue.

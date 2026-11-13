@@ -1,0 +1,299 @@
+=== SYSTEM ===
+You are a senior Python engineer fixing a bug in a real open-source repository. Return the complete replacement function in one ```python code block. Do not include prose or explanation.
+
+=== CONTRACT ===
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. Return a complete, syntactically valid replacement for the target function.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Keep the function's public signature and documented behavior.
+
+=== INITIAL PROMPT: boltons (3657 bytes, sha256 fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9) ===
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. Return a complete, syntactically valid replacement for the target function.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Keep the function's public signature and documented behavior.
+
+## Issue
+
+`isoparse` in `boltons/timeutils.py` mishandles fractional seconds.
+
+`isoparse('1970-01-01T00:00:00.851')` must produce microsecond 851000 (851
+thousandths of a second), but it produces 851. The fractional digits after the
+decimal point are a decimal fraction of one second and must be scaled to
+microseconds: one digit means tenths, three digits mean thousandths, six digits
+mean millionths.
+
+More than six fractional digits must truncate to microsecond precision instead
+of raising `ValueError: microsecond must be in 0..999999`; for example
+`.123456789` must produce microsecond 123456.
+
+Plain timestamps with no fraction, and timezone suffixes such as `Z` and
+`+05:30`, must keep working unchanged.
+
+## Repository context
+
+Repository: boltons
+File: boltons/timeutils.py
+
+```python
+ 102| def isoparse(iso_str):
+ 103|     """Parses the limited subset of `ISO8601-formatted time`_ strings as
+ 104|     returned by :meth:`datetime.datetime.isoformat`.
+ 105| 
+ 106|     >>> epoch_dt = datetime.fromtimestamp(0, timezone.utc).replace(tzinfo=None)
+ 107|     >>> iso_str = epoch_dt.isoformat()
+ 108|     >>> print(iso_str)
+ 109|     1970-01-01T00:00:00
+ 110|     >>> isoparse(iso_str)
+ 111|     datetime.datetime(1970, 1, 1, 0, 0)
+ 112| 
+ 113|     >>> utcnow = datetime.now(timezone.utc).replace(tzinfo=None)
+ 114|     >>> utcnow == isoparse(utcnow.isoformat())
+ 115|     True
+ 116| 
+ 117|     For further datetime parsing, see the `iso8601`_ package for strict
+ 118|     ISO parsing and `dateutil <https://pypi.python.org/pypi/python-dateutil>`__
+ 119|     package for loose parsing and more.
+ 120| 
+ 121|     .. _ISO8601-formatted time: https://en.wikipedia.org/wiki/ISO_8601
+ 122|     .. _iso8601: https://pypi.python.org/pypi/iso8601
+ 123| 
+ 124|     >>> isoparse('1970-01-01T00:00:00.851')
+ 125|     datetime.datetime(1970, 1, 1, 0, 0, 0, 851000)
+ 126| 
+ 127|     Timezone suffixes (``Z``, ``+HH:MM``, ``-HHMM``, and so on) yield
+ 128|     timezone-aware datetimes, so aware
+ 129|     :meth:`~datetime.datetime.isoformat` output round-trips, too.
+ 130| 
+ 131|     >>> isoparse('1970-01-01T00:00:00+05:30')
+ 132|     datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=19800)))
+ 133|     >>> aware_now = datetime.now(timezone.utc)
+ 134|     >>> aware_now == isoparse(aware_now.isoformat())
+ 135|     True
+ 136| 
+ 137|     """
+ 138|     tzinfo = None
+ 139|     tz_match = _ISO_TZ_RE.search(iso_str)
+ 140|     if tz_match:
+ 141|         iso_str = iso_str[:tz_match.start()]
+ 142|         tz = tz_match.group(1)
+ 143|         if tz == 'Z':
+ 144|             tzinfo = timezone.utc
+ 145|         else:
+ 146|             digits = tz[1:].replace(':', '').split('.')[0]
+ 147|             hh, mm = int(digits[0:2]), int(digits[2:4])
+ 148|             ss = int(digits[4:6] or 0)
+ 149|             sign = -1 if tz[0] == '-' else 1
+ 150|             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+ 151|                                                seconds=ss))
+ 152|     parts = _NONDIGIT_RE.split(iso_str)
+ 153|     dt_args = [int(p) for p in parts]
+ 154|     return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Return the complete corrected `isoparse` function in one ```python code block. Do not return a diff.
+
+
+=== INITIAL PROMPT: toolz (1810 bytes, sha256 e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60) ===
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. Return a complete, syntactically valid replacement for the target function.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Keep the function's public signature and documented behavior.
+
+## Issue
+
+Signature introspection in `toolz.functoolz` is broken.
+
+`_check_sigspec` now unconditionally returns `(None, False)`, so
+`is_valid_args`, `is_partial_args`, `num_required_args`, `has_varargs`,
+`has_keywords`, and `is_arity` report that every callable is invalid. For
+example `num_required_args(lambda x: None)` returns `False` instead of `1`.
+
+Restore `_check_sigspec` so it:
+1. accepts an already-supplied `inspect.Signature`;
+2. otherwise resolves `inspect.signature(func)`;
+3. falls back to the builtin signature registry via
+   `builtin_func(*builtin_args)` when no signature is available;
+4. still returns `(None, False)` for a callable whose `__signature__` is
+   present but invalid.
+
+Do not change the public helpers.
+
+## Repository context
+
+Repository: toolz
+File: toolz/functoolz.py
+
+```python
+ 911|                 exc_name = exc.__name__
+ 912|             return f'{self.func.__name__}_excepting_{exc_name}'
+ 913|         except AttributeError:
+ 914|             return 'excepting'
+ 915| 
+ 916| 
+ 917| def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+ 918|     return None, False
+ 919| 
+ 920| 
+ 921| if PYPY:  # pragma: no cover
+ 922|     _check_sigspec_orig = _check_sigspec
+ 923| 
+ 924|     def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+```
+
+Return the complete corrected `_check_sigspec` function in one ```python code block. Do not return a diff.
+
+
+=== INITIAL PROMPT: more-itertools (3282 bytes, sha256 be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad) ===
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. Return a complete, syntactically valid replacement for the target function.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Keep the function's public signature and documented behavior.
+
+## Issue
+
+`split_into` returns chunks that are one item too short.
+
+`list(split_into([1, 2, 3, 4, 5, 6, 7, 8, 9], [2, 3, 4]))` returns
+`[[1], [3, 4], [6, 7, 8]]` instead of `[[1, 2], [3, 4, 5], [6, 7, 8, 9]]`.
+Each requested size must produce exactly that many items (fewer only when the
+iterable is exhausted), a `None` size must consume all remaining items, and
+the existing behavior for empty inputs, bool sizes, and invalid sizes must be
+preserved.
+
+## Repository context
+
+Repository: more-itertools
+File: more_itertools/more.py
+
+```python
+1741|         buf.append(next_item)
+1742|         cur_item = next_item
+1743| 
+1744|     yield buf
+1745| 
+1746| 
+1747| def split_into(iterable, sizes):
+1748|     """Yield a list of sequential items from *iterable* of length 'n' for each
+1749|     integer 'n' in *sizes*.
+1750| 
+1751|         >>> list(split_into([1,2,3,4,5,6], [1,2,3]))
+1752|         [[1], [2, 3], [4, 5, 6]]
+1753| 
+1754|     If the sum of *sizes* is smaller than the length of *iterable*, then the
+1755|     remaining items of *iterable* will not be returned.
+1756| 
+1757|         >>> list(split_into([1,2,3,4,5,6], [2,3]))
+1758|         [[1, 2], [3, 4, 5]]
+1759| 
+1760|     If the sum of *sizes* is larger than the length of *iterable*, fewer items
+1761|     will be returned in the iteration that overruns the *iterable* and further
+1762|     lists will be empty:
+1763| 
+1764|         >>> list(split_into([1,2,3,4], [1,2,3,4]))
+1765|         [[1], [2, 3], [4], []]
+1766| 
+1767|     When a ``None`` object is encountered in *sizes*, the returned list will
+1768|     contain items up to the end of *iterable* the same way that
+1769|     :func:`itertools.slice` does:
+1770| 
+1771|         >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
+1772|         [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
+1773| 
+1774|     :func:`split_into` can be useful for grouping a series of items where the
+1775|     sizes of the groups are not uniform. An example would be where in a row
+1776|     from a table, multiple columns represent elements of the same feature
+1777|     (e.g. a point represented by x,y,z) but, the format is not the same for
+1778|     all columns.
+1779|     """
+1780|     # convert the iterable argument into an iterator so its contents can
+1781|     # be consumed by islice in case it is a generator
+1782|     it = iter(iterable)
+1783| 
+1784|     for size in sizes:
+1785|         if size is None:
+1786|             yield list(it)
+1787|             return
+1788|         else:
+1789|             yield list(islice(it, max(size - 1, 0)))
+1790| 
+1791| 
+1792| def padded(iterable, fillvalue=None, n=None, next_multiple=False):
+1793|     """Yield the elements from *iterable*, followed by *fillvalue*, such that
+1794|     at least *n* items are emitted.
+1795| 
+```
+
+Return the complete corrected `split_into` function in one ```python code block. Do not return a diff.
+
+
+=== REPAIR PROMPT SOURCE (build_repair_prompt) ===
+def build_repair_prompt(task: dict, current_fn: str, scored: dict,
+                        apply_error: str) -> str:
+    failed_lines = "\n".join(f"- `{name}`" for name in scored["failed"])
+    parts = [
+        E.FUNCTION_CONTRACT,
+        f"## Issue\n\n{task['issue']}",
+        f"## Current implementation of `{task['fn']}`\n\n"
+        f"This is the version that produced the results below:\n\n"
+        f"```python\n{current_fn}\n```",
+    ]
+    if apply_error:
+        parts.append(
+            "## Application error\n\n"
+            f"The previous reply could not be applied: `{apply_error}`\n"
+            "Return the complete replacement function itself, not a diff or prose."
+        )
+    parts.append(
+        f"## Test results from that implementation\n\n"
+        f"{scored['passed']}/{scored['passed'] + len(scored['failed'])} cases passed. "
+        f"Failing cases:\n{failed_lines}\n\n"
+        f"Exact outcomes:\n{scored['feedback'] or 'see failing case names'}"
+    )
+    if task.get("repair_hint"):
+        parts.append(f"## Repair hint\n\n{task['repair_hint']}")
+    parts.append(
+        f"## Repair task\n\n"
+        f"Diagnose the root cause of every listed failure. Return a complete "
+        f"corrected `{task['fn']}` function in one ```python code block. "
+        f"Keep the parts that already pass working, and do not return a diff. "
+        f"Re-check the listed failures against your new implementation before "
+        f"returning."
+    )
+    return "\n\n".join(part for part in parts if part) + "\n"
+
+
+=== REPAIR HINT: boltons (405 bytes, sha256 ca7701a9b5ad6032cf7a47d917a950dad5e9a9d978a91b39b003db6ac322c482) ===
+Fractional seconds are a fixed-width six-digit field. Append zeros on the right with str.ljust(6, '0'); never prepend them with str.rjust. Then slice to six characters and convert to int: '851'.ljust(6, '0') == '851000', '000001'.ljust(6, '0') == '000001', and '123456789'.ljust(6, '0')[:6] == '123456'. Do not use float arithmetic or multiply/divide after parsing. The result must be an int in 0..999999.
+
+=== REPAIR HINT: toolz (477 bytes, sha256 43929b7e2247b9c863a604d439d84b5e4df5006bbdbcf16f1c271dd65bde9bf2) ===
+Use this control flow exactly, inside the required function definition:
+
+```python
+if sigspec is None:
+    try:
+        sigspec = inspect.signature(func)
+    except (ValueError, TypeError) as e:
+        sigspec = e
+if isinstance(sigspec, ValueError):
+    return None, builtin_func(*builtin_args)
+if not isinstance(sigspec, inspect.Signature):
+    return None, False
+return sigspec, None
+```
+Do not replace the caught exception with None, and never put a bool in the first slot.
+
+=== REPAIR HINT: more-itertools (411 bytes, sha256 8c9dcde7f18f7e41bd5e39cc2609cc8b221fd05c7cfffb3d3a2a77fc3848ad9e) ===
+`False` is an int subclass with value 0, so a size of False is valid and must yield an empty chunk. Do not reject it with `isinstance(size, bool)`; only reject values that are not `int` instances. Pass the validated size directly to `islice(it, size)`; do not map a non-positive size to -1, because -1 consumes all remaining items. Validate non-integer sizes before any comparison and raise ValueError for them.

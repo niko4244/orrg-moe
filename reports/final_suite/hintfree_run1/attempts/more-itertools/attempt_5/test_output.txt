@@ -1,0 +1,44 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\nikma\AppData\Local\Programs\Python\Python311\python.exe
+rootdir: I:\.freebuff\reports\final_suite\hintfree_run1\more-itertools
+configfile: pyproject.toml
+plugins: anyio-4.12.1, langsmith-0.4.32, libtmux-0.62.0, asyncio-0.26.0, typeguard-4.4.3
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 16 items
+
+tests/test_more.py::SplitIntoTests::test_bool_in_sizes FAILED            [  6%]
+tests/test_more.py::SplitIntoTests::test_both_empty PASSED               [ 12%]
+tests/test_more.py::SplitIntoTests::test_generator_iterable_integrity PASSED [ 18%]
+tests/test_more.py::SplitIntoTests::test_generator_sizes_integrity PASSED [ 25%]
+tests/test_more.py::SplitIntoTests::test_invalid_in_sizes FAILED         [ 31%]
+tests/test_more.py::SplitIntoTests::test_invalid_in_sizes_after_none PASSED [ 37%]
+tests/test_more.py::SplitIntoTests::test_iterable_empty PASSED           [ 43%]
+tests/test_more.py::SplitIntoTests::test_iterable_empty_using_none PASSED [ 50%]
+tests/test_more.py::SplitIntoTests::test_iterable_just_right PASSED      [ 56%]
+tests/test_more.py::SplitIntoTests::test_iterable_too_large PASSED       [ 62%]
+tests/test_more.py::SplitIntoTests::test_iterable_too_small PASSED       [ 68%]
+tests/test_more.py::SplitIntoTests::test_iterable_too_small_extra PASSED [ 75%]
+tests/test_more.py::SplitIntoTests::test_sizes_empty PASSED              [ 81%]
+tests/test_more.py::SplitIntoTests::test_using_none_mid_sizes PASSED     [ 87%]
+tests/test_more.py::SplitIntoTests::test_using_none_with_leftover PASSED [ 93%]
+tests/test_more.py::SplitIntoTests::test_using_none_without_leftover PASSED [100%]
+
+================================== FAILURES ===================================
+______________________ SplitIntoTests.test_bool_in_sizes ______________________
+tests\test_more.py:1982: in test_bool_in_sizes
+    actual = list(mi.split_into(iterable, sizes))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+more_itertools\more.py:1790: in split_into
+    raise ValueError(
+E   ValueError: Sizes must be integers or None, got bool: True
+____________________ SplitIntoTests.test_invalid_in_sizes _____________________
+tests\test_more.py:1991: in test_invalid_in_sizes
+    list(mi.split_into(iterable, sizes))
+more_itertools\more.py:1799: in split_into
+    raise TypeError(
+E   TypeError: Sizes must be integers or None, got []
+=========================== short test summary info ===========================
+FAILED tests/test_more.py::SplitIntoTests::test_bool_in_sizes - ValueError: S...
+FAILED tests/test_more.py::SplitIntoTests::test_invalid_in_sizes - TypeError:...
+======================== 2 failed, 14 passed in 0.76s =========================
+

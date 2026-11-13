@@ -1,0 +1,76 @@
+{
+  "device": "NVIDIA GeForce RTX 5060 Ti",
+  "geometry": {
+    "hidden": 768,
+    "inter": 3072,
+    "layers": 8,
+    "shared": 4,
+    "groups": 4,
+    "variants": 14
+  },
+  "total_params": 450172064,
+  "active_k1": 110433440,
+  "correctness_max_abs": 0.0,
+  "rows": [
+    {
+      "name": "orrg_fused",
+      "params": 450172064,
+      "prefill_b1": 2121.354750178947,
+      "decode_b1": 23.658979469922613,
+      "prefill_b8": 15503.875968853317,
+      "decode_b8": 147.3662541869627,
+      "prefill_b64": 67902.42673256062,
+      "decode_b64": 884.5088468064669
+    },
+    {
+      "name": "orrg_naive",
+      "params": 450172064,
+      "prefill_b1": 780.8820550884461,
+      "decode_b1": 13.336606235291512,
+      "prefill_b8": 4593.94505483374,
+      "decode_b8": 54.23871458314101,
+      "prefill_b64": 30308.860309876716,
+      "decode_b64": 289.699795443528
+    },
+    {
+      "name": "dense_active",
+      "params": 110445312,
+      "prefill_b1": 7856.664968728558,
+      "decode_b1": 64.74788119297355,
+      "prefill_b8": 79847.16753323833,
+      "decode_b8": 522.9307873864951,
+      "prefill_b64": 125152.00958257148,
+      "decode_b64": 4272.2260986600495
+    },
+    {
+      "name": "dense_total",
+      "params": 450183936,
+      "prefill_b1": 7563.7154395304005,
+      "decode_b1": 67.41543997096612,
+      "prefill_b8": 33063.188143602216,
+      "decode_b8": 540.8967222507919,
+      "prefill_b64": 37326.62620530205,
+      "decode_b64": 3744.4537107724236
+    }
+  ],
+  "ratios": {
+    "prefill_b1_fused_over_naive": 2.7166135223054564,
+    "prefill_b1_fused_over_dense_total": 0.2804646429573576,
+    "prefill_b1_fused_over_dense_active": 0.27000702697931706,
+    "decode_b1_fused_over_naive": 1.7739880035833924,
+    "decode_b1_fused_over_dense_total": 0.35094304034968626,
+    "decode_b1_fused_over_dense_active": 0.3654016013189647,
+    "prefill_b8_fused_over_naive": 3.3748501089581318,
+    "prefill_b8_fused_over_dense_total": 0.4689165455404924,
+    "prefill_b8_fused_over_dense_active": 0.194169391949933,
+    "decode_b8_fused_over_naive": 2.716993854289616,
+    "decode_b8_fused_over_dense_total": 0.27244804437663966,
+    "decode_b8_fused_over_dense_active": 0.2818083343753198,
+    "prefill_b64_fused_over_naive": 2.240349060912506,
+    "prefill_b64_fused_over_dense_total": 1.8191418200800435,
+    "prefill_b64_fused_over_dense_active": 0.5425596197699141,
+    "decode_b64_fused_over_naive": 3.053191133436222,
+    "decode_b64_fused_over_dense_total": 0.23621839529270244,
+    "decode_b64_fused_over_dense_active": 0.2070369934502966
+  }
+}

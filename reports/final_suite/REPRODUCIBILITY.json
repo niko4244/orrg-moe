@@ -1,0 +1,84 @@
+{
+  "suite": "50 cases: boltons 17, toolz 17, more-itertools 16",
+  "run1_receipt": "reports/final_suite/final_run1/receipt.json",
+  "run1_receipt_sha256": "ef01a582a2a7afee185456784fa4f2964ebb47a335e9c8285f00e54b861cebfd",
+  "run2_receipt": "reports/final_suite/final_run2/receipt.json",
+  "run2_receipt_sha256": "843426ca033bd63e0059332b6acf8598d30a6278f4cdd279584df06b4ad348a4",
+  "run1_total": 49,
+  "run2_total": 49,
+  "total_cases": 50,
+  "per_repo": {
+    "boltons": {
+      "run1_passed": 17,
+      "run1_cases": 17,
+      "run2_passed": 17,
+      "run2_cases": 17,
+      "failed": [],
+      "per_case_identical": true,
+      "function_sha256_run1": "2298907d7a4fda798d2e506a253352b68aba4802f79cf1664096ff1a37ee100a",
+      "function_sha256_run2": "2298907d7a4fda798d2e506a253352b68aba4802f79cf1664096ff1a37ee100a",
+      "function_identical": true,
+      "attempts_run1": 2,
+      "attempts_run2": 2,
+      "attempt_prompt_hashes_identical": true,
+      "attempt_response_hashes_identical": true
+    },
+    "toolz": {
+      "run1_passed": 16,
+      "run1_cases": 17,
+      "run2_passed": 16,
+      "run2_cases": 17,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+      ],
+      "per_case_identical": true,
+      "function_sha256_run1": "1a8300da487166c7aafe479ed968735bd5c71994e7f25754144a8ea192e7efbd",
+      "function_sha256_run2": "1a8300da487166c7aafe479ed968735bd5c71994e7f25754144a8ea192e7efbd",
+      "function_identical": true,
+      "attempts_run1": 6,
+      "attempts_run2": 6,
+      "attempt_prompt_hashes_identical": true,
+      "attempt_response_hashes_identical": true
+    },
+    "more-itertools": {
+      "run1_passed": 16,
+      "run1_cases": 16,
+      "run2_passed": 16,
+      "run2_cases": 16,
+      "failed": [],
+      "per_case_identical": true,
+      "function_sha256_run1": "da8744c97807d366c38db84f5af6cc294ea670f12897eab1b5cf423a65f708b4",
+      "function_sha256_run2": "da8744c97807d366c38db84f5af6cc294ea670f12897eab1b5cf423a65f708b4",
+      "function_identical": true,
+      "attempts_run1": 2,
+      "attempts_run2": 2,
+      "attempt_prompt_hashes_identical": true,
+      "attempt_response_hashes_identical": true
+    }
+  },
+  "all_per_case_results_identical": true,
+  "all_output_hashes_identical": true,
+  "all_attempt_response_hashes_identical": true,
+  "artifacts": {
+    "SCAFFOLD.json": {
+      "bytes": 5887,
+      "sha256": "333c80e288ac92e4a3dfcd89024deecda80a47ab05c6ff89696bd182ed9770fc"
+    },
+    "PROMPTS_VERBATIM.txt": {
+      "bytes": 12971,
+      "sha256": "38fea2919a2252b3a20b6bae727a043a19e85afebb6d4d9cf6e894e133e2d76c"
+    },
+    "PROMPT_TABLE.json": {
+      "bytes": 1591,
+      "sha256": "fb2daf439d4e7a41c8a7dbd6bff4be2b9dd8c2c25f1cc577d2c54eafd237723e"
+    },
+    "toolz_fixture_correction.json": {
+      "bytes": 1404,
+      "sha256": "5207e7c11ed1ce3ca358461ec9ad000b8f73e56149cdc7e7131ae64b85bd1536"
+    },
+    "baselines_after_toolz_fixture_correction.json": {
+      "bytes": 439,
+      "sha256": "7dfe27438b7fb008f7850119759e23556d92daaa8422f866d3c52c053d644a61"
+    }
+  }
+}

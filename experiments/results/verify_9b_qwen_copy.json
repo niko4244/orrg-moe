@@ -1,0 +1,164 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "dtype": "bfloat16",
+  "device": "cpu",
+  "geometry": {
+    "shared": 4,
+    "groups": 4,
+    "variants": 14,
+    "skeleton_scale": 1.0,
+    "expert_width_ratio": 1.0,
+    "expert_mode": "additive",
+    "router_warm_start": "cluster",
+    "top_residuals": 1,
+    "router_group_top_k": 1,
+    "residual_init": "copy"
+  },
+  "params": {
+    "dense": 1543714304,
+    "total": 9060309936,
+    "active_k0": 1545952176,
+    "active_k1": 2123979696,
+    "active_k2": 2702007216,
+    "expansion": 5.86916239133326,
+    "router": 2237872,
+    "skeleton": 1156055040,
+    "residual": 7514357760,
+    "shard_width": 1120,
+    "expert_width": 1120
+  },
+  "conversion": {
+    "lossless_label": false,
+    "logit_kl": 0.7196216583251953,
+    "logit_max_abs": 11.53125,
+    "max_carve_error": 1.5789474248886108,
+    "worst_layer": "model.layers.27.mlp",
+    "first_layer_error": 0.32065218687057495,
+    "last_layer_error": 1.5789474248886108,
+    "per_layer_carve": [
+      {
+        "layer": "0",
+        "error": 0.32065218687057495
+      },
+      {
+        "layer": "1",
+        "error": 0.9226519465446472
+      },
+      {
+        "layer": "2",
+        "error": 0.2930232584476471
+      },
+      {
+        "layer": "3",
+        "error": 0.050470709800720215
+      },
+      {
+        "layer": "4",
+        "error": 0.07238051295280457
+      },
+      {
+        "layer": "5",
+        "error": 0.6555555462837219
+      },
+      {
+        "layer": "6",
+        "error": 1.0594135522842407
+      },
+      {
+        "layer": "7",
+        "error": 0.9681274890899658
+      },
+      {
+        "layer": "8",
+        "error": 0.5178571343421936
+      },
+      {
+        "layer": "9",
+        "error": 0.4060150384902954
+      },
+      {
+        "layer": "10",
+        "error": 0.8625991940498352
+      },
+      {
+        "layer": "11",
+        "error": 0.5852017998695374
+      },
+      {
+        "layer": "12",
+        "error": 0.5589743852615356
+      },
+      {
+        "layer": "13",
+        "error": 0.6191860437393188
+      },
+      {
+        "layer": "14",
+        "error": 0.7239583134651184
+      },
+      {
+        "layer": "15",
+        "error": 0.8156565427780151
+      },
+      {
+        "layer": "16",
+        "error": 0.8130841255187988
+      },
+      {
+        "layer": "17",
+        "error": 0.583832323551178
+      },
+      {
+        "layer": "18",
+        "error": 0.7671793103218079
+      },
+      {
+        "layer": "19",
+        "error": 1.0555555820465088
+      },
+      {
+        "layer": "20",
+        "error": 0.4480452537536621
+      },
+      {
+        "layer": "21",
+        "error": 0.6307692527770996
+      },
+      {
+        "layer": "22",
+        "error": 0.3395833373069763
+      },
+      {
+        "layer": "23",
+        "error": 0.41133004426956177
+      },
+      {
+        "layer": "24",
+        "error": 0.567573070526123
+      },
+      {
+        "layer": "25",
+        "error": 0.4086538553237915
+      },
+      {
+        "layer": "26",
+        "error": 0.6000000238418579
+      },
+      {
+        "layer": "27",
+        "error": 1.5789474248886108
+      }
+    ],
+    "layers": 28
+  },
+  "warm_start": {
+    "agreement_mean": 0.9884207589285714,
+    "agreement_min": 0.966796875,
+    "agreement_max": 0.998046875,
+    "layers": 28
+  },
+  "timing": {
+    "load_s": 1.03631591796875,
+    "convert_s": 77.58822250366211
+  }
+}

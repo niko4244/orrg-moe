@@ -1,0 +1,20 @@
+--- toolz/functoolz.py (corrected fixture)
++++ toolz/functoolz.py (restored 27/50 fixture)
+@@ -965,15 +965,8 @@
+ 
+ 
+ def is_valid_args(func, args, kwargs, sigspec=None):
+-    sigspec, rv = _check_sigspec(sigspec, func, _sigs._is_valid_args,
+-                                 func, args, kwargs)
+-    if sigspec is None:
+-        return rv
+-    try:
+-        sigspec.bind(*args, **kwargs)
+-    except TypeError:
+-        return False
+-    return True
++    # BUG: introspection regression - always reports "unknown".
++    return None
+ 
+ 
+ def is_partial_args(func, args, kwargs, sigspec=None):

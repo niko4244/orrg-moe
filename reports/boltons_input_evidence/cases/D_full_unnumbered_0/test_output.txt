@@ -1,0 +1,87 @@
+[
+ {
+  "case": "basic_epoch",
+  "status": "PASSED",
+  "detail": ""
+ },
+ {
+  "case": "frac_3_digits_851",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "frac_leading_zero_051",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "frac_6_digits_000001",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "frac_overprecise_truncates",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "frac_1_digit_5",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "frac_2_digits_05",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "frac_4_digits_0001",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "isoformat_milliseconds",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "isoformat_microseconds",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "isoformat_default",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "tz_zulu",
+  "status": "PASSED",
+  "detail": ""
+ },
+ {
+  "case": "tz_offset_plus_0530",
+  "status": "PASSED",
+  "detail": ""
+ },
+ {
+  "case": "tz_offset_with_fraction",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "tz_aware_isoformat_roundtrip",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ },
+ {
+  "case": "tz_invalid_offset_raises",
+  "status": "PASSED",
+  "detail": ""
+ },
+ {
+  "case": "dt_to_timestamp_fraction",
+  "status": "FAILED",
+  "detail": "ValueError: second must be in 0..59"
+ }
+]

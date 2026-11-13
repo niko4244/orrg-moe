@@ -1,0 +1,12 @@
+{
+  "reason": "The buggy fixture contained an unintended second defect: is_valid_args was hard-coded to return None, while the task issue says only _check_sigspec is broken and public helpers must not change. The extra defect was masked at baseline (still 1/17) and made the stated toolz ceiling 13/17, below the required 14/17.",
+  "file": "toolz/functoolz.py",
+  "before_file_sha256": "32a150066517eb3a17f77d5ab537695466ebde08a06bbeda7328b174b2ebaf9a",
+  "after_file_sha256": "4bd6cb5303b13db91b01a5faec062125852e203af291e30b2762e97f4d653847",
+  "function_before": "def is_valid_args(func, args, kwargs, sigspec=None):\n    # BUG: introspection regression - always reports \"unknown\".\n    return None\n",
+  "function_after": "def is_valid_args(func, args, kwargs, sigspec=None):\n    sigspec, rv = _check_sigspec(sigspec, func, _sigs._is_valid_args,\n                                 func, args, kwargs)\n    if sigspec is None:\n        return rv\n    try:\n        sigspec.bind(*args, **kwargs)\n    except TypeError:\n        return False\n    return True\n",
+  "function_before_sha256": "9b8bac588b3090359471523e87262f3cba37d8e374f4439a1baea79e5b24fbe4",
+  "function_after_sha256": "b61db9f015823870da61283c76f233bd8e4e73ec57c9cfa4e7ffe8b84cdbf49d",
+  "upstream_source": "coding_research\\repos\\toolz\\toolz\\functoolz.py",
+  "baseline_expected_after_correction": "1/17 (unchanged)"
+}

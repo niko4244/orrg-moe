@@ -1,0 +1,169 @@
+{
+  "suite": "50 cases: boltons 17, toolz 17, more-itertools 16",
+  "baseline_27_50": {
+    "per_repo": {
+      "boltons": {
+        "passed": 9,
+        "cases": 17
+      },
+      "toolz": {
+        "passed": 4,
+        "cases": 17
+      },
+      "more-itertools": {
+        "passed": 14,
+        "cases": 16
+      }
+    },
+    "total_passed": 27,
+    "total_cases": 50,
+    "provenance": "Documented verified one-shot result; retained without recomputation or rebaselining.",
+    "old_receipts": [
+      {
+        "path": "reports/final_suite/run1/receipt.json",
+        "bytes": 3409,
+        "sha256": "655d17a3e4f4429283a8174d4712b10fcac24e6b7fa250cdbcc8b35433d764b7"
+      },
+      {
+        "path": "reports/final_suite/run2/receipt.json",
+        "bytes": 3409,
+        "sha256": "14d9528cedb17621ccb981401f43dd24b9e61065f296d37d85f7e6f68c330409"
+      }
+    ]
+  },
+  "restored_inputs": {
+    "toolz_fixture": {
+      "path": "coding_research/work/toolz_buggy/toolz/functoolz.py",
+      "corrected_before_restore": {
+        "path": "reports/final_suite/archive_toolz_fixture_corrected.py",
+        "bytes": 34173,
+        "sha256": "49f8d2f54f5a112ff41bd864247a80a245b2abf49e826db0125b862e3180df84",
+        "normalized": {
+          "bytes": 33050,
+          "sha256": "4bd6cb5303b13db91b01a5faec062125852e203af291e30b2762e97f4d653847"
+        }
+      },
+      "restored": {
+        "bytes": 33975,
+        "sha256": "d6b8da227ddfa6d3c03ac0789ee308c7f00a9ad28a24dd44bd1a89e52ba9964d",
+        "normalized": {
+          "bytes": 32859,
+          "sha256": "32a150066517eb3a17f77d5ab537695466ebde08a06bbeda7328b174b2ebaf9a"
+        }
+      },
+      "verified_27_50_base_normalized": {
+        "bytes": 32859,
+        "sha256": "32a150066517eb3a17f77d5ab537695466ebde08a06bbeda7328b174b2ebaf9a"
+      },
+      "restore_diff": {
+        "path": "reports/final_suite/restore_toolz.diff",
+        "bytes": 592,
+        "sha256": "9caaf4d374148d671c3141c2f3b860289702c5680b831780c83970dedb7d3293"
+      },
+      "diff_text": "--- toolz/functoolz.py (corrected fixture)\n+++ toolz/functoolz.py (restored 27/50 fixture)\n@@ -965,15 +965,8 @@\n \n \n def is_valid_args(func, args, kwargs, sigspec=None):\n-    sigspec, rv = _check_sigspec(sigspec, func, _sigs._is_valid_args,\n-                                 func, args, kwargs)\n-    if sigspec is None:\n-        return rv\n-    try:\n-        sigspec.bind(*args, **kwargs)\n-    except TypeError:\n-        return False\n-    return True\n+    # BUG: introspection regression - always reports \"unknown\".\n+    return None\n \n \n def is_partial_args(func, args, kwargs, sigspec=None):\n",
+      "source": "Exact pre-correction block recovered from the base commit/working tree of the archived 27/50 run; no guessed reconstruction."
+    },
+    "target_fixtures": {
+      "boltons/timeutils.py": {
+        "current_raw": {
+          "bytes": 24898,
+          "sha256": "a19b45d55a313edfd1af8fa1a54edaaa4af854a30c1093086f96dbd9d61c138a"
+        },
+        "current_normalized": {
+          "bytes": 24237,
+          "sha256": "b83183298f71e56a1a0ba4a3b7b8260460d55a4b00b59e453a221a3802d10f69"
+        },
+        "verified_base_normalized_sha256": "b83183298f71e56a1a0ba4a3b7b8260460d55a4b00b59e453a221a3802d10f69"
+      },
+      "more_itertools/more.py": {
+        "current_raw": {
+          "bytes": 181695,
+          "sha256": "16706fed4062cfed4e07033186edcb675743f501b4cba312bc389a14ee4f8fcb"
+        },
+        "current_normalized": {
+          "bytes": 176036,
+          "sha256": "28d2b98f762483296d67348f293723284f9222d2b101484cb10cca42fae83ead"
+        },
+        "verified_base_normalized_sha256": "28d2b98f762483296d67348f293723284f9222d2b101484cb10cca42fae83ead"
+      }
+    },
+    "cases_and_oracles": {
+      "boltons_oracle": {
+        "path": "harness/isoparse_cases.py",
+        "bytes": 2871,
+        "sha256": "8211129c6bf7c0975d4bc3d5cea9ed3e3b93f718f1d59cbff132954f92a87b70",
+        "expected_sha256": "8211129c6bf7c0975d4bc3d5cea9ed3e3b93f718f1d59cbff132954f92a87b70"
+      },
+      "toolz_tests": {
+        "path": "coding_research/work/toolz_buggy/toolz/tests/test_inspect_args.py",
+        "current_raw": {
+          "bytes": 17043,
+          "sha256": "671aa0b7d3a8812fb4885080a186b5bc4d9d09921305427a269ee37e1f39936d"
+        },
+        "current_normalized": {
+          "bytes": 16539,
+          "sha256": "0f524a2e128272cef54993c4dfef3a3d24a2af19cfa0cf9a60eab7157cb75b95"
+        },
+        "verified_27_50_raw": {
+          "bytes": 17043,
+          "sha256": "671aa0b7d3a8812fb4885080a186b5bc4d9d09921305427a269ee37e1f39936d"
+        }
+      },
+      "more_itertools_tests": {
+        "path": "coding_research/work/more_buggy/tests/test_more.py",
+        "current_raw": {
+          "bytes": 266555,
+          "sha256": "3bd3398e72a1268bcbbd0eb1e94c11cc417f42f93d304f33de803a9a2b3f818d"
+        },
+        "current_normalized": {
+          "bytes": 259039,
+          "sha256": "7ed775cb9dd3e2cfdd82d83b025026d82ff6268d667e3866ab9bc6655e5b7307"
+        },
+        "verified_27_50_raw": {
+          "bytes": 266555,
+          "sha256": "3bd3398e72a1268bcbbd0eb1e94c11cc417f42f93d304f33de803a9a2b3f818d"
+        }
+      }
+    },
+    "all_inputs_restored": true
+  },
+  "one_shot_restore_check": {
+    "path": "reports/final_suite/oneshot_restore_check/receipt.json",
+    "bytes": 5918,
+    "sha256": "bba4727875ba766157f8737bda40d5a648d9c7e6807702caa6be0bd03e1dfb7b",
+    "total_passed": 27,
+    "total_cases": 50,
+    "per_repo": {
+      "boltons": {
+        "passed": 9,
+        "cases": 17
+      },
+      "toolz": {
+        "passed": 4,
+        "cases": 17
+      },
+      "more-itertools": {
+        "passed": 14,
+        "cases": 16
+      }
+    },
+    "initial_prompt_sha256": {
+      "boltons": "fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9",
+      "toolz": "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60",
+      "more-itertools": "be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad"
+    },
+    "function_sha256": {
+      "boltons": "b3c26d6ec08f25d0af0230c1422014f0ca874b51d9488e5ac5eba1481d8ad9c6",
+      "toolz": "b0260eeb664b33f83ac06d5688bed40dc2a66f601f75dea7a7337267f92959f1",
+      "more-itertools": "46262255d0be119a925ed2bd9e1f9735c3cd19dfa3867583fc9faf469d183bff"
+    },
+    "note": "Confirmation only; the report baseline remains the fixed documented 27/50. This run is not used to recompute or replace it."
+  },
+  "hintfree_scaffold": {
+    "path": "harness/final_suite.py",
+    "bytes": 17894,
+    "sha256": "40f9a6b101b69b5b503fa5b1c7b0c581577370deabef0830f9fc47658411f9da",
+    "task_specific_hint_strings_present": false
+  },
+  "baseline_policy": "The report uses exactly boltons 9/17, toolz 4/17, more-itertools 14/16, total 27/50. No 14/50 baseline is used anywhere."
+}

@@ -1,0 +1,184 @@
+{
+  "run": "final_run2",
+  "model": "claude-spark-x2.6-local",
+  "thinking": "disabled",
+  "temperature": 0.0,
+  "max_tokens": 3000,
+  "protocol": "function-replacement + bounded self-repair",
+  "max_attempts_per_task": 6,
+  "feedback_limit_chars": 5000,
+  "contract": "You are fixing one bug in a real repository.\nRules:\n1. Read the issue and the file excerpt; change only what the issue requires.\n2. Preserve public behavior unrelated to the bug.\n3. Return a complete, syntactically valid replacement for the target function.\n4. Every branch of a conditional that computes a value must assign that value.\n5. Keep the function's public signature and documented behavior.",
+  "contract_sha256": "59ae47551fd8584b8e9fc3aa8351a7b0f9c96b24d4f05fc17583124e1208b523",
+  "system": "You are a senior Python engineer fixing a bug in a real open-source repository. Return the complete replacement function in one ```python code block. Do not include prose or explanation.",
+  "system_sha256": "a27b8c0187460571d65608283c8e213152343dd2e5abc3bede518e33eed95171",
+  "per_repo": {
+    "boltons": {
+      "passed": 17,
+      "cases": 17,
+      "failed": [],
+      "apply_ok": true,
+      "touched": [
+        "isoparse"
+      ],
+      "attempts": 2,
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "passed": 9,
+          "failed": [
+            "dt_to_timestamp_fraction",
+            "frac_1_digit_5",
+            "frac_2_digits_05",
+            "frac_3_digits_851",
+            "frac_4_digits_0001",
+            "frac_leading_zero_051",
+            "frac_overprecise_truncates",
+            "isoformat_milliseconds"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 2,
+          "passed": 17,
+          "failed": [],
+          "apply_ok": true
+        }
+      ]
+    },
+    "toolz": {
+      "passed": 16,
+      "cases": 17,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+      ],
+      "apply_ok": true,
+      "touched": [
+        "_check_sigspec"
+      ],
+      "attempts": 6,
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "passed": 5,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_has_keywords",
+            "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+            "toolz/tests/test_inspect_args.py::test_has_varargs",
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_is_arity",
+            "toolz/tests/test_inspect_args.py::test_is_partial",
+            "toolz/tests/test_inspect_args.py::test_is_valid",
+            "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+            "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_num_required_args"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 2,
+          "passed": 16,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 3,
+          "passed": 16,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 4,
+          "passed": 16,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 5,
+          "passed": 16,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 6,
+          "passed": 16,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+          ],
+          "apply_ok": true
+        }
+      ]
+    },
+    "more-itertools": {
+      "passed": 16,
+      "cases": 16,
+      "failed": [],
+      "apply_ok": true,
+      "touched": [
+        "split_into"
+      ],
+      "attempts": 2,
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "passed": 14,
+          "failed": [
+            "tests/test_more.py::SplitIntoTests::test_bool_in_sizes",
+            "tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+          ],
+          "apply_ok": true
+        },
+        {
+          "attempt": 2,
+          "passed": 16,
+          "failed": [],
+          "apply_ok": true
+        }
+      ]
+    }
+  },
+  "total_passed": 49,
+  "total_cases": 50,
+  "initial_prompt_sha256": {
+    "boltons": "fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9",
+    "toolz": "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60",
+    "more-itertools": "be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad"
+  },
+  "initial_prompt_bytes": {
+    "boltons": 3657,
+    "toolz": 1810,
+    "more-itertools": 3282
+  },
+  "function_sha256": {
+    "boltons": "2298907d7a4fda798d2e506a253352b68aba4802f79cf1664096ff1a37ee100a",
+    "toolz": "1a8300da487166c7aafe479ed968735bd5c71994e7f25754144a8ea192e7efbd",
+    "more-itertools": "da8744c97807d366c38db84f5af6cc294ea670f12897eab1b5cf423a65f708b4"
+  },
+  "attempt_prompt_sha256": {
+    "boltons": [
+      "fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9",
+      "80a3cd03be62b73122f8ab1f68fb6181f624025eaf0a40034b781a6545617ef6"
+    ],
+    "toolz": [
+      "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60",
+      "abaf7b2a4119cd61af72fd661c02012cee5bef5ef9a6d206ea67ee1c6e4664fa",
+      "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c",
+      "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c",
+      "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c",
+      "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c"
+    ],
+    "more-itertools": [
+      "be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad",
+      "1fb26aabc0f028f82f7d157ecf0ab3b37bb7cc91df5c120cd03cfd13a5b345ca"
+    ]
+  }
+}

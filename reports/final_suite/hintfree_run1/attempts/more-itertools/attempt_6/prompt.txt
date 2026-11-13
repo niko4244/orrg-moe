@@ -1,0 +1,98 @@
+## Current implementation of `split_into`
+
+This is the version that produced the results below:
+
+```python
+def split_into(iterable, sizes):
+    """Yield a list of sequential items from *iterable* of length 'n' for each
+    integer 'n' in *sizes*.
+
+        >>> list(split_into([1,2,3,4,5,6], [1,2,3]))
+        [[1], [2, 3], [4, 5, 6]]
+
+    If the sum of *sizes* is smaller than the length of *iterable*, then the
+    remaining items of *iterable* will not be returned.
+
+        >>> list(split_into([1,2,3,4,5,6], [2,3]))
+        [[1, 2], [3, 4, 5]]
+
+    If the sum of *sizes* is larger than the length of *iterable*, fewer items
+    will be returned in the iteration that overruns the *iterable* and further
+    lists will be empty:
+
+        >>> list(split_into([1,2,3,4], [1,2,3,4]))
+        [[1], [2, 3], [4], []]
+
+    When a ``None`` object is encountered in *sizes*, the returned list will
+    contain items up to the end of *iterable* the same way that
+    :func:`itertools.slice` does:
+
+        >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
+        [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
+
+    :func:`split_into` can be useful for grouping a series of items where the
+    sizes of the groups are not uniform. An example would be where in a row
+    from a table, multiple columns represent elements of the same feature
+    (e.g. a point represented by x,y,z) but, the format is not the same for
+    all columns.
+    """
+    # convert the iterable argument into an iterator so its contents can
+    # be consumed by islice in case it is a generator
+    it = iter(iterable)
+
+    for size in sizes:
+        if size is None:
+            yield list(it)
+            return
+        elif isinstance(size, bool):
+            # bool is a subclass of int, but True/False are not valid sizes
+            raise ValueError(
+                "Sizes must be integers or None, got bool: {!r}".format(size)
+            )
+        elif isinstance(size, int):
+            # islice with a positive length yields exactly that many items,
+            # while islice with a negative length yields the remaining items
+            # (matching the behavior of itertools.slice).
+            yield list(islice(it, size if size > 0 else -1))
+        else:
+            raise TypeError(
+                "Sizes must be integers or None, got {!r}".format(size)
+            )
+
+```
+
+## Test results from that implementation
+
+14/16 cases passed. Failing cases:
+- `tests/test_more.py::SplitIntoTests::test_bool_in_sizes`
+- `tests/test_more.py::SplitIntoTests::test_invalid_in_sizes`
+
+Actual vs expected:
+- `SplitIntoTests.test_bool_in_sizes`: ValueError: Sizes must be integers or None, got bool: True
+- `SplitIntoTests.test_invalid_in_sizes`: TypeError: Sizes must be integers or None, got []
+
+Raw test output:
+```text
+================================== FAILURES ===================================
+______________________ SplitIntoTests.test_bool_in_sizes ______________________
+tests\test_more.py:1982: in test_bool_in_sizes
+    actual = list(mi.split_into(iterable, sizes))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+more_itertools\more.py:1790: in split_into
+    raise ValueError(
+E   ValueError: Sizes must be integers or None, got bool: True
+____________________ SplitIntoTests.test_invalid_in_sizes _____________________
+tests\test_more.py:1991: in test_invalid_in_sizes
+    list(mi.split_into(iterable, sizes))
+more_itertools\more.py:1799: in split_into
+    raise TypeError(
+E   TypeError: Sizes must be integers or None, got []
+=========================== short test summary info ===========================
+FAILED tests/test_more.py::SplitIntoTests::test_bool_in_sizes - ValueError: S...
+FAILED tests/test_more.py::SplitIntoTests::test_invalid_in_sizes - TypeError:...
+======================== 2 failed, 14 passed in 0.76s =========================
+```
+
+## Repair task
+
+Diagnose the root cause of every listed failure. Return a complete corrected `split_into` function in one ```python code block. Keep the parts that already pass working, and do not return a diff. Re-check the listed failures against your new implementation before returning.

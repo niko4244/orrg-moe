@@ -1,0 +1,71 @@
+[{"case": "basic_epoch", "status": "PASSED", "detail": ""}, {"case": "frac_3_digits_851", "status": "FAILED", "detail": "AssertionError: "}, {"case": "frac_leading_zero_051", "status": "FAILED", "detail": "AssertionError: "}, {"case": "frac_6_digits_000001", "status": "PASSED", "detail": ""}, {"case": "frac_overprecise_truncates", "status": "FAILED", "detail": "ValueError: microsecond must be in 0..999999"}, {"case": "frac_1_digit_5", "status": "FAILED", "detail": "AssertionError: "}, {"case": "frac_2_digits_05", "status": "FAILED", "detail": "AssertionError: "}, {"case": "frac_4_digits_0001", "status": "FAILED", "detail": "AssertionError: "}, {"case": "isoformat_milliseconds", "status": "FAILED", "detail": "AssertionError: "}, {"case": "isoformat_microseconds", "status": "PASSED", "detail": ""}, {"case": "isoformat_default", "status": "PASSED", "detail": ""}, {"case": "tz_zulu", "status": "PASSED", "detail": ""}, {"case": "tz_offset_plus_0530", "status": "PASSED", "detail": ""}, {"case": "tz_offset_with_fraction", "status": "PASSED", "detail": ""}, {"case": "tz_aware_isoformat_roundtrip", "status": "PASSED", "detail": ""}, {"case": "tz_invalid_offset_raises", "status": "PASSED", "detail": ""}, {"case": "dt_to_timestamp_fraction", "status": "FAILED", "detail": "AssertionError: "}]
+
+
+
+--- diagnostic pytest of the 17 oracle cases ---
+.FF.FFFFF.......F                                                        [100%]
+================================== FAILURES ===================================
+__________________________ test_01_frac_3_digits_851 __________________________
+..\attempts\boltons\attempt_3\test_oracle_feedback.py:8: in test_01_frac_3_digits_851
+    assert isoparse('1970-01-01T00:00:00.851').microsecond == 851000
+E   AssertionError: assert 851 == 851000
+E    +  where 851 = datetime.datetime(1970, 1, 1, 0, 0, 0, 851).microsecond
+E    +    where datetime.datetime(1970, 1, 1, 0, 0, 0, 851) = isoparse('1970-01-01T00:00:00.851')
+________________________ test_02_frac_leading_zero_051 ________________________
+..\attempts\boltons\attempt_3\test_oracle_feedback.py:11: in test_02_frac_leading_zero_051
+    assert isoparse('2020-01-02T03:04:05.051').microsecond == 51000
+E   AssertionError: assert 51 == 51000
+E    +  where 51 = datetime.datetime(2020, 1, 2, 3, 4, 5, 51).microsecond
+E    +    where datetime.datetime(2020, 1, 2, 3, 4, 5, 51) = isoparse('2020-01-02T03:04:05.051')
+_____________________ test_04_frac_overprecise_truncates ______________________
+..\attempts\boltons\attempt_3\test_oracle_feedback.py:17: in test_04_frac_overprecise_truncates
+    assert isoparse('2020-01-01T00:00:00.123456789').microsecond == 123456
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:157: in isoparse
+    return datetime(*dt_args[:6], microsecond=microsecond, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: microsecond must be in 0..999999
+___________________________ test_05_frac_1_digit_5 ____________________________
+..\attempts\boltons\attempt_3\test_oracle_feedback.py:20: in test_05_frac_1_digit_5
+    assert isoparse('2020-01-02T03:04:05.5').microsecond == 500000
+E   AssertionError: assert 5 == 500000
+E    +  where 5 = datetime.datetime(2020, 1, 2, 3, 4, 5, 5).microsecond
+E    +    where datetime.datetime(2020, 1, 2, 3, 4, 5, 5) = isoparse('2020-01-02T03:04:05.5')
+__________________________ test_06_frac_2_digits_05 ___________________________
+..\attempts\boltons\attempt_3\test_oracle_feedback.py:23: in test_06_frac_2_digits_05
+    assert isoparse('2020-01-02T03:04:05.05').microsecond == 50000
+E   AssertionError: assert 5 == 50000
+E    +  where 5 = datetime.datetime(2020, 1, 2, 3, 4, 5, 5).microsecond
+E    +    where datetime.datetime(2020, 1, 2, 3, 4, 5, 5) = isoparse('2020-01-02T03:04:05.05')
+_________________________ test_07_frac_4_digits_0001 __________________________
+..\attempts\boltons\attempt_3\test_oracle_feedback.py:26: in test_07_frac_4_digits_0001
+    assert isoparse('2020-01-02T03:04:05.0001').microsecond == 100
+E   AssertionError: assert 1 == 100
+E    +  where 1 = datetime.datetime(2020, 1, 2, 3, 4, 5, 1).microsecond
+E    +    where datetime.datetime(2020, 1, 2, 3, 4, 5, 1) = isoparse('2020-01-02T03:04:05.0001')
+_______________________ test_08_isoformat_milliseconds ________________________
+..\attempts\boltons\attempt_3\test_oracle_feedback.py:29: in test_08_isoformat_milliseconds
+    dt=datetime(2020,1,2,3,4,5,851000); assert isoparse(dt.isoformat(timespec='milliseconds')) == dt
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert datetime.datetime(2020, 1, 2, 3, 4, 5, 851) == datetime.datetime(2020, 1, 2, 3, 4, 5, 851000)
+E    +  where datetime.datetime(2020, 1, 2, 3, 4, 5, 851) = isoparse('2020-01-02T03:04:05.851')
+E    +    where '2020-01-02T03:04:05.851' = <built-in method isoformat of datetime.datetime object at 0x000001ECB1C08E10>(timespec='milliseconds')
+E    +      where <built-in method isoformat of datetime.datetime object at 0x000001ECB1C08E10> = datetime.datetime(2020, 1, 2, 3, 4, 5, 851000).isoformat
+______________________ test_16_dt_to_timestamp_fraction _______________________
+..\attempts\boltons\attempt_3\test_oracle_feedback.py:55: in test_16_dt_to_timestamp_fraction
+    assert abs(dt_to_timestamp(isoparse('1970-01-01T00:00:00.851')) - 0.851) < 1e-9
+E   AssertionError: assert 0.8501489999999999 < 1e-09
+E    +  where 0.8501489999999999 = abs((0.000851 - 0.851))
+E    +    where 0.000851 = dt_to_timestamp(datetime.datetime(1970, 1, 1, 0, 0, 0, 851))
+E    +      where datetime.datetime(1970, 1, 1, 0, 0, 0, 851) = isoparse('1970-01-01T00:00:00.851')
+=========================== short test summary info ===========================
+FAILED ..\attempts\boltons\attempt_3\test_oracle_feedback.py::test_01_frac_3_digits_851
+FAILED ..\attempts\boltons\attempt_3\test_oracle_feedback.py::test_02_frac_leading_zero_051
+FAILED ..\attempts\boltons\attempt_3\test_oracle_feedback.py::test_04_frac_overprecise_truncates
+FAILED ..\attempts\boltons\attempt_3\test_oracle_feedback.py::test_05_frac_1_digit_5
+FAILED ..\attempts\boltons\attempt_3\test_oracle_feedback.py::test_06_frac_2_digits_05
+FAILED ..\attempts\boltons\attempt_3\test_oracle_feedback.py::test_07_frac_4_digits_0001
+FAILED ..\attempts\boltons\attempt_3\test_oracle_feedback.py::test_08_isoformat_milliseconds
+FAILED ..\attempts\boltons\attempt_3\test_oracle_feedback.py::test_16_dt_to_timestamp_fraction
+8 failed, 9 passed in 0.27s
+

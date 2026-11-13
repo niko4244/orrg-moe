@@ -1,0 +1,24 @@
+{
+  "boltons": {
+    "passed": 9,
+    "cases": 17,
+    "failed": [
+      "frac_3_digits_851",
+      "frac_leading_zero_051",
+      "frac_overprecise_truncates",
+      "frac_1_digit_5",
+      "frac_2_digits_05",
+      "frac_4_digits_0001",
+      "isoformat_milliseconds",
+      "dt_to_timestamp_fraction"
+    ]
+  },
+  "toolz": {
+    "passed": 1,
+    "cases": 17
+  },
+  "more": {
+    "passed": 4,
+    "cases": 16
+  }
+}

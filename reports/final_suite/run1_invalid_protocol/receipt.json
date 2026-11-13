@@ -1,0 +1,84 @@
+{
+  "run": "run1",
+  "model": "claude-spark-x2.6-local",
+  "thinking": "disabled",
+  "temperature": 0.0,
+  "max_tokens": 3000,
+  "protocol": "function-replacement",
+  "contract": "You are fixing one bug in a real repository.\nRules:\n1. Read the issue and the file excerpt; change only what the issue requires.\n2. Preserve public behavior unrelated to the bug.\n3. The diff must apply cleanly to the repository at the stated path.\n4. Every branch of a conditional that computes a value must assign that value.\n5. Return only the diff, no prose or fences.",
+  "contract_sha256": "633a15b6465f454948763d4e5ea33ea1139e9779db68c1b53cb4340275b39d79",
+  "system": "You are a senior Python engineer fixing a bug in a real open-source repository. Return only a unified diff that applies with `git apply -p1` from the repository root. Use `--- a/<path>` and `+++ b/<path>` headers and correct @@ hunk ranges. Do not include prose, explanation, or markdown fences.",
+  "system_sha256": "6b05a5ef7ebc43e5de9a5bbda7b5f359ed6138ebc2e705bf8b006a668471e248",
+  "per_repo": {
+    "boltons": {
+      "passed": 0,
+      "cases": 17,
+      "failed": [
+        "basic_epoch",
+        "dt_to_timestamp_fraction",
+        "frac_1_digit_5",
+        "frac_2_digits_05",
+        "frac_3_digits_851",
+        "frac_4_digits_0001",
+        "frac_6_digits_000001",
+        "frac_leading_zero_051",
+        "frac_overprecise_truncates",
+        "isoformat_default",
+        "isoformat_microseconds",
+        "isoformat_milliseconds",
+        "tz_aware_isoformat_roundtrip",
+        "tz_invalid_offset_raises",
+        "tz_offset_plus_0530",
+        "tz_offset_with_fraction",
+        "tz_zulu"
+      ],
+      "apply_ok": true,
+      "touched": []
+    },
+    "toolz": {
+      "passed": 3,
+      "cases": 17,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_func_keyword",
+        "toolz/tests/test_inspect_args.py::test_has_keywords",
+        "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+        "toolz/tests/test_inspect_args.py::test_has_varargs",
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+        "toolz/tests/test_inspect_args.py::test_introspect_builtin_modules",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_py3",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_is_arity",
+        "toolz/tests/test_inspect_args.py::test_is_partial",
+        "toolz/tests/test_inspect_args.py::test_is_valid",
+        "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_num_required_args"
+      ],
+      "apply_ok": true,
+      "touched": [
+        "_check_sigspec"
+      ]
+    },
+    "more-itertools": {
+      "passed": 16,
+      "cases": 16,
+      "failed": [],
+      "apply_ok": true,
+      "touched": [
+        "split_into"
+      ]
+    }
+  },
+  "total_passed": 19,
+  "total_cases": 50,
+  "prompt_sha256": {
+    "boltons": "78f8c6bc23dda54ab8ad43a329de9453dba778317ab05a6a8c1a5e921010db8e",
+    "toolz": "4ed11807dc01837b879bb73942b652cf6461b64ba8e2b7373a83b27b6d51af10",
+    "more-itertools": "1d09a328d1ce4e232e05a3f1bcc129687b23bbbc0b6c9bd0d2ff9f1e92b734dd"
+  },
+  "function_sha256": {
+    "boltons": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "toolz": "70a72af2e1e5e3e76e27fb65db0bfda4e60471c6fe7119da195437cae75bec2f",
+    "more-itertools": "1a761a957e64ca872a425724e6a89ff2cca6cebda0b5b60df8366cd5bcbbcaa6"
+  }
+}

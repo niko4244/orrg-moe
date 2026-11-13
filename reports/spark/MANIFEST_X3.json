@@ -1,0 +1,5401 @@
+{
+ "schema": "spark_x3_manifest/v1",
+ "generated_at": "2026-11-12T18:29:50-0600",
+ "root": "I:\\spark-enh",
+ "root_source": "module_location",
+ "status": {
+  "complete": true,
+  "artifacts": 332,
+  "bytes": 121492099369,
+  "missing": [],
+  "outside_root": [],
+  "failed_checks": [],
+  "reproduction_findings": {},
+  "unverified_checks": [],
+  "reproduction_exact": true,
+  "reproduction_ok": true,
+  "baseline": {
+   "r5": 106,
+   "r6": 99
+  },
+  "decode_deterministic": true
+ },
+ "entrypoints": {
+  "deploy": "train/spark_x3_deploy.sh <adapter> <tag> [merged] [--verify]",
+  "eval": "python -m train.spark_x3_eval --model <name> --suite core --out <dir>",
+  "manifest": "python -m train.spark_x3_manifest"
+ },
+ "artifacts": [
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/chat_template.jinja",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\chat_template.jinja",
+   "size": 5717,
+   "sha256": "480576bd2ef80726a0dba6406d72ca37f4f4f9ca747c7f1c8d159dbdf40f6929",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/config.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\config.json",
+   "size": 2118,
+   "sha256": "cc96adf0382fee947da2daf0507e91bd850a718e956c7daef485e8a9c412629c",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/configuration_spark.py",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\configuration_spark.py",
+   "size": 4329,
+   "sha256": "02218597240490f490659b184052db940b08163ff9c3af7b7e59323f6f963722",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/generation_config.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\generation_config.json",
+   "size": 281,
+   "sha256": "804a5276a9d237600688267dd2bf6f9d4129ec21faf417f870d5d52b32ad9e6c",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/LICENSE",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\LICENSE",
+   "size": 11338,
+   "sha256": "525c465ab952779d2d360a9ff36f7f49ae018a23d80302ff839a850a77784c36",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/merge_receipt.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\merge_receipt.json",
+   "size": 517,
+   "sha256": "116a2b2430935c7420054aae2fd85d8b1716bbb77e1e3dd6e2afa0da51371187",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/model-00001-of-00003.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\model-00001-of-00003.safetensors",
+   "size": 3975582040,
+   "sha256": "e4029385097a1300c4048cf066ce7e116080b96647dd400ea8547b019a9551b4",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/model-00002-of-00003.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\model-00002-of-00003.safetensors",
+   "size": 3986357584,
+   "sha256": "0e4036ce453872385d03bf3b8208edf120d2f5b4e3e183ac2d1ff9a217780cae",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/model-00003-of-00003.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\model-00003-of-00003.safetensors",
+   "size": 262252896,
+   "sha256": "4762e45cb54b554d86ece5e065d92f1536451a9892046432344ac6a49937c6b1",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/model.safetensors.index.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\model.safetensors.index.json",
+   "size": 24432,
+   "sha256": "a85ee81dd3ed2d3103004bb2add60d3d47fd07e604f6a3ab8d2e4d95a2bc157d",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/modeling_spark.py",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\modeling_spark.py",
+   "size": 19418,
+   "sha256": "9cf0d1ad2b54b9f7088792779ddd8b5cb4d4fe63bfea054da7f2dd16362bcaf4",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/README.md",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\README.md",
+   "size": 14132,
+   "sha256": "800e1c6d938bbc96d7a0688f60335085339ecb369f20d5248732cb73af4aae85",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/special_tokens_map.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\special_tokens_map.json",
+   "size": 643,
+   "sha256": "2377a1e0ade492be863b7d8a968a9f7f5de3f9889e8b01c3977d6ca75200bd86",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/tokenizer.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\tokenizer.json",
+   "size": 10115785,
+   "sha256": "f71f91ee1b2ac0b27e47bf49ee4859d322ab3d191217ec9964d0189b02454c49",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "model_parent",
+   "role": "bf16_parent",
+   "path": "out/rawfix_v5/base_v13_hf/tokenizer_config.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\base_v13_hf\\tokenizer_config.json",
+   "size": 21731,
+   "sha256": "40bf879f8f1d6aef2a38c1b86b83055900c1ede6cb6f8ce42cabebf4b505de70",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "adapter_r5",
+   "role": "adapter",
+   "path": "out/rawfix_v5/train_r5/adapter/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\train_r5\\adapter\\adapter_config.json",
+   "size": 1214,
+   "sha256": "97e87d312ed4aac9a20b1c34fbbb6838671957d1c33fea332211e1db9b03855e",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "adapter_r5",
+   "role": "adapter",
+   "path": "out/rawfix_v5/train_r5/adapter/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\train_r5\\adapter\\adapter_model.safetensors",
+   "size": 129856184,
+   "sha256": "0853910653270d136743c67e13003b6c36cce394871b909328e2c43d6c6295ba",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "adapter_r5",
+   "role": "adapter",
+   "path": "out/rawfix_v5/train_r5/adapter/chat_template.jinja",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\train_r5\\adapter\\chat_template.jinja",
+   "size": 5838,
+   "sha256": "dd6b44baa33d53fc5ead6fd743f999bb70a0cfeecbd17452ded093754fcd321b",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "adapter_r5",
+   "role": "adapter",
+   "path": "out/rawfix_v5/train_r5/adapter/README.md",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\train_r5\\adapter\\README.md",
+   "size": 5230,
+   "sha256": "9b4de1e72e3241f23031d4775942c02a1e37e65051738c2d1d13af4e85599fd3",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "adapter_r5",
+   "role": "adapter",
+   "path": "out/rawfix_v5/train_r5/adapter/special_tokens_map.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\train_r5\\adapter\\special_tokens_map.json",
+   "size": 643,
+   "sha256": "2377a1e0ade492be863b7d8a968a9f7f5de3f9889e8b01c3977d6ca75200bd86",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "adapter_r5",
+   "role": "adapter",
+   "path": "out/rawfix_v5/train_r5/adapter/tokenizer.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\train_r5\\adapter\\tokenizer.json",
+   "size": 10115884,
+   "sha256": "8df2cf69d7c196a2b9f88162f49e888063b8e85bb7a0352d72c673cdbca2746a",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "adapter_r5",
+   "role": "adapter",
+   "path": "out/rawfix_v5/train_r5/adapter/tokenizer_config.json",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\train_r5\\adapter\\tokenizer_config.json",
+   "size": 21731,
+   "sha256": "40bf879f8f1d6aef2a38c1b86b83055900c1ede6cb6f8ce42cabebf4b505de70",
+   "inside_root": true,
+   "required_by": [
+    "train",
+    "merge"
+   ]
+  },
+  {
+   "group": "adapter_r6",
+   "role": "adapter",
+   "path": "out/x3/train_r6/adapter/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\adapter\\adapter_config.json",
+   "size": 1214,
+   "sha256": "07fab7050db560d9b623716c0e9979f0e78256b2aa0d24d899a42601ac9a3309",
+   "inside_root": true,
+   "required_by": [
+    "merge",
+    "deploy"
+   ]
+  },
+  {
+   "group": "adapter_r6",
+   "role": "adapter",
+   "path": "out/x3/train_r6/adapter/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\adapter\\adapter_model.safetensors",
+   "size": 129856184,
+   "sha256": "fba6812d5e85c2c3ef3785ed0212e92b47595551e328cfd3a31b4a5c80a24690",
+   "inside_root": true,
+   "required_by": [
+    "merge",
+    "deploy"
+   ]
+  },
+  {
+   "group": "adapter_r6",
+   "role": "adapter",
+   "path": "out/x3/train_r6/adapter/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\adapter\\README.md",
+   "size": 5230,
+   "sha256": "9b4de1e72e3241f23031d4775942c02a1e37e65051738c2d1d13af4e85599fd3",
+   "inside_root": true,
+   "required_by": [
+    "merge",
+    "deploy"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-120/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-120\\adapter_config.json",
+   "size": 1214,
+   "sha256": "07fab7050db560d9b623716c0e9979f0e78256b2aa0d24d899a42601ac9a3309",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-120/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-120\\adapter_model.safetensors",
+   "size": 129856184,
+   "sha256": "e206e3b24b9d2e0591cf1c80b981b6ac723c5e295498a0690f748a2e8945ebee",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-120/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-120\\README.md",
+   "size": 5230,
+   "sha256": "9b4de1e72e3241f23031d4775942c02a1e37e65051738c2d1d13af4e85599fd3",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-120/trainer_state.pt",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-120\\trainer_state.pt",
+   "size": 259965771,
+   "sha256": "3cd74473c23957f507150eb81346966ce0fbaa6144b02e4ad623a973c2c5160a",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-180/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-180\\adapter_config.json",
+   "size": 1214,
+   "sha256": "07fab7050db560d9b623716c0e9979f0e78256b2aa0d24d899a42601ac9a3309",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-180/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-180\\adapter_model.safetensors",
+   "size": 129856184,
+   "sha256": "fba6812d5e85c2c3ef3785ed0212e92b47595551e328cfd3a31b4a5c80a24690",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-180/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-180\\README.md",
+   "size": 5230,
+   "sha256": "9b4de1e72e3241f23031d4775942c02a1e37e65051738c2d1d13af4e85599fd3",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-180/trainer_state.pt",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-180\\trainer_state.pt",
+   "size": 259965771,
+   "sha256": "f89826040e72fb85a0ddd74907d5506f378cbdd61e417a9cf32908e3c91d3c10",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-60/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-60\\adapter_config.json",
+   "size": 1214,
+   "sha256": "07fab7050db560d9b623716c0e9979f0e78256b2aa0d24d899a42601ac9a3309",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-60/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-60\\adapter_model.safetensors",
+   "size": 129856184,
+   "sha256": "892444145261bc4b9f41e0e0c219107f22ef1b1c2c8eb46ce71d717a0c6201e0",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-60/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-60\\README.md",
+   "size": 5230,
+   "sha256": "9b4de1e72e3241f23031d4775942c02a1e37e65051738c2d1d13af4e85599fd3",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "checkpoint_r6",
+   "role": "checkpoint",
+   "path": "out/x3/train_r6/checkpoint-60/trainer_state.pt",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\checkpoint-60\\trainer_state.pt",
+   "size": 259965771,
+   "sha256": "31cccea4e0b84a42527a5fbaf92cdc54375fdde84f861e0ceda4d008f9baffa3",
+   "inside_root": true,
+   "required_by": [
+    "training_recovery"
+   ]
+  },
+  {
+   "group": "train_receipt",
+   "role": "receipt",
+   "path": "out/x3/train_r6/train_summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\train_summary.json",
+   "size": 1142,
+   "sha256": "51b737759c5c506ee0d3830d13ca63a7890d7cfa6a2a1c5c6bda6226c2068c05",
+   "inside_root": true,
+   "required_by": [
+    "report"
+   ]
+  },
+  {
+   "group": "train_receipt",
+   "role": "receipt",
+   "path": "out/x3/train_r6/metrics.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r6\\metrics.jsonl",
+   "size": 6021,
+   "sha256": "7d0fcc0648433c14cf27649e61804b03a002af8fc2998b8f4e287575f3e33f0d",
+   "inside_root": true,
+   "required_by": [
+    "report"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/delta_d1.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d1.jsonl",
+   "size": 122321,
+   "sha256": "9f260892b6a144449650bdd950bddfcfae2cb0387991a7b16d1f569e83027adb",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/delta_d1_manifest.json",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d1_manifest.json",
+   "size": 625,
+   "sha256": "302a91695476f3c5d3328c0aa6e3884dae1ce8358591d9e7ee40e5bfd25990e5",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/delta_d2.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d2.jsonl",
+   "size": 193291,
+   "sha256": "f57ae4db80eb2a9132f761aea52891bde346ec171f8f51d7595716f917b92360",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/delta_d2_manifest.json",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d2_manifest.json",
+   "size": 445,
+   "sha256": "dece2acf71d44623835c2faafafbc05cadb903e9f0eab50045806f8d7bea4f0d",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/delta_d4.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d4.jsonl",
+   "size": 505992,
+   "sha256": "71f774d6c46d095ab57ccbee2d3dc714345c79f4753bd9effb66976c2dd3e03d",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/delta_d4_manifest.json",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d4_manifest.json",
+   "size": 1082,
+   "sha256": "4a9d7d9538d15789874127a83dee6ef409964d3514bed1111f05cb3761ff5800",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/manifest.json",
+   "abs_path": "I:\\spark-enh\\data\\x3\\manifest.json",
+   "size": 1507,
+   "sha256": "7af3d6892c7a3ac25978eee8f3ba3e0f772d5487d91a56720998c840d9eadd65",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/sft_all.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\sft_all.jsonl",
+   "size": 18991922,
+   "sha256": "bc59fe04cbb24d0733b4b194e26612e252fa8b3c6eff87acd3893d763fddbe5d",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/sft_r7_manifest.json",
+   "abs_path": "I:\\spark-enh\\data\\x3\\sft_r7_manifest.json",
+   "size": 807,
+   "sha256": "259e9b687149d9235d0ecd676d84def8fc77d0cd912e4d3b4b54a9c501a9026c",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/sft_r7_train.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\sft_r7_train.jsonl",
+   "size": 3448711,
+   "sha256": "3199bcea843f827d5218c5e4f552257b1881e6f6389399395ee60d4e86f5c912",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/sft_r7_val.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\sft_r7_val.jsonl",
+   "size": 778202,
+   "sha256": "8412394fa1cd13a2393191dc88c2a7834e3fa45e1d60323aba6083810fcb3e7f",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/sft_train.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\sft_train.jsonl",
+   "size": 8524265,
+   "sha256": "0b73b30756a9df88ec3b5c83bf2eb467ca5d06ec15149897c4e76079740fa48d",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "corpus",
+   "role": "corpus",
+   "path": "data/x3/sft_val.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\sft_val.jsonl",
+   "size": 778202,
+   "sha256": "8412394fa1cd13a2393191dc88c2a7834e3fa45e1d60323aba6083810fcb3e7f",
+   "inside_root": true,
+   "required_by": [
+    "train"
+   ]
+  },
+  {
+   "group": "eval_suite",
+   "role": "eval_suite",
+   "path": "tasks/repair_holdout_60_20261030.jsonl",
+   "abs_path": "I:\\spark-enh\\tasks\\repair_holdout_60_20261030.jsonl",
+   "size": 157332,
+   "sha256": "d8455ec9828a9dd869f5caf6d9766230b94cb5a3505ca01856294cbce7a545fc",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "eval_suite",
+   "role": "eval_suite",
+   "path": "tasks/eval_v2.jsonl",
+   "abs_path": "I:\\spark-enh\\tasks\\eval_v2.jsonl",
+   "size": 8070602,
+   "sha256": "e587c836673df0b343c0240f3fe8702b31020edc8dede2d404836c86c1583863",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "gguf_r5",
+   "role": "gguf",
+   "path": "out/rawfix_v5/rawfix-v5-r5-Q6_K.gguf",
+   "abs_path": "I:\\spark-enh\\out\\rawfix_v5\\rawfix-v5-r5-Q6_K.gguf",
+   "size": 3379173824,
+   "sha256": "fe9fcdda13081d74572277fbde2eea576c5e6f1ebad8e0046b126b1d5f69e09a",
+   "inside_root": true,
+   "required_by": [
+    "deploy",
+    "ollama"
+   ]
+  },
+  {
+   "group": "gguf_r6",
+   "role": "gguf",
+   "path": "out/x3/gguf/r6-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\r6-q6k.gguf",
+   "size": 3379173344,
+   "sha256": "3e8328a353cf9e8fa4894d017e5c64f36aadf7e288da2e37e03d800af9ca8751",
+   "inside_root": true,
+   "required_by": [
+    "deploy",
+    "ollama"
+   ]
+  },
+  {
+   "group": "merged_model",
+   "role": "merged_model",
+   "path": "out/x3/merged_r5/model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\merged_r5\\model.safetensors",
+   "size": 8224192576,
+   "sha256": "bcba73ec68bc0f91067d8d8f6d026b2de84d4a2910c22738988177f2f35b1f33",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "merged_model",
+   "role": "merged_model",
+   "path": "out/x3/merged_r6/model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\merged_r6\\model.safetensors",
+   "size": 8224192576,
+   "sha256": "9425b68e18cb035339fe226fd6b3ce432fee237e078de227b7d8c4121ca80458",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "gguf_intermediate",
+   "role": "gguf_intermediate",
+   "path": "out/x3/gguf/r5-f16.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\r5-f16.gguf",
+   "size": 8229921504,
+   "sha256": "81ea1f0404804305768f30f06fcbe8420525670b89faf9aaf042cbe0dd764100",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "gguf_intermediate",
+   "role": "gguf_intermediate",
+   "path": "out/x3/gguf/r6-f16.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\r6-f16.gguf",
+   "size": 8229921504,
+   "sha256": "6a244bd8e71d94e05e6d50b7b0845d78881b02437fc7aeea94b434e53bf5ca2d",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "eval_r5",
+   "role": "eval_output",
+   "path": "out/x3/base_r5q6/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\base_r5q6\\results.jsonl",
+   "size": 281133,
+   "sha256": "2a97e9ded799a8a5b988cf90e0cc5ec0ad4ca16d42db75781d9558ca3146f7df",
+   "inside_root": true,
+   "required_by": [
+    "report"
+   ]
+  },
+  {
+   "group": "eval_r5",
+   "role": "eval_output",
+   "path": "out/x3/base_r5q6/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\base_r5q6\\summary.json",
+   "size": 625,
+   "sha256": "d825ce7513296fceb3ef9e2af5e50fb33c30b4cfd11cf5f50e2c756ee2d4d91a",
+   "inside_root": true,
+   "required_by": [
+    "report"
+   ]
+  },
+  {
+   "group": "eval_r6",
+   "role": "eval_output",
+   "path": "out/x3/r6/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\r6\\results.jsonl",
+   "size": 278505,
+   "sha256": "7af332638ac9f4a3056c6198822e117c96a83824aa08268783755e119465bb59",
+   "inside_root": true,
+   "required_by": [
+    "report"
+   ]
+  },
+  {
+   "group": "eval_r6",
+   "role": "eval_output",
+   "path": "out/x3/r6/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\r6\\summary.json",
+   "size": 626,
+   "sha256": "ff8195f3159344478fbb8ee08ea96db8296218b2d29ae722f0cbe27e86ebf150",
+   "inside_root": true,
+   "required_by": [
+    "report"
+   ]
+  },
+  {
+   "group": "repro",
+   "role": "eval_output",
+   "path": "out/x3/repro_r5/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\repro_r5\\results.jsonl",
+   "size": 276580,
+   "sha256": "c6729db7d79b26d268807bc99ecf756f3004e62dd0c331e182bc663dbc708dd5",
+   "inside_root": true,
+   "required_by": [
+    "verification"
+   ]
+  },
+  {
+   "group": "repro",
+   "role": "eval_output",
+   "path": "out/x3/repro_r5/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\repro_r5\\summary.json",
+   "size": 626,
+   "sha256": "209a46765d057295b861437b6c0b3810c82db97e1a130dbf2a4a0c9980c65b5d",
+   "inside_root": true,
+   "required_by": [
+    "verification"
+   ]
+  },
+  {
+   "group": "repro",
+   "role": "eval_output",
+   "path": "out/x3/repro_r6/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\repro_r6\\results.jsonl",
+   "size": 278504,
+   "sha256": "463981c4b2ff18b70179a99e8fc1918bedffdd64d7037a2ddcdffa87737911d9",
+   "inside_root": true,
+   "required_by": [
+    "verification"
+   ]
+  },
+  {
+   "group": "repro",
+   "role": "eval_output",
+   "path": "out/x3/repro_r6/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\repro_r6\\summary.json",
+   "size": 626,
+   "sha256": "83ea8daedfc65a4faf842ee355effe75d606023ecfcbeb32bbccbe09498e6bef",
+   "inside_root": true,
+   "required_by": [
+    "verification"
+   ]
+  },
+  {
+   "group": "rescore",
+   "role": "determinism_proof",
+   "path": "out/x3/rescore_r5/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\rescore_r5\\results.jsonl",
+   "size": 281133,
+   "sha256": "e591cae78a55b595fb09271109c8799691f66994b57d307cbb34a2814318c65d",
+   "inside_root": true,
+   "required_by": [
+    "verification"
+   ]
+  },
+  {
+   "group": "rescore",
+   "role": "determinism_proof",
+   "path": "out/x3/rescore_r5/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\rescore_r5\\summary.json",
+   "size": 625,
+   "sha256": "66f5c24c01a3f7e363a5b87ef7e5cad208fe19c52603bcb98d855a3bfb353a61",
+   "inside_root": true,
+   "required_by": [
+    "verification"
+   ]
+  },
+  {
+   "group": "rescore",
+   "role": "determinism_proof",
+   "path": "out/x3/rescore_r6/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\rescore_r6\\results.jsonl",
+   "size": 281475,
+   "sha256": "63ea4de05b2f012036dd7b14965eac1676ebfeca252ffb8b99700325f0b0b0e5",
+   "inside_root": true,
+   "required_by": [
+    "verification"
+   ]
+  },
+  {
+   "group": "rescore",
+   "role": "determinism_proof",
+   "path": "out/x3/rescore_r6/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\rescore_r6\\summary.json",
+   "size": 626,
+   "sha256": "ab0205f9b72d4372043755705bc69e0452e53982a9ee2945f43b3f8191e50c2a",
+   "inside_root": true,
+   "required_by": [
+    "verification"
+   ]
+  },
+  {
+   "group": "lane_eval",
+   "role": "citable_baseline",
+   "path": "out/x3/lane_r5_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\lane_r5_a\\results.jsonl",
+   "size": 281353,
+   "sha256": "1550856ba8f10bc8c0cb63da9a9b31c7933dcd19862e3374e311d9b02b9490d3",
+   "inside_root": true,
+   "required_by": [
+    "campaign_baseline"
+   ]
+  },
+  {
+   "group": "lane_eval",
+   "role": "citable_baseline",
+   "path": "out/x3/lane_r5_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\lane_r5_a\\summary.json",
+   "size": 3022,
+   "sha256": "681de69d426a19c2e1a5d2432aea23878365c7b8badf867bbd4da8de6fa677e6",
+   "inside_root": true,
+   "required_by": [
+    "campaign_baseline"
+   ]
+  },
+  {
+   "group": "lane_eval",
+   "role": "citable_baseline",
+   "path": "out/x3/lane_r5_b/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\lane_r5_b\\results.jsonl",
+   "size": 281350,
+   "sha256": "e2769d43de2d74b8538e5d33ac4109e8232f5245bc525855ca2f11e600030b95",
+   "inside_root": true,
+   "required_by": [
+    "campaign_baseline"
+   ]
+  },
+  {
+   "group": "lane_eval",
+   "role": "citable_baseline",
+   "path": "out/x3/lane_r5_b/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\lane_r5_b\\summary.json",
+   "size": 3023,
+   "sha256": "6cb0307cde9056611d6919874a29e68b2a9106c168d1a74a17b3b3d3f7c5c2ab",
+   "inside_root": true,
+   "required_by": [
+    "campaign_baseline"
+   ]
+  },
+  {
+   "group": "lane_eval",
+   "role": "citable_baseline",
+   "path": "out/x3/lane_r6/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\lane_r6\\results.jsonl",
+   "size": 280109,
+   "sha256": "6ec01d19b1ae22284b807644cfaaca1e5e469a74cad93c787b98a352f5d61607",
+   "inside_root": true,
+   "required_by": [
+    "campaign_baseline"
+   ]
+  },
+  {
+   "group": "lane_eval",
+   "role": "citable_baseline",
+   "path": "out/x3/lane_r6/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\lane_r6\\summary.json",
+   "size": 3121,
+   "sha256": "b92feaad0d26bd40aec7a9b8e6e7ae2008258a18bb711f485ad9f8a53a97d195",
+   "inside_root": true,
+   "required_by": [
+    "campaign_baseline"
+   ]
+  },
+  {
+   "group": "lane_state",
+   "role": "runtime_receipt",
+   "path": "out/x3/runtime/lane_state.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\lane_state.json",
+   "size": 938,
+   "sha256": "9b79628d791fbef45eaae9b116c5d15444a83d8db89a0a1cb7f92e58f6a7fb19",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_state",
+   "role": "runtime_receipt",
+   "path": "out/x3/runtime/lane_log_offset.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\lane_log_offset.json",
+   "size": 20,
+   "sha256": "ae1c55499da9a5f2d3976cca2523d00f20604b1e7abfb1ed76018eb24c497092",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-0cfbf7503d36ff7c5e4b274983be250011e070987a55f0c32563d4dd7a9d8b5a",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-0cfbf7503d36ff7c5e4b274983be250011e070987a55f0c32563d4dd7a9d8b5a",
+   "size": 3379173376,
+   "sha256": "0cfbf7503d36ff7c5e4b274983be250011e070987a55f0c32563d4dd7a9d8b5a",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-176b133c1776274ab8845afa60a1e1c210d76569188bf0334900f1923e58d844",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-176b133c1776274ab8845afa60a1e1c210d76569188bf0334900f1923e58d844",
+   "size": 3379173376,
+   "sha256": "176b133c1776274ab8845afa60a1e1c210d76569188bf0334900f1923e58d844",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-1c6994e1dd717338e6cfcd53331b3c4176dbf489c98e3e44ac52a818ce6e4705",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-1c6994e1dd717338e6cfcd53331b3c4176dbf489c98e3e44ac52a818ce6e4705",
+   "size": 474,
+   "sha256": "1c6994e1dd717338e6cfcd53331b3c4176dbf489c98e3e44ac52a818ce6e4705",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-31e356b6634bb09d651b719cdc0c0de8f626c56836c2bbaf5250c2a328434289",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-31e356b6634bb09d651b719cdc0c0de8f626c56836c2bbaf5250c2a328434289",
+   "size": 3379173344,
+   "sha256": "31e356b6634bb09d651b719cdc0c0de8f626c56836c2bbaf5250c2a328434289",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-34bf2a18e9eda7c97301d9cd72abe16d62f21c9278b49c62e0526b39df8114f9",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-34bf2a18e9eda7c97301d9cd72abe16d62f21c9278b49c62e0526b39df8114f9",
+   "size": 473,
+   "sha256": "34bf2a18e9eda7c97301d9cd72abe16d62f21c9278b49c62e0526b39df8114f9",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-36a2f4c2b4f29a91cd09d9b30f5217f66fae53466107d36b1f457b0d46dab887",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-36a2f4c2b4f29a91cd09d9b30f5217f66fae53466107d36b1f457b0d46dab887",
+   "size": 3379173376,
+   "sha256": "36a2f4c2b4f29a91cd09d9b30f5217f66fae53466107d36b1f457b0d46dab887",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-3e8328a353cf9e8fa4894d017e5c64f36aadf7e288da2e37e03d800af9ca8751",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-3e8328a353cf9e8fa4894d017e5c64f36aadf7e288da2e37e03d800af9ca8751",
+   "size": 3379173344,
+   "sha256": "3e8328a353cf9e8fa4894d017e5c64f36aadf7e288da2e37e03d800af9ca8751",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-4df08209b7f4a9dfc0ac04824d75aeea730a3e9f632ea6783b2c3cb87246fa53",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-4df08209b7f4a9dfc0ac04824d75aeea730a3e9f632ea6783b2c3cb87246fa53",
+   "size": 473,
+   "sha256": "4df08209b7f4a9dfc0ac04824d75aeea730a3e9f632ea6783b2c3cb87246fa53",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-536d0f9787f86fa4bed19dfe34865987d4d6f7bc45a2428adda8dadcbcab429c",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-536d0f9787f86fa4bed19dfe34865987d4d6f7bc45a2428adda8dadcbcab429c",
+   "size": 3379173376,
+   "sha256": "536d0f9787f86fa4bed19dfe34865987d4d6f7bc45a2428adda8dadcbcab429c",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-61794047d4d59d0395e35603e1de9ebf17ad14bc376a9bf823430dac09f37084",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-61794047d4d59d0395e35603e1de9ebf17ad14bc376a9bf823430dac09f37084",
+   "size": 473,
+   "sha256": "61794047d4d59d0395e35603e1de9ebf17ad14bc376a9bf823430dac09f37084",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-635ccaf9dbd3ffc2ef193c4645e401e10e9ee307e9a56c0afbabfa7352d9c619",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-635ccaf9dbd3ffc2ef193c4645e401e10e9ee307e9a56c0afbabfa7352d9c619",
+   "size": 475,
+   "sha256": "635ccaf9dbd3ffc2ef193c4645e401e10e9ee307e9a56c0afbabfa7352d9c619",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-7c585299f47dff0a3ce8b72465cf95404a20120d02efde5b8892c1d485759eba",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-7c585299f47dff0a3ce8b72465cf95404a20120d02efde5b8892c1d485759eba",
+   "size": 474,
+   "sha256": "7c585299f47dff0a3ce8b72465cf95404a20120d02efde5b8892c1d485759eba",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-83564ab21510f96e83f4331ef4f4c5318b6de37a39adfa8d364da762c0338d62",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-83564ab21510f96e83f4331ef4f4c5318b6de37a39adfa8d364da762c0338d62",
+   "size": 473,
+   "sha256": "83564ab21510f96e83f4331ef4f4c5318b6de37a39adfa8d364da762c0338d62",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-8f99be617342a2a96c09790d25e2951fe22855ff752c593b1c6035ca5d519908",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-8f99be617342a2a96c09790d25e2951fe22855ff752c593b1c6035ca5d519908",
+   "size": 474,
+   "sha256": "8f99be617342a2a96c09790d25e2951fe22855ff752c593b1c6035ca5d519908",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-927d9379b97383336e103eeacbec5d39fdf931469e0fa88830c1c0374a861cce",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-927d9379b97383336e103eeacbec5d39fdf931469e0fa88830c1c0374a861cce",
+   "size": 3379173376,
+   "sha256": "927d9379b97383336e103eeacbec5d39fdf931469e0fa88830c1c0374a861cce",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-9776b9f3dfac4228fa698ef469e2913f439bc55d1450375485f1db8abc56b318",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-9776b9f3dfac4228fa698ef469e2913f439bc55d1450375485f1db8abc56b318",
+   "size": 473,
+   "sha256": "9776b9f3dfac4228fa698ef469e2913f439bc55d1450375485f1db8abc56b318",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-a320f8e2b1a17072d3b37bd38b7cdb049d4f6f034357474a0422e1286265d404",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-a320f8e2b1a17072d3b37bd38b7cdb049d4f6f034357474a0422e1286265d404",
+   "size": 3379173344,
+   "sha256": "a320f8e2b1a17072d3b37bd38b7cdb049d4f6f034357474a0422e1286265d404",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-a9e715c59160657abf085606c12b96b3299a9a4fa23b320c09d223337a966c7c",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-a9e715c59160657abf085606c12b96b3299a9a4fa23b320c09d223337a966c7c",
+   "size": 119,
+   "sha256": "a9e715c59160657abf085606c12b96b3299a9a4fa23b320c09d223337a966c7c",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-b96d682c34f4b3bb93db6e944bfc4dd0459b452b1546a72761ba923b2409b1e3",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-b96d682c34f4b3bb93db6e944bfc4dd0459b452b1546a72761ba923b2409b1e3",
+   "size": 3379173376,
+   "sha256": "b96d682c34f4b3bb93db6e944bfc4dd0459b452b1546a72761ba923b2409b1e3",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-bf2d91c8d7d80282826a7011b9de99000066553a3df542f19db5d717337d19a6",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-bf2d91c8d7d80282826a7011b9de99000066553a3df542f19db5d717337d19a6",
+   "size": 484,
+   "sha256": "bf2d91c8d7d80282826a7011b9de99000066553a3df542f19db5d717337d19a6",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-e6d12b44fabb3dc04543e748bddde813b8110222ff590ff7025d37410f0568c1",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-e6d12b44fabb3dc04543e748bddde813b8110222ff590ff7025d37410f0568c1",
+   "size": 3379173376,
+   "sha256": "e6d12b44fabb3dc04543e748bddde813b8110222ff590ff7025d37410f0568c1",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-eff1247309a0ac4648de2a5b542ecdaab4716ff939f0e398883ec0025760b14a",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-eff1247309a0ac4648de2a5b542ecdaab4716ff939f0e398883ec0025760b14a",
+   "size": 475,
+   "sha256": "eff1247309a0ac4648de2a5b542ecdaab4716ff939f0e398883ec0025760b14a",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-f2500b4b406787904f0db986666ab5fca3059b13ef93928175676c92505c1073",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-f2500b4b406787904f0db986666ab5fca3059b13ef93928175676c92505c1073",
+   "size": 3379173344,
+   "sha256": "f2500b4b406787904f0db986666ab5fca3059b13ef93928175676c92505c1073",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-f2899f5c25e9dd921d60fd7939c3cccab1d5100f3b6dca04f047aba433a1a99d",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-f2899f5c25e9dd921d60fd7939c3cccab1d5100f3b6dca04f047aba433a1a99d",
+   "size": 473,
+   "sha256": "f2899f5c25e9dd921d60fd7939c3cccab1d5100f3b6dca04f047aba433a1a99d",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/blobs/sha256-fe9fcdda13081d74572277fbde2eea576c5e6f1ebad8e0046b126b1d5f69e09a",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\blobs\\sha256-fe9fcdda13081d74572277fbde2eea576c5e6f1ebad8e0046b126b1d5f69e09a",
+   "size": 3379173824,
+   "sha256": "fe9fcdda13081d74572277fbde2eea576c5e6f1ebad8e0046b126b1d5f69e09a",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/d1-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\d1-q6\\latest",
+   "size": 473,
+   "sha256": "83564ab21510f96e83f4331ef4f4c5318b6de37a39adfa8d364da762c0338d62",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/d2-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\d2-q6\\latest",
+   "size": 473,
+   "sha256": "61794047d4d59d0395e35603e1de9ebf17ad14bc376a9bf823430dac09f37084",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/d3-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\d3-q6\\latest",
+   "size": 473,
+   "sha256": "4df08209b7f4a9dfc0ac04824d75aeea730a3e9f632ea6783b2c3cb87246fa53",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/d4b-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\d4b-q6\\latest",
+   "size": 474,
+   "sha256": "1c6994e1dd717338e6cfcd53331b3c4176dbf489c98e3e44ac52a818ce6e4705",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/spark-r5-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\spark-r5-q6\\latest",
+   "size": 484,
+   "sha256": "bf2d91c8d7d80282826a7011b9de99000066553a3df542f19db5d717337d19a6",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/spark-r6-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\spark-r6-q6\\latest",
+   "size": 473,
+   "sha256": "34bf2a18e9eda7c97301d9cd72abe16d62f21c9278b49c62e0526b39df8114f9",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/spark-r7-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\spark-r7-q6\\latest",
+   "size": 473,
+   "sha256": "9776b9f3dfac4228fa698ef469e2913f439bc55d1450375485f1db8abc56b318",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/spark-r8-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\spark-r8-q6\\latest",
+   "size": 473,
+   "sha256": "f2899f5c25e9dd921d60fd7939c3cccab1d5100f3b6dca04f047aba433a1a99d",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/x01-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\x01-q6\\latest",
+   "size": 474,
+   "sha256": "8f99be617342a2a96c09790d25e2951fe22855ff752c593b1c6035ca5d519908",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/x025-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\x025-q6\\latest",
+   "size": 475,
+   "sha256": "eff1247309a0ac4648de2a5b542ecdaab4716ff939f0e398883ec0025760b14a",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/x05-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\x05-q6\\latest",
+   "size": 474,
+   "sha256": "7c585299f47dff0a3ce8b72465cf95404a20120d02efde5b8892c1d485759eba",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "lane_store",
+   "role": "model_store",
+   "path": "out/x3/runtime/models/manifests-v2/ollama.com/library/x075-q6/latest",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\models\\manifests-v2\\ollama.com\\library\\x075-q6\\latest",
+   "size": 475,
+   "sha256": "635ccaf9dbd3ffc2ef193c4645e401e10e9ee307e9a56c0afbabfa7352d9c619",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified_r5_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified_r5_a\\results.jsonl",
+   "size": 236407,
+   "sha256": "5d1b035ca8892bb0e355c31eef25d82ca8afe68f13e8b747e260520c29ea3902",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified_r5_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified_r5_a\\summary.json",
+   "size": 1210,
+   "sha256": "664ff38981739067271201f1273ebe6eb02536601c441818bc488af86054d5bc",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified_r5_b/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified_r5_b\\results.jsonl",
+   "size": 228408,
+   "sha256": "314d9266a7c6c24862ec19b428ebdbe0d94ea7a3c249565600f5baa58213e40f",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified_r5_b/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified_r5_b\\summary.json",
+   "size": 1212,
+   "sha256": "d359a0afff8effda0896350e3e02fdb46e79663b065290e42da935e6384f2282",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified\\summary.json",
+   "size": 3736,
+   "sha256": "4a359680b170e2df16d9261b0b4e2a8b1d60ed2c2093489481d23bf8b1447867",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified2_r5_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified2_r5_a\\results.jsonl",
+   "size": 298174,
+   "sha256": "e009e4968281095269e90fc43e70ec9520ad446c2f9c4cf684ed4650ab237251",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified2_r5_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified2_r5_a\\summary.json",
+   "size": 1681,
+   "sha256": "67d678f66f5e9ce3e2da4b35c846bd516e8ddefc02caa37ca386cb000b28da37",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified2_r5_b/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified2_r5_b\\results.jsonl",
+   "size": 287965,
+   "sha256": "cb57d2ce18fdb19bf0ff287245a981cc6e320c71fa775579c5dcc1688c91b37b",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified2_r5_b/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified2_r5_b\\summary.json",
+   "size": 1683,
+   "sha256": "4d064c3a746e4b0785cedb26171ed37e1602876c4e2903760560fef938d5f3bc",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/verified2/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\verified2\\summary.json",
+   "size": 3929,
+   "sha256": "f5ae5aa6ad6dd0db159d99c6d997530f687399793b5c506b59963320b07c877f",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "train/spark_x3_selfverify.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_selfverify.py",
+   "size": 22208,
+   "sha256": "815827311422364526ca4a90ee40372b17ee89b2245006039c84acf23f05bbf0",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "train/spark_x3_verify_report.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_verify_report.py",
+   "size": 4579,
+   "sha256": "e7863382e76e4d7981fdd90dbd8f4d83438cc8f8df1c836c6c66cb6a72d77ac0",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_EXECUTION_VERIFIED_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_EXECUTION_VERIFIED_20261112.md",
+   "size": 5200,
+   "sha256": "bded8f39556b6c1778fa06d0e554187e042c63b6b6ad8f0742b2b634a3175b40",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "verifier_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_VERIFIER_STRENGTHENED_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_VERIFIER_STRENGTHENED_20261112.md",
+   "size": 6443,
+   "sha256": "5b69438050a921912e80a0d3bc8d63cf2f8510e3636db1c9a2e7d4929bccb5c2",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/bestofn_r5/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\bestofn_r5\\results.jsonl",
+   "size": 958846,
+   "sha256": "5135da235804fb415f33db4da133ff5fbad4e448f2f811f357379bb3552f1fb9",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/bestofn_r5/selectors.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\bestofn_r5\\selectors.json",
+   "size": 1226,
+   "sha256": "d2dc9fca7d2ee0ea3427074e6e4e13d8fa8a85e7a0e131451b66462e4c1ad883",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/bestofn_r5/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\bestofn_r5\\summary.json",
+   "size": 1170,
+   "sha256": "44e5c04f6063df90f7e777f9885c3ca5e8606fac12946d138a397054f32cafa8",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/bestofn_r5_b/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\bestofn_r5_b\\results.jsonl",
+   "size": 976098,
+   "sha256": "6537711fea87ebc1fcbce164ccb7119d4d0cb0e84f843e83b2bcb04052dea495",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/bestofn_r5_b/selectors.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\bestofn_r5_b\\selectors.json",
+   "size": 1226,
+   "sha256": "66f6446305616ad70bd0683796aec157ef8b86e5adfe4fe077a295852a217285",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/bestofn_r5_b/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\bestofn_r5_b\\summary.json",
+   "size": 1173,
+   "sha256": "629834122749c90a32a4b7b15265bfda0cada1817808ef72b33ae112b3601a09",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/hybrid/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\hybrid\\summary.json",
+   "size": 2636,
+   "sha256": "544f95ae88729d5e53fe65598de7928705e880c676139810c655566ffbdfc290",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/lane_r5_c/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\lane_r5_c\\results.jsonl",
+   "size": 283824,
+   "sha256": "aa3837a44d885da60fe99f580a0c3d16e3195538e4a88d8b4f17ea595d2d33f8",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/lane_r5_c/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\lane_r5_c\\summary.json",
+   "size": 3261,
+   "sha256": "b58a63cf877d413d12b562bb0a88b4365f6853b03bc28c1a2af29001b7d7ac0c",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "train/spark_x3_bestofn.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_bestofn.py",
+   "size": 9530,
+   "sha256": "977ab0779a28b7aa76dc4dbfc519543c5c86bdf0000c5bf7eda286dcfb522fab",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "train/spark_x3_selectors.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_selectors.py",
+   "size": 5311,
+   "sha256": "8b58defbda106b36959cea225dc8de648b06ebd8c6c3672ab1c5c703888c4f8d",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "train/spark_x3_hybrid.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_hybrid.py",
+   "size": 5194,
+   "sha256": "06edc129d18ab27c95b19c45dbb3ddef2006fba1752e52d75c469e7611e23e1c",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_REPEAT_AND_BESTOFN_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_REPEAT_AND_BESTOFN_20261112.md",
+   "size": 7242,
+   "sha256": "c071080abf0352aa28df9cfd732a11ed0fd2b2b147e3c39c888df110e05568b1",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "bestofn_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_HYBRID_SERVED_PATH_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_HYBRID_SERVED_PATH_20261112.md",
+   "size": 5437,
+   "sha256": "6ea7c119acdc404859f6543e632c2abaf47fe6829c3b08b9da3a463483405bec",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/d4_lane_b/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\d4_lane_b\\results.jsonl",
+   "size": 272782,
+   "sha256": "8b982b0eef78e6e9b266a3aa689935f3e846d97b98440efe478ca6592a6e9a99",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/d4_lane_b/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\d4_lane_b\\summary.json",
+   "size": 3256,
+   "sha256": "194e8e94850a68330962a5206c8b7d71bf43cf174ec1510433301086832c4882",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/d4_lane_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\d4_lane_a\\results.jsonl",
+   "size": 279781,
+   "sha256": "636cf93dc4e4a83311c6752de0f654ceaca905c4734cae65874c0afa86cc5053",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/d4_lane_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\d4_lane_a\\summary.json",
+   "size": 3255,
+   "sha256": "747be6b126d46cc935175713421873ef40ac1b4e685bfe21459ea8fcbd4204da",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d4b/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d4b\\adapter_config.json",
+   "size": 1117,
+   "sha256": "e0a301b80d3e0f9e3bfb8b747f0ba29a4109f5fcda0e26bd0737ce0161dd1a70",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d4b/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d4b\\adapter_model.safetensors",
+   "size": 3843480,
+   "sha256": "aa30fbbe3029415bd8861320911cfc808ab9a57a5a28644c6ce3cef9e1d6d00e",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d4b/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d4b\\README.md",
+   "size": 5212,
+   "sha256": "4b8554d896938cff3b82ea425c75067414dd3336f285052351b280aea4fde90a",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d4b/train_receipt.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d4b\\train_receipt.json",
+   "size": 7914,
+   "sha256": "9f08d235307f141483d96b2221e36b9078023432aa90fa2e0067cd8046c8db2a",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/gguf/d4b-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\d4b-q6k.gguf",
+   "size": 3379173376,
+   "sha256": "e6d12b44fabb3dc04543e748bddde813b8110222ff590ff7025d37410f0568c1",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "data/x3/delta_d4.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d4.jsonl",
+   "size": 505992,
+   "sha256": "71f774d6c46d095ab57ccbee2d3dc714345c79f4753bd9effb66976c2dd3e03d",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "data/x3/delta_d4_manifest.json",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d4_manifest.json",
+   "size": 1082,
+   "sha256": "4a9d7d9538d15789874127a83dee6ef409964d3514bed1111f05cb3761ff5800",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "train/spark_x3_build_d4.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_build_d4.py",
+   "size": 6947,
+   "sha256": "25fe87bb102ead7d3a115952b5a67eac99e29351efa0444cda5b0ffda61201eb",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d4_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_DELTA_D4_RESULT_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_DELTA_D4_RESULT_20261112.md",
+   "size": 6856,
+   "sha256": "52c43d5a89c9f2d477e9fe279b172bde901221d5953e080e686c9caa7dd1fe97",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/d3_lane_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\d3_lane_a\\results.jsonl",
+   "size": 270982,
+   "sha256": "46735237bc877749e74de78304383c3019348a0bffeed9f7157ca28c47a6dd9f",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/d3_lane_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\d3_lane_a\\summary.json",
+   "size": 3140,
+   "sha256": "b3b9c4ab847802f5b8f191dbbae3b4debefc1a944ce991a6b913517057ff53bf",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d3b/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d3b\\adapter_config.json",
+   "size": 1117,
+   "sha256": "e0a301b80d3e0f9e3bfb8b747f0ba29a4109f5fcda0e26bd0737ce0161dd1a70",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d3b/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d3b\\adapter_model.safetensors",
+   "size": 3843480,
+   "sha256": "4ac69f7595cd2b1fefc454fbdd66b089b9555fe2c3e8d9752539a364b74d484e",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d3b/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d3b\\README.md",
+   "size": 5212,
+   "sha256": "4b8554d896938cff3b82ea425c75067414dd3336f285052351b280aea4fde90a",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d3b/train_receipt.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d3b\\train_receipt.json",
+   "size": 7884,
+   "sha256": "ba83ba87da1839ab40c120437543c9aaf5240693fd5fb68d5b669b7c5ba117f8",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/gguf/d3-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\d3-q6k.gguf",
+   "size": 3379173376,
+   "sha256": "536d0f9787f86fa4bed19dfe34865987d4d6f7bc45a2428adda8dadcbcab429c",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/screen/d3/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\screen\\d3\\results.jsonl",
+   "size": 167044,
+   "sha256": "49ecf1b71c622e1580c14548bef3a6d56e5e491667111e31d2d2e5b948abd8ec",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/screen/d3/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\screen\\d3\\summary.json",
+   "size": 3227,
+   "sha256": "1706dd64bcae2ca9121b5718ff7adfc295a021b87ce1d28f94b09cb80cf4a71f",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d3_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_DELTA_D3_RESULT_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_DELTA_D3_RESULT_20261112.md",
+   "size": 5244,
+   "sha256": "899a02661fe2c5709c44450a3d2dfee87ab97b57b6c245762de230e74c1190ed",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "out/x3/screen/d2/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\screen\\d2\\results.jsonl",
+   "size": 174144,
+   "sha256": "f15e67383c0e456ea50687c21c585e03126ca4de0bd65e6460a4d6279eb3d237",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "out/x3/screen/d2/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\screen\\d2\\summary.json",
+   "size": 3248,
+   "sha256": "d2719fdd2e4befdad4fed45d4174d82fa29f95cabce483625155c0c7ff1f0057",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "out/x3/train_d2a/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d2a\\adapter_config.json",
+   "size": 1203,
+   "sha256": "125f96d43f7d894380346403280dac70b47926a396add1ec59c340e0f4792ba1",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "out/x3/train_d2a/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d2a\\adapter_model.safetensors",
+   "size": 32506728,
+   "sha256": "0d7aefd81c4afae22903434aac35452ce5db86add1d81bad23def969512377e8",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "out/x3/train_d2a/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d2a\\README.md",
+   "size": 5212,
+   "sha256": "4b8554d896938cff3b82ea425c75067414dd3336f285052351b280aea4fde90a",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "out/x3/train_d2a/train_receipt.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d2a\\train_receipt.json",
+   "size": 2657,
+   "sha256": "f18aba65bd83ff417aa3d3dfb679ce1e510d39e789e88591b2db62998c16bf4e",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "out/x3/gguf/d2-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\d2-q6k.gguf",
+   "size": 3379173376,
+   "sha256": "36a2f4c2b4f29a91cd09d9b30f5217f66fae53466107d36b1f457b0d46dab887",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "data/x3/delta_d2.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d2.jsonl",
+   "size": 193291,
+   "sha256": "f57ae4db80eb2a9132f761aea52891bde346ec171f8f51d7595716f917b92360",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "data/x3/delta_d2_manifest.json",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d2_manifest.json",
+   "size": 445,
+   "sha256": "dece2acf71d44623835c2faafafbc05cadb903e9f0eab50045806f8d7bea4f0d",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d2_screen",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_DELTA_D2_SCREEN_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_DELTA_D2_SCREEN_20261112.md",
+   "size": 5058,
+   "sha256": "0a4e62c132b95db1808b33831f604e8754d29d4f81fcfa08e00f900005152a63",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/d1_lane_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\d1_lane_a\\results.jsonl",
+   "size": 254505,
+   "sha256": "2cad42a7ddf9760b535adac078915ba0106203b44784ba68035c5bd474a98696",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/d1_lane_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\d1_lane_a\\summary.json",
+   "size": 3255,
+   "sha256": "b73cb6c4ba3df5407050289f58fdeca9397be9f75ddb7a4ea8c315bd70d03e26",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d1/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d1\\adapter_config.json",
+   "size": 1204,
+   "sha256": "072cafa710bc2bf5ef7af546156c21f22efae99b4c8210ea3a008a06d2f7866c",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d1/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d1\\adapter_model.safetensors",
+   "size": 64956416,
+   "sha256": "e25f950db8c390e9632a68625666d565ab4e8e84ac5c71dbd050cb97cad01cc1",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d1/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d1\\README.md",
+   "size": 5212,
+   "sha256": "4b8554d896938cff3b82ea425c75067414dd3336f285052351b280aea4fde90a",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_d1/train_receipt.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_d1\\train_receipt.json",
+   "size": 5782,
+   "sha256": "57cb0ddabaaa9c5f96572083237ba6f59fd62988c1970a7c64ac467b90b9a6f4",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/gguf/d1-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\d1-q6k.gguf",
+   "size": 3379173344,
+   "sha256": "f2500b4b406787904f0db986666ab5fca3059b13ef93928175676c92505c1073",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "data/x3/delta_d1.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d1.jsonl",
+   "size": 122321,
+   "sha256": "9f260892b6a144449650bdd950bddfcfae2cb0387991a7b16d1f569e83027adb",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "data/x3/delta_d1_manifest.json",
+   "abs_path": "I:\\spark-enh\\data\\x3\\delta_d1_manifest.json",
+   "size": 625,
+   "sha256": "302a91695476f3c5d3328c0aa6e3884dae1ce8358591d9e7ee40e5bfd25990e5",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "d1_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_DELTA_D1_RESULT_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_DELTA_D1_RESULT_20261112.md",
+   "size": 6192,
+   "sha256": "1fd9fc81a8dfacc3e7d830ae75b8c38cadbea1ff5a719fbe91095bb94554bd48",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/x01_lane_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\x01_lane_a\\results.jsonl",
+   "size": 274870,
+   "sha256": "0b66fa81bcde919f093c1eefc1acd6695df5e7a04159987616863fdb3db64234",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/x01_lane_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\x01_lane_a\\summary.json",
+   "size": 3140,
+   "sha256": "f64562cb257bb7339c406e3ccb8baa84c7f8a19aa244d755acbc2eb64122e097",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/x01/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\x01\\results.jsonl",
+   "size": 170480,
+   "sha256": "9e711fc2774bac895c1dd2e56a9f047cda1b9eae89e6540e0d8b19270f99be89",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/x01/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\x01\\summary.json",
+   "size": 3248,
+   "sha256": "c9ee94f7a804debb817959aae4be62b841e5627eeba07c4f1aa3db552e89840e",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/x025/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\x025\\results.jsonl",
+   "size": 174537,
+   "sha256": "76903da81cc0572cbae9681fe154527849f2167fa8806af69eec3759cdc3898d",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/x025/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\x025\\summary.json",
+   "size": 3249,
+   "sha256": "3fa7efc4fed269c80f1bad0b357d5ce3ed8bae4a1e7c99bc5aef2da87a183616",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/x05/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\x05\\results.jsonl",
+   "size": 174706,
+   "sha256": "aebf9d1c7c7d27e19a67ba99edcadc269c26581e202f925b3e51b8e0fe8e648c",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/x05/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\x05\\summary.json",
+   "size": 3248,
+   "sha256": "ef84c2791dfce8bee489a88776fc1a05e77ec0b410ad3d88e2d39aab8614a23d",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/x075/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\x075\\results.jsonl",
+   "size": 174163,
+   "sha256": "593ef713e9fa195e03c62e297861aa7999e255abb13c6ede9327bf58dee09d3d",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/x075/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\x075\\summary.json",
+   "size": 3249,
+   "sha256": "61afbd6162f6d15c1ecfc08eb7d121785ddf2df3551216e1914a5e173648d26c",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/diag/sweep65.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\diag\\sweep65.jsonl",
+   "size": 267645,
+   "sha256": "39d3b3d2492c689dce76e4bfc1bd751bf6be5fdbf6b333873be463d568641a3c",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/diag/sweep65_manifest.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\diag\\sweep65_manifest.json",
+   "size": 2280,
+   "sha256": "f51373a9b77cb76cc33a850a7c8a8c11f93878012374f554188a2a8e4c7c1b99",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/gguf/x01-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\x01-q6k.gguf",
+   "size": 3379173376,
+   "sha256": "0cfbf7503d36ff7c5e4b274983be250011e070987a55f0c32563d4dd7a9d8b5a",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/gguf/x025-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\x025-q6k.gguf",
+   "size": 3379173376,
+   "sha256": "b96d682c34f4b3bb93db6e944bfc4dd0459b452b1546a72761ba923b2409b1e3",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/gguf/x05-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\x05-q6k.gguf",
+   "size": 3379173376,
+   "sha256": "927d9379b97383336e103eeacbec5d39fdf931469e0fa88830c1c0374a861cce",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/gguf/x075-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\x075-q6k.gguf",
+   "size": 3379173376,
+   "sha256": "176b133c1776274ab8845afa60a1e1c210d76569188bf0334900f1923e58d844",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/blend_receipts/x01.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\blend_receipts\\x01.json",
+   "size": 1159,
+   "sha256": "bb56982da392e859f78ee888f9345dd8be0b52941a59c042a4d6c361d22e6bc4",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/blend_receipts/x025.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\blend_receipts\\x025.json",
+   "size": 1160,
+   "sha256": "196e2d86bd28f9046abf71d6fe5f7386fc6f94211ab83f306bbcfe6c1c88dbd4",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/blend_receipts/x05.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\blend_receipts\\x05.json",
+   "size": 1159,
+   "sha256": "a2d805b1a809268d6daeadf41451686e94c9fc322d9ba75e9afa2e1e5ee9a0eb",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/sweep/blend_receipts/x075.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\sweep\\blend_receipts\\x075.json",
+   "size": 1160,
+   "sha256": "bd6eb635965b7047172b03965bda969f9854885dd1eeb4c85cf0a59547f501cf",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "x01_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_MERGE_SWEEP_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_MERGE_SWEEP_20261112.md",
+   "size": 6846,
+   "sha256": "5950d76b66889b55b1c2cf7d2d1dfec5dd4869bf002f08fe912517298b3baeb1",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r8_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/r8_lane_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\r8_lane_a\\results.jsonl",
+   "size": 281441,
+   "sha256": "62d6acfc1cd66e33bdf9c194d23d4972edb9af3e72dd887e46c8d8bd10a4c051",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r8_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/r8_lane_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\r8_lane_a\\summary.json",
+   "size": 3244,
+   "sha256": "e227c49760614885338df1d48a9eae48026dc64349b53f015a70718ff6f34b96",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r8_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r8/train_summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r8\\train_summary.json",
+   "size": 1146,
+   "sha256": "390d5156562f626eac91224df90eaabfa875dedc865e147298b880a484329c57",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r8_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r8/metrics.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r8\\metrics.jsonl",
+   "size": 3027,
+   "sha256": "c5e88994e9152394da0f297373f93853a597849f5df69a7b6c0db3264ef5bea2",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r8_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r8/adapter/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r8\\adapter\\adapter_config.json",
+   "size": 1214,
+   "sha256": "c1a6180b56a11c33e46817559a06720402220a0d08a7912e0d819e0c3924c866",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r8_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r8/adapter/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r8\\adapter\\adapter_model.safetensors",
+   "size": 129856184,
+   "sha256": "b93703fe64c3cff2ac5f2cd6f107a9c30199edd3f8d5a5b0d65e2d0746ba9752",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r8_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r8/adapter/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r8\\adapter\\README.md",
+   "size": 5230,
+   "sha256": "9b4de1e72e3241f23031d4775942c02a1e37e65051738c2d1d13af4e85599fd3",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r8_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/gguf/r8-q6k.gguf",
+   "abs_path": "I:\\spark-enh\\out\\x3\\gguf\\r8-q6k.gguf",
+   "size": 3379173344,
+   "sha256": "a320f8e2b1a17072d3b37bd38b7cdb049d4f6f034357474a0422e1286265d404",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r8_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_R8_RESULT_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_R8_RESULT_20261112.md",
+   "size": 5393,
+   "sha256": "cd380299836d9b1df3a73c77be89a36a08dd69c6cafb2352a0b86a071bad6da6",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/r7_lane_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\r7_lane_a\\results.jsonl",
+   "size": 282415,
+   "sha256": "040e1fcaca5c950ee5ef16ffad1fd3873a6daab33d6efd7dbdd5f78d7ca2c94b",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/r7_lane_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\r7_lane_a\\summary.json",
+   "size": 3261,
+   "sha256": "5f9cf598d0d8a074f782c29002872623857f4290cacd9125f10188479c0b8dd1",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r7/train_summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r7\\train_summary.json",
+   "size": 1147,
+   "sha256": "fcd15cc9d20959a24ef016cd8b421a68be39cc2f06d965d0dde1bee5fdb30d83",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r7/metrics.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r7\\metrics.jsonl",
+   "size": 5716,
+   "sha256": "a6ce5e1651ae4e6e724f6e25b583b4d1a80d14266877deb80c4f6cee82516fdf",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r7/adapter/adapter_config.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r7\\adapter\\adapter_config.json",
+   "size": 1214,
+   "sha256": "97e55821486f12b0b196efc53cc958c09ba3f224b3ddd98312bebb328417c0db",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r7/adapter/adapter_model.safetensors",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r7\\adapter\\adapter_model.safetensors",
+   "size": 129856184,
+   "sha256": "ab76061683b2d3114bde49209e307c3cb6583bc75027e24df95886dfe22db78c",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "out/x3/train_r7/adapter/README.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\train_r7\\adapter\\README.md",
+   "size": 5230,
+   "sha256": "9b4de1e72e3241f23031d4775942c02a1e37e65051738c2d1d13af4e85599fd3",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "data/x3/sft_r7_train.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\sft_r7_train.jsonl",
+   "size": 3448711,
+   "sha256": "3199bcea843f827d5218c5e4f552257b1881e6f6389399395ee60d4e86f5c912",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "data/x3/sft_r7_val.jsonl",
+   "abs_path": "I:\\spark-enh\\data\\x3\\sft_r7_val.jsonl",
+   "size": 778202,
+   "sha256": "8412394fa1cd13a2393191dc88c2a7834e3fa45e1d60323aba6083810fcb3e7f",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "data/x3/sft_r7_manifest.json",
+   "abs_path": "I:\\spark-enh\\data\\x3\\sft_r7_manifest.json",
+   "size": 807,
+   "sha256": "259e9b687149d9235d0ecd676d84def8fc77d0cd912e4d3b4b54a9c501a9026c",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_R7_RESULT_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_R7_RESULT_20261112.md",
+   "size": 4830,
+   "sha256": "e1ba8f1c898ee47eecb5c1307567012cdb7385b2cfe4ba5b78c7a3b1ecf4966d",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "r7_experiment",
+   "role": "experiment_output",
+   "path": "reports/SPARK_X3_R6_LOSS_DIAGNOSIS_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_R6_LOSS_DIAGNOSIS_20261112.md",
+   "size": 3978,
+   "sha256": "3195385cfd230dbf394e87aa5e5a3a09643f177202ad759013ee60e9c3f0535e",
+   "inside_root": true,
+   "required_by": [
+    "experiment"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/a_foreign_model_prerepair/NON_CITABLE.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\a_foreign_model_prerepair\\NON_CITABLE.md",
+   "size": 981,
+   "sha256": "6c7f629ec653a266e5efc449f176ef8c448795830472ae91964e951b1d06abf2",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/a_foreign_model_prerepair/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\a_foreign_model_prerepair\\results.jsonl",
+   "size": 21942,
+   "sha256": "e920ce09a2d1f6603e4e93c5ee29e8a959d0c731a242d9ec885517d78de2602a",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/a_foreign_model_prerepair/summary_contaminated.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\a_foreign_model_prerepair\\summary_contaminated.json",
+   "size": 3315,
+   "sha256": "456dbbaffa98774fd4bd33531c221690c2b14bb3bd0195b8595bca9fbded4210",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/b_same_model/NON_CITABLE.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\b_same_model\\NON_CITABLE.md",
+   "size": 800,
+   "sha256": "c61c9c1617a3b11b88df07e63f4754d50a03f2c9bfbfa22d1b6b44bca908fdb0",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/b_same_model/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\b_same_model\\results.jsonl",
+   "size": 22157,
+   "sha256": "fba68c9b53fa5b0b76efc4046bd699a4ae74da1157f61ae4190e0f460bf5bc81",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/b_same_model/summary_contaminated.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\b_same_model\\summary_contaminated.json",
+   "size": 3219,
+   "sha256": "ae4df4d3cab3f89890408a0933d7d0e5389e011434ec80ea7a839aca7fe51f02",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/c_foreign_model/NON_CITABLE.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\c_foreign_model\\NON_CITABLE.md",
+   "size": 861,
+   "sha256": "f0f8a27425a73fce3db98789b93f1f262a339b275c6a6e59d75824425f230881",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/c_foreign_model/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\c_foreign_model\\results.jsonl",
+   "size": 22062,
+   "sha256": "bf384fc51d5fd2d71cf9cc7e51c4381abe3f1600fd7d96964e1bf6bf58c7b9e4",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/c_foreign_model/summary_contaminated.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\c_foreign_model\\summary_contaminated.json",
+   "size": 3446,
+   "sha256": "50f724b6cd200b38b800ba5b28aedf3ef1acab3efbcdf654675e0f00dc08ff39",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/d_clean_check/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\d_clean_check\\results.jsonl",
+   "size": 8254,
+   "sha256": "4b82256251f237d22d2535344e19b9457310326f24dcdaefc4446fca3cf0e025",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/d_clean_check/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\d_clean_check\\summary.json",
+   "size": 2996,
+   "sha256": "49c50784e0a861596b5ee9975ed60421fe436bcd9a9e4e6f55da660cf2ac5cba",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/e_final_check/NON_CITABLE.md",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\e_final_check\\NON_CITABLE.md",
+   "size": 801,
+   "sha256": "8827f552a7a6a46b37d0092da2e9009fb1f8321f626a1fc61f9a46b16eb1efa0",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/e_final_check/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\e_final_check\\results.jsonl",
+   "size": 16596,
+   "sha256": "c608c3c5cb86a00c97289986183a17604ddd38be2eb90851701a4037e6536b84",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/e_final_check/summary_contaminated.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\e_final_check\\summary_contaminated.json",
+   "size": 3229,
+   "sha256": "49f87d582f440d74e23134f35ee93bc1b949e83208a41e011179060f2e8101f1",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "contamination_test",
+   "role": "guard_evidence",
+   "path": "out/x3/contamination_scratch/baseline_hashes_before.txt",
+   "abs_path": "I:\\spark-enh\\out\\x3\\contamination_scratch\\baseline_hashes_before.txt",
+   "size": 575,
+   "sha256": "f27142ee5d6623ecb8b9a298e1d57bdf7c098a06ebfadce97d4d0d5b4269116f",
+   "inside_root": true,
+   "required_by": [
+    "guard"
+   ]
+  },
+  {
+   "group": "ledger",
+   "role": "ledger",
+   "path": "reports/SPARK_X3_CAMPAIGN_LEDGER_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_CAMPAIGN_LEDGER_20261112.md",
+   "size": 17637,
+   "sha256": "c675a55b1f50a4368b72e32567004e3634a1479175a873983e78237abb710f6f",
+   "inside_root": true,
+   "required_by": [
+    "campaign_baseline"
+   ]
+  },
+  {
+   "group": "superseded_eval",
+   "role": "superseded_output",
+   "path": "out/x3/base_r5q6/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\base_r5q6\\results.jsonl",
+   "size": 281133,
+   "sha256": "2a97e9ded799a8a5b988cf90e0cc5ec0ad4ca16d42db75781d9558ca3146f7df",
+   "inside_root": true,
+   "required_by": [
+    "non_reproducible_reference"
+   ]
+  },
+  {
+   "group": "superseded_eval",
+   "role": "superseded_output",
+   "path": "out/x3/base_r5q6/results_pre_rescore.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\base_r5q6\\results_pre_rescore.jsonl",
+   "size": 286672,
+   "sha256": "df125bd7d4b19e8900a1bceea778555a1ac071222b5795a848bde9040c80dfe5",
+   "inside_root": true,
+   "required_by": [
+    "non_reproducible_reference"
+   ]
+  },
+  {
+   "group": "superseded_eval",
+   "role": "superseded_output",
+   "path": "out/x3/base_r5q6/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\base_r5q6\\summary.json",
+   "size": 625,
+   "sha256": "d825ce7513296fceb3ef9e2af5e50fb33c30b4cfd11cf5f50e2c756ee2d4d91a",
+   "inside_root": true,
+   "required_by": [
+    "non_reproducible_reference"
+   ]
+  },
+  {
+   "group": "superseded_eval",
+   "role": "superseded_output",
+   "path": "out/x3/r6/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\r6\\results.jsonl",
+   "size": 278505,
+   "sha256": "7af332638ac9f4a3056c6198822e117c96a83824aa08268783755e119465bb59",
+   "inside_root": true,
+   "required_by": [
+    "non_reproducible_reference"
+   ]
+  },
+  {
+   "group": "superseded_eval",
+   "role": "superseded_output",
+   "path": "out/x3/r6/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\r6\\summary.json",
+   "size": 626,
+   "sha256": "ff8195f3159344478fbb8ee08ea96db8296218b2d29ae722f0cbe27e86ebf150",
+   "inside_root": true,
+   "required_by": [
+    "non_reproducible_reference"
+   ]
+  },
+  {
+   "group": "pinned_eval",
+   "role": "eval_output",
+   "path": "out/x3/pinned_r5_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\pinned_r5_a\\results.jsonl",
+   "size": 281353,
+   "sha256": "fa97fcb67335015b61c0b895c20ad3a3e0483cdd4da4f773b4cf3339cda36d35",
+   "inside_root": true,
+   "required_by": [
+    "determinism_evidence"
+   ]
+  },
+  {
+   "group": "pinned_eval",
+   "role": "eval_output",
+   "path": "out/x3/pinned_r5_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\pinned_r5_a\\summary.json",
+   "size": 1508,
+   "sha256": "83bb6e9a276d503214c2fe8763cb5791b8901e17ad2d14ef17d6c800bc4680ba",
+   "inside_root": true,
+   "required_by": [
+    "determinism_evidence"
+   ]
+  },
+  {
+   "group": "pinned_eval",
+   "role": "eval_output",
+   "path": "out/x3/pinned_r5_b/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\pinned_r5_b\\results.jsonl",
+   "size": 281361,
+   "sha256": "2d8bdbf5ec16979de176cf78ea6ffd530506b3ba160022b7e67f85534dae8085",
+   "inside_root": true,
+   "required_by": [
+    "determinism_evidence"
+   ]
+  },
+  {
+   "group": "pinned_eval",
+   "role": "eval_output",
+   "path": "out/x3/pinned_r5_b/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\pinned_r5_b\\summary.json",
+   "size": 1508,
+   "sha256": "fd12d5a2236b7d852c2befbf5cbe76e9a1f25b3ae9712d624b5e180d1603a107",
+   "inside_root": true,
+   "required_by": [
+    "determinism_evidence"
+   ]
+  },
+  {
+   "group": "pinned_eval",
+   "role": "eval_output",
+   "path": "out/x3/pinned_r6/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\pinned_r6\\results.jsonl",
+   "size": 280109,
+   "sha256": "5533388fdd56f95ccbede93e77b4f6a9ef2990c9fc4c719c7b61f726e41058bd",
+   "inside_root": true,
+   "required_by": [
+    "determinism_evidence"
+   ]
+  },
+  {
+   "group": "pinned_eval",
+   "role": "eval_output",
+   "path": "out/x3/pinned_r6/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\pinned_r6\\summary.json",
+   "size": 1492,
+   "sha256": "b6e3f5d11e649849d30c2ca518ba0091f7bc2a66e70d76d2ac199e306007292d",
+   "inside_root": true,
+   "required_by": [
+    "determinism_evidence"
+   ]
+  },
+  {
+   "group": "protocol_experiments",
+   "role": "eval_output",
+   "path": "out/x3/pinned2_r5_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\pinned2_r5_a\\results.jsonl",
+   "size": 275970,
+   "sha256": "491fdb52a4208faee7315b8afe56834b2de19170319eb25ca0d68c224fb7ab53",
+   "inside_root": true,
+   "required_by": [
+    "determinism_evidence"
+   ]
+  },
+  {
+   "group": "protocol_experiments",
+   "role": "eval_output",
+   "path": "out/x3/pinned2_r5_a/summary.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\pinned2_r5_a\\summary.json",
+   "size": 1716,
+   "sha256": "d340d0849078ef02f8623320da8eb4ea0e3e4d100daf06f594864ba501e9bfc3",
+   "inside_root": true,
+   "required_by": [
+    "determinism_evidence"
+   ]
+  },
+  {
+   "group": "protocol_experiments",
+   "role": "eval_output",
+   "path": "out/x3/pinned3_r5_a/results.jsonl",
+   "abs_path": "I:\\spark-enh\\out\\x3\\pinned3_r5_a\\results.jsonl",
+   "size": 80552,
+   "sha256": "76bd02307362c6d3a4c4325ee494942a8d5ea754ecb2abb80b3869efe667b9ab",
+   "inside_root": true,
+   "required_by": [
+    "determinism_evidence"
+   ]
+  },
+  {
+   "group": "runtime",
+   "role": "runtime_receipt",
+   "path": "out/x3/runtime/lane_log_offset.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\lane_log_offset.json",
+   "size": 20,
+   "sha256": "ae1c55499da9a5f2d3976cca2523d00f20604b1e7abfb1ed76018eb24c497092",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "runtime",
+   "role": "runtime_receipt",
+   "path": "out/x3/runtime/lane_state.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\lane_state.json",
+   "size": 938,
+   "sha256": "9b79628d791fbef45eaae9b116c5d15444a83d8db89a0a1cb7f92e58f6a7fb19",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "runtime",
+   "role": "runtime_receipt",
+   "path": "out/x3/runtime/server_handshake.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\runtime\\server_handshake.json",
+   "size": 856,
+   "sha256": "46546d97cbf60e55a9e775165663e080070443d78347cd9e75e3c8d6fe692785",
+   "inside_root": true,
+   "required_by": [
+    "eval"
+   ]
+  },
+  {
+   "group": "runtime_log",
+   "role": "runtime_evidence",
+   "path": "logs/x3_ollama_server.log",
+   "abs_path": "I:\\spark-enh\\logs\\x3_ollama_server.log",
+   "size": 26707512,
+   "sha256": "6821b3c5003b030c1f530e67719a41a3e9d11ba7e6c5917467bf791f7e71a362",
+   "inside_root": true,
+   "required_by": [
+    "reproduction"
+   ]
+  },
+  {
+   "group": "runtime_log",
+   "role": "runtime_evidence",
+   "path": "logs/x3_stability.log",
+   "abs_path": "I:\\spark-enh\\logs\\x3_stability.log",
+   "size": 773,
+   "sha256": "ed55f9ff0daae21218fde29f26cb05a8b142aa5ad0abe11e8461c008f0626247",
+   "inside_root": true,
+   "required_by": [
+    "reproduction"
+   ]
+  },
+  {
+   "group": "runtime_log",
+   "role": "runtime_evidence",
+   "path": "logs/x3_probe_f16.log",
+   "abs_path": "I:\\spark-enh\\logs\\x3_probe_f16.log",
+   "size": 441,
+   "sha256": "b5c467ad84287439ca01cd69e690b6fddf46210e13c8e0161eddefe52d43ffbe",
+   "inside_root": true,
+   "required_by": [
+    "reproduction"
+   ]
+  },
+  {
+   "group": "runtime_log",
+   "role": "runtime_evidence",
+   "path": "logs/x3_probe_q8_uniform.log",
+   "abs_path": "I:\\spark-enh\\logs\\x3_probe_q8_uniform.log",
+   "size": 764,
+   "sha256": "ea7831c74c6aebf85208c2f2d4a5fcf2996a3466051de82d8add3aebad63beda",
+   "inside_root": true,
+   "required_by": [
+    "reproduction"
+   ]
+  },
+  {
+   "group": "runtime_log",
+   "role": "runtime_evidence",
+   "path": "logs/x3_probe_final.log",
+   "abs_path": "I:\\spark-enh\\logs\\x3_probe_final.log",
+   "size": 652,
+   "sha256": "010ca1ccefcf9d30300cd8a3799d8d149fd56e38162c9951498755e91e38ba82",
+   "inside_root": true,
+   "required_by": [
+    "reproduction"
+   ]
+  },
+  {
+   "group": "runtime_log",
+   "role": "runtime_evidence",
+   "path": "logs/x3_order_probe.log",
+   "abs_path": "I:\\spark-enh\\logs\\x3_order_probe.log",
+   "size": 580,
+   "sha256": "81aa67e749085b70fb8ebdc9b0e51d561a6ee13213f3b6f802cd9793b26462ee",
+   "inside_root": true,
+   "required_by": [
+    "reproduction"
+   ]
+  },
+  {
+   "group": "analysis",
+   "role": "analysis",
+   "path": "out/x3/comparison.json",
+   "abs_path": "I:\\spark-enh\\out\\x3\\comparison.json",
+   "size": 2783,
+   "sha256": "d907ffb24aa0432d60d82b2a312df6330757586c2fffd2d5edfa7b580f558154",
+   "inside_root": true,
+   "required_by": [
+    "report"
+   ]
+  },
+  {
+   "group": "report",
+   "role": "report",
+   "path": "reports/SPARK_X3_R6_MEASURED_IMPROVEMENT_20261112.md",
+   "abs_path": "I:\\spark-enh\\reports\\SPARK_X3_R6_MEASURED_IMPROVEMENT_20261112.md",
+   "size": 9589,
+   "sha256": "b51d966ba30b0760ac03413e1a5fc92582dfe61b4e5e073113be5b896199a5ea",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "report",
+   "role": "report",
+   "path": "train/README_X3.md",
+   "abs_path": "I:\\spark-enh\\train\\README_X3.md",
+   "size": 11711,
+   "sha256": "155c1b53ee7c4fc69cbe4b3301f7871a051218927d35e76b3a9721ec17e11bce",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_bestofn.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_bestofn.py",
+   "size": 9530,
+   "sha256": "977ab0779a28b7aa76dc4dbfc519543c5c86bdf0000c5bf7eda286dcfb522fab",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_build_d4.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_build_d4.py",
+   "size": 6947,
+   "sha256": "25fe87bb102ead7d3a115952b5a67eac99e29351efa0444cda5b0ffda61201eb",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_compare.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_compare.py",
+   "size": 5153,
+   "sha256": "729761f2a9f6fee5f4014ff7386a3afc817b56d732c3f851061d8ba2f84e0b4f",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_compat.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_compat.py",
+   "size": 3766,
+   "sha256": "a6cd2b4b83e77e31d2365765a821cad0d9bb85d1375786e2ad76cf79971f0ac0",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_data.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_data.py",
+   "size": 12072,
+   "sha256": "7a5565fd7105514be8e4ed66b76449b8aaa85c2a4baa103c1cf1180cbbd2dbf3",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_eval.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_eval.py",
+   "size": 15423,
+   "sha256": "6687190c0a223afaf2386f0fe606000848d1396b4f5f7d2f2922efde07227a71",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_hybrid.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_hybrid.py",
+   "size": 5194,
+   "sha256": "06edc129d18ab27c95b19c45dbb3ddef2006fba1752e52d75c469e7611e23e1c",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_io.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_io.py",
+   "size": 5578,
+   "sha256": "d56d30777104f1cc0fe27c814d35be4365270c4a99189f3947cbe8ba50ce2089",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_lane.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_lane.py",
+   "size": 10817,
+   "sha256": "baee46324a87865585df933889be8d756883cc7759ecbf11462cd1dd66cb45f6",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_manifest.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_manifest.py",
+   "size": 79015,
+   "sha256": "8b5363e1a2370f5d66157a6225ed62ca6f51e9815e1f586a07ecb2527af580a2",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_merge.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_merge.py",
+   "size": 3032,
+   "sha256": "d546175572975b2b0237c55df00f8aa3936d825a7925842e5e717b61d05582b3",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_merge_sweep.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_merge_sweep.py",
+   "size": 5825,
+   "sha256": "ad6f88ac4433f07c7f03b32e452ea5388b218923ed090d12626050d609ef96c4",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_paths.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_paths.py",
+   "size": 5400,
+   "sha256": "38818a99ed03ebdc5ec6da44a0780b846f588824bcfb462c7ef6d3d321d236d4",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_report.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_report.py",
+   "size": 9106,
+   "sha256": "2c0ccedd211d02710a69da8829dc43df376a544021bc5eec562082ecf660166c",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_runtime.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_runtime.py",
+   "size": 11294,
+   "sha256": "9a193dfe6b5def5eb6eed7ca75268720933540f6d7aa0c834cde2e413ae197ca",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_score.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_score.py",
+   "size": 10770,
+   "sha256": "36ff34a22294d487e92258fb2a836315ac4181c972921d70a5fe9c45e1decdee",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_selectors.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_selectors.py",
+   "size": 5311,
+   "sha256": "8b58defbda106b36959cea225dc8de648b06ebd8c6c3672ab1c5c703888c4f8d",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_selfverify.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_selfverify.py",
+   "size": 22208,
+   "sha256": "815827311422364526ca4a90ee40372b17ee89b2245006039c84acf23f05bbf0",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_smoke.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_smoke.py",
+   "size": 1729,
+   "sha256": "a0871be314bc112ff327801f3c8d829ce728f33e6b8c16b206ef75b16a7f9a59",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_train.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_train.py",
+   "size": 12818,
+   "sha256": "c13b814197c8ef7018d683669192a48daed58b56725000f6c46f92093fa193f7",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_train_delta.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_train_delta.py",
+   "size": 8433,
+   "sha256": "f100d9800782719c993bcdc183e027c153902854818c0e315dd87bac289549ab",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_verify_report.py",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_verify_report.py",
+   "size": 4579,
+   "sha256": "e7863382e76e4d7981fdd90dbd8f4d83438cc8f8df1c836c6c66cb6a72d77ac0",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/spark_x3_deploy.sh",
+   "abs_path": "I:\\spark-enh\\train\\spark_x3_deploy.sh",
+   "size": 4925,
+   "sha256": "dd1b0c5b6e027581829ccde199dfc10c20a03d972b0ddeecc9bf53aaf713c15e",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "code",
+   "role": "code",
+   "path": "train/README_X3.md",
+   "abs_path": "I:\\spark-enh\\train\\README_X3.md",
+   "size": 11711,
+   "sha256": "155c1b53ee7c4fc69cbe4b3301f7871a051218927d35e76b3a9721ec17e11bce",
+   "inside_root": true,
+   "required_by": []
+  },
+  {
+   "group": "converter",
+   "role": "tool",
+   "path": "ref/llama.cpp-src/convert_hf_to_gguf.py",
+   "abs_path": "I:\\spark-enh\\ref\\llama.cpp-src\\convert_hf_to_gguf.py",
+   "size": 13602,
+   "sha256": "20c5f57f98193e859ef26f44603e8cf6e90d27df11c43c1d54f218fa5e141c21",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "converter",
+   "role": "tool",
+   "path": "ref/llama.cpp-src/conversion/spark2_5.py",
+   "abs_path": "I:\\spark-enh\\ref\\llama.cpp-src\\conversion\\spark2_5.py",
+   "size": 2941,
+   "sha256": "73cadaf8fe62ab32cb3b83a75707ff6d4a985a8e96f2ee8fd107f7a03642b67a",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/cublas64_13.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\cublas64_13.dll",
+   "size": 54942320,
+   "sha256": "1119dbca0a808e0c8850bb4221e330daf0b5ddb348d62d37b6ac533854723df9",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/cublasLt64_13.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\cublasLt64_13.dll",
+   "size": 492752496,
+   "sha256": "0f5bc315fef706b5626248ebd74e8a48a9e82fa2f0cad38330f5f70984913107",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/cudart64_13.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\cudart64_13.dll",
+   "size": 551024,
+   "sha256": "05bfafcb97bd53b0089568a96e1e5bd6921637bd0853ff7f5342bd31a6a16890",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-base.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-base.dll",
+   "size": 796160,
+   "sha256": "9bc3937e9585f848399a39078add21aa1f85e5b78d7322423020deca566517f2",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-alderlake.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-alderlake.dll",
+   "size": 1230336,
+   "sha256": "e5268920fbc2160ed4253af3b3f5fea81b1b73cde2e4fc5452fc9505bc199d0d",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-cannonlake.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-cannonlake.dll",
+   "size": 1448448,
+   "sha256": "1fcb5e274adc47d7ff1e771fc537001b6778977286a334ee25c935b7a83e23ad",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-cascadelake.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-cascadelake.dll",
+   "size": 1434112,
+   "sha256": "21ee7a48c24cbeb5777e4a31ccc4055d6058aea7d53c4156b4fa91b91840aab2",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-cooperlake.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-cooperlake.dll",
+   "size": 1434624,
+   "sha256": "6ef1d775eda1b4e2cf1a5ed583e794bcad199c29eb01889b8aa82193972b7d67",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-haswell.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-haswell.dll",
+   "size": 1235968,
+   "sha256": "a675f0e13137ddee826dbf705d89eea4cc55cae4a850218e1dde1167a54d4510",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-icelake.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-icelake.dll",
+   "size": 1440768,
+   "sha256": "e97f59c65ada00a8fdcaf87a4765061c2abfdde5504ebf57e8b13e469a9d33ad",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-ivybridge.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-ivybridge.dll",
+   "size": 1127424,
+   "sha256": "a6cf9f567d4e5ab882afb39e569e09cc6d52b94755ad6de9e8f0f528b29f60db",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-piledriver.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-piledriver.dll",
+   "size": 1131520,
+   "sha256": "54e9b281350a931ece49099293f1ba62b1f785e82efe0c349c5a9a08ba02fe0e",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-sandybridge.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-sandybridge.dll",
+   "size": 1107968,
+   "sha256": "da5a8fd6f293b72b269035536e74e86f0b09c83e150589a56dad541aea22bd18",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-sapphirerapids.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-sapphirerapids.dll",
+   "size": 1711616,
+   "sha256": "db5dfb35cfd3d38ba322d96c255b2d68eb694b21b8b4f547f8893540dc399fdd",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-skylakex.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-skylakex.dll",
+   "size": 1441792,
+   "sha256": "39a2621b1e34437b6dc1dca882f77a9cb3477c1417b76666a3fe8e8561cb113f",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-sse42.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-sse42.dll",
+   "size": 932352,
+   "sha256": "0eb1d17eb5b384d3949242234a35c0ae8f46fa7307b6d8842f628bc37afa585c",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-x64.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-x64.dll",
+   "size": 924160,
+   "sha256": "f93d821658aa301a58c62a98726f8060b06cfb879a56db2457264eab6b654ef1",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cpu-zen4.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cpu-zen4.dll",
+   "size": 1441280,
+   "sha256": "ae60dbd72ab113f60c622db3164099619c5f23a2e0f559a7983efa7f21ec8b05",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-cuda.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-cuda.dll",
+   "size": 145132032,
+   "sha256": "84abb3d3f1b7c6e1be56f8c44d89bb81952faa4afdbfea767f7e8c250da261f8",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml-rpc.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml-rpc.dll",
+   "size": 168448,
+   "sha256": "3717c982a248d421c08ecb5ec2237a1edb51486597e9d678439bc22a492c28cb",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/ggml.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\ggml.dll",
+   "size": 79872,
+   "sha256": "a233f6085776df87160f0e07cd40f9b6c0d9d7bf315e9b907f9747fe6aedb371",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/libomp.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\libomp.dll",
+   "size": 768000,
+   "sha256": "a12116ba72d1d6820407cf30be23da04ce79d6bb8a71a5ee71759c5a1faa6f1c",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-batched-bench-impl.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-batched-bench-impl.dll",
+   "size": 61440,
+   "sha256": "b5efae55c2844d8aa442b165be27a6f1edc4d2c7aa79279cabb5d4bcac27428a",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-bench-impl.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-bench-impl.dll",
+   "size": 397824,
+   "sha256": "2166607cb6918e63ec97aa3cc4e306887d224f85d430e6bba59cd3ecbc86f02e",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-cli-impl.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-cli-impl.dll",
+   "size": 3296768,
+   "sha256": "c430492f5c80140682f10e25926a0ac59e158442863914e44ec47a373ab60bdd",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-common.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-common.dll",
+   "size": 7773696,
+   "sha256": "cd3ce0a102d50edd65f19dac115faff1f797ec7c0dd43e9b0beec4dad88e99bc",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-completion-impl.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-completion-impl.dll",
+   "size": 133632,
+   "sha256": "05503c303e2eb47ade34e68abff349ebb923bc43276a3c4fa81f22a79b26c5f7",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-fit-params-impl.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-fit-params-impl.dll",
+   "size": 41472,
+   "sha256": "46b655b4d2dd75519af355282f8dc9743c997e66fcfa0590c42a71686f15a455",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-perplexity-impl.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-perplexity-impl.dll",
+   "size": 194048,
+   "sha256": "5700b463257dc2b157d3aa8c2ce3b83610547f5735d50d4f69f42ac2c5e26264",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-quantize-impl.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-quantize-impl.dll",
+   "size": 137216,
+   "sha256": "7842f44be916e13b28356a285e5d1fcf43891bb249744108dd08d3a4e2f8f064",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-quantize.exe",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-quantize.exe",
+   "size": 9216,
+   "sha256": "eeb75877bd41d8d7b51d18129d873e6220014613baea349fa18e6b5d36c987de",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama-server-impl.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama-server-impl.dll",
+   "size": 8904192,
+   "sha256": "9d8641520c04b44c0f14881614acb40db0029e9a42abd99b92059e94ada99b24",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/llama.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\llama.dll",
+   "size": 3154944,
+   "sha256": "ae8ff0f4be6ea67778ed1f03a23d0b04a15cfca1f00ca46a1078516f98d4c57e",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  },
+  {
+   "group": "quantizer",
+   "role": "tool",
+   "path": "tools/llama.cpp/bin/mtmd.dll",
+   "abs_path": "I:\\spark-enh\\tools\\llama.cpp\\bin\\mtmd.dll",
+   "size": 1772032,
+   "sha256": "7409c7e02920cb8ab814c1000094de65db6ab17b801c1b900d087db178e0bfdc",
+   "inside_root": true,
+   "required_by": [
+    "deploy"
+   ]
+  }
+ ],
+ "external": [
+  {
+   "id": "ollama.runtime",
+   "kind": "service",
+   "path": "C:\\Users\\nikma\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+   "required_by": [
+    "deploy",
+    "eval"
+   ],
+   "reason": "Ollama serves /api/chat at 127.0.0.1:11434; it is the inference runtime, not an artifact.",
+   "exists": true
+  },
+  {
+   "id": "python.interpreter",
+   "kind": "runtime",
+   "path": "C:\\Users\\nikma\\AppData\\Local\\Programs\\Python\\Python311\\python.exe",
+   "required_by": [
+    "train",
+    "eval",
+    "merge",
+    "report",
+    "manifest"
+   ],
+   "reason": "The torch 2.11.0+cu128 / transformers 5.16.1 environment only exists in this interpreter.",
+   "exists": true
+  },
+  {
+   "id": "scratch.os_temp",
+   "kind": "scratch",
+   "path": "%TEMP% (tempfile.TemporaryDirectory)",
+   "required_by": [
+    "eval(scoring)"
+   ],
+   "reason": "Generated code is executed in a throw-away directory; it is scoring scratch, never an input.",
+   "exists": null
+  },
+  {
+   "id": "network.huggingface",
+   "kind": "network",
+   "path": "https://huggingface.co (datasets: ise-uiuc/Magicoder-Evol-Instruct-110K, open-r1/OpenR1-Math-220k)",
+   "required_by": [
+    "data"
+   ],
+   "reason": "Only needed to REBUILD the corpus; the materialised jsonl in data/x3 is the training input.",
+   "exists": null
+  }
+ ],
+ "ollama": {
+  "models_dir": "F:\\Ollama\\models",
+  "env": "OLLAMA_MODELS",
+  "exists": true,
+  "models": {
+   "spark-r5-q6": {
+    "manifest": "F:\\Ollama\\models\\manifests-v2\\ollama.com\\library\\spark-r5-q6\\latest",
+    "digest": "fe9fcdda13081d74572277fbde2eea576c5e6f1ebad8e0046b126b1d5f69e09a",
+    "size": 3379173824,
+    "blob": "F:\\Ollama\\models\\blobs\\sha256-fe9fcdda13081d74572277fbde2eea576c5e6f1ebad8e0046b126b1d5f69e09a",
+    "blob_exists": true,
+    "blob_size": 3379173824,
+    "mirror_in_root": "out/rawfix_v5/rawfix-v5-r5-Q6_K.gguf",
+    "mirror_size": 3379173824,
+    "digest_matches_in_root_gguf": true
+   },
+   "spark-r6-q6": {
+    "manifest": "F:\\Ollama\\models\\manifests-v2\\ollama.com\\library\\spark-r6-q6\\latest",
+    "digest": "3e8328a353cf9e8fa4894d017e5c64f36aadf7e288da2e37e03d800af9ca8751",
+    "size": 3379173344,
+    "blob": "F:\\Ollama\\models\\blobs\\sha256-3e8328a353cf9e8fa4894d017e5c64f36aadf7e288da2e37e03d800af9ca8751",
+    "blob_exists": true,
+    "blob_size": 3379173344,
+    "mirror_in_root": "out/x3/gguf/r6-q6k.gguf",
+    "mirror_size": 3379173344,
+    "digest_matches_in_root_gguf": true
+   }
+  }
+ },
+ "pinned_runtime": {
+  "env": {
+   "OLLAMA_MODELS": "F:\\Ollama\\models",
+   "OLLAMA_HOST": "0.0.0.0:11434",
+   "OLLAMA_NUM_PARALLEL": "1",
+   "OLLAMA_NUM_BATCH": "512",
+   "OLLAMA_CONTEXT_LENGTH": "32768",
+   "OLLAMA_KV_CACHE_TYPE": "f16",
+   "OLLAMA_FLASH_ATTENTION": "1",
+   "OLLAMA_NUM_THREADS": "20",
+   "OLLAMA_MAX_LOADED_MODELS": "1",
+   "OLLAMA_KEEP_ALIVE": "30m",
+   "OLLAMA_GPU_OVERHEAD": "0",
+   "OLLAMA_NO_CLOUD": "true",
+   "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+   "OLLAMA_DEBUG": "1"
+  },
+  "env_sha256": "b2b0d655024b1b227fe8ccdc7ff48ee85286965d0561bfdda9e8ec7cc84ad342",
+  "load_config": {
+   "n_ctx": "262144",
+   "n_batch": "512",
+   "n_ubatch": "512",
+   "n_threads": "10"
+  },
+  "handshake": {
+   "schema": "spark_x3_runtime/v1",
+   "pid": 39636,
+   "started_at": "2026-11-12T07:48:36-0600",
+   "binary": "C:\\Users\\nikma\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+   "version": "0.40.8",
+   "log": "I:\\spark-enh\\logs\\x3_ollama_server.log",
+   "env": {
+    "OLLAMA_MODELS": "F:\\Ollama\\models",
+    "OLLAMA_HOST": "0.0.0.0:11434",
+    "OLLAMA_NUM_PARALLEL": "1",
+    "OLLAMA_NUM_BATCH": "512",
+    "OLLAMA_CONTEXT_LENGTH": "32768",
+    "OLLAMA_KV_CACHE_TYPE": "f16",
+    "OLLAMA_FLASH_ATTENTION": "1",
+    "OLLAMA_NUM_THREADS": "20",
+    "OLLAMA_MAX_LOADED_MODELS": "1",
+    "OLLAMA_KEEP_ALIVE": "30m",
+    "OLLAMA_GPU_OVERHEAD": "0",
+    "OLLAMA_NO_CLOUD": "true",
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "OLLAMA_DEBUG": "1"
+   },
+   "env_sha256": "b2b0d655024b1b227fe8ccdc7ff48ee85286965d0561bfdda9e8ec7cc84ad342"
+  }
+ },
+ "lane": {
+  "state": {
+   "schema": "spark_x3_lane/v1",
+   "name": "spark-x3-lane",
+   "pid": 44596,
+   "port": 11500,
+   "base": "http://127.0.0.1:11500",
+   "models_dir": "I:\\spark-enh\\out\\x3\\runtime\\models",
+   "log": "I:\\spark-enh\\logs\\x3_lane_server.log",
+   "started_at": "2026-11-12T11:28:46-0600",
+   "version": "0.40.8",
+   "env": {
+    "OLLAMA_MODELS": "I:\\spark-enh\\out\\x3\\runtime\\models",
+    "OLLAMA_HOST": "127.0.0.1:11500",
+    "OLLAMA_NUM_PARALLEL": "1",
+    "OLLAMA_NUM_BATCH": "512",
+    "OLLAMA_CONTEXT_LENGTH": "32768",
+    "OLLAMA_KV_CACHE_TYPE": "f16",
+    "OLLAMA_FLASH_ATTENTION": "1",
+    "OLLAMA_NUM_THREADS": "20",
+    "OLLAMA_MAX_LOADED_MODELS": "1",
+    "OLLAMA_KEEP_ALIVE": "60m",
+    "OLLAMA_GPU_OVERHEAD": "0",
+    "OLLAMA_NO_CLOUD": "true",
+    "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+    "OLLAMA_DEBUG": "1"
+   },
+   "env_sha256": "fdafddeba7360ef6d0d44cc644cb79835adc2f86bd33cf7a9529e048cecbc1f3"
+  },
+  "env": {
+   "OLLAMA_MODELS": "I:\\spark-enh\\out\\x3\\runtime\\models",
+   "OLLAMA_HOST": "127.0.0.1:11500",
+   "OLLAMA_NUM_PARALLEL": "1",
+   "OLLAMA_NUM_BATCH": "512",
+   "OLLAMA_CONTEXT_LENGTH": "32768",
+   "OLLAMA_KV_CACHE_TYPE": "f16",
+   "OLLAMA_FLASH_ATTENTION": "1",
+   "OLLAMA_NUM_THREADS": "20",
+   "OLLAMA_MAX_LOADED_MODELS": "1",
+   "OLLAMA_KEEP_ALIVE": "60m",
+   "OLLAMA_GPU_OVERHEAD": "0",
+   "OLLAMA_NO_CLOUD": "true",
+   "CUBLAS_WORKSPACE_CONFIG": ":4096:8",
+   "OLLAMA_DEBUG": "1"
+  },
+  "models_dir": "I:\\spark-enh\\out\\x3\\runtime\\models",
+  "log": "I:\\spark-enh\\logs\\x3_lane_server.log",
+  "port": 11500
+ },
+ "experiment": {
+  "name": "d4",
+  "dir": "out/x3/d4_lane_b",
+  "hypothesis": "rebalancing the corpus to 1:1 repair:coding holds coding competence while keeping D3's repair gains, clearing the 106 baseline",
+  "single_variable": "training data mix only: 132 repair + 132 contamination-screened coding replay rows, versus D3's 132 + 20; same parent, out_proj only, r4/a8, lr 1e-5, seed, 300 steps, ||delta|| 2.35 vs D3's 2.59",
+  "passed": 102,
+  "scored": 165,
+  "delta_vs_r5": -4,
+  "delta_vs_r6": 3,
+  "citable": true,
+  "contaminated": false,
+  "lane_audit": {
+   "available": true,
+   "expected": 165,
+   "expected_source": "harness_requests",
+   "served": 165,
+   "foreign_requests": 0,
+   "missing_requests": 0,
+   "model_loads": 1,
+   "context_lengths": [
+    "32768"
+   ],
+   "batch_sizes": [
+    [
+     "1024",
+     "1024"
+    ]
+   ],
+   "kv_cache_types": [
+    "f16"
+   ],
+   "contaminated": false,
+   "reason": "lane served exactly the harness requests"
+  },
+  "delta_l2_total": 2.2606,
+  "targets": [
+   "out_proj"
+  ],
+  "diagnostic_screen": null,
+  "promoted": false,
+  "why_not_promoted": "below the baseline (102 vs 106) and the coding hypothesis is falsified: coding does not move (33, same as D3) and repair60 falls to 29; the first build scored 105 but was withdrawn because one row's instruction declared an eval entry point, and that single row (0.4% of the corpus) moved the score by 3 tasks",
+  "next_change": "stop the adapter dose/mix search: six arms bracket 99-106 and a single training row moves the total by 3, so move to full-parameter continued pretraining on a corpus two orders of magnitude larger, or quantify test-time compute with the existing verifier",
+  "train": {
+   "data": "data/x3/delta_d4.jsonl",
+   "rows_seen": null,
+   "steps": 300,
+   "lr": 1e-05,
+   "seed": 17,
+   "supervised_tokens": null,
+   "adapter_sha256": null,
+   "wall_seconds": 248.4
+  },
+  "history": [
+   {
+    "name": "r7",
+    "passed": 102,
+    "delta_vs_r5": -4,
+    "delta_vs_r6": 3,
+    "promoted": false,
+    "contaminated": false
+   },
+   {
+    "name": "r8",
+    "passed": 99,
+    "delta_vs_r5": -7,
+    "delta_vs_r6": 0,
+    "promoted": false,
+    "contaminated": false
+   },
+   {
+    "name": "x01",
+    "passed": 102,
+    "delta_vs_r5": -4,
+    "delta_vs_r6": 3,
+    "promoted": false,
+    "contaminated": false
+   },
+   {
+    "name": "d1",
+    "passed": 73,
+    "delta_vs_r5": -33,
+    "delta_vs_r6": -26,
+    "promoted": false,
+    "contaminated": false
+   },
+   {
+    "name": "d3",
+    "passed": 104,
+    "delta_vs_r5": -2,
+    "delta_vs_r6": 5,
+    "promoted": false,
+    "contaminated": false
+   },
+   {
+    "name": "d4",
+    "passed": 102,
+    "delta_vs_r5": -4,
+    "delta_vs_r6": 3,
+    "promoted": false,
+    "contaminated": false
+   }
+  ]
+ },
+ "screen": {
+  "name": "d2",
+  "kind": "diagnostic screen (full lane deliberately not spent)",
+  "dir": "out/x3/screen/d2",
+  "passed": 31,
+  "scored": 65,
+  "baseline_screen": 33,
+  "delta_l2_total": 2.8214,
+  "bound": 6.0,
+  "within_bound": true,
+  "steps": 40,
+  "lr": 1e-05,
+  "rank": 4,
+  "tokens_seen": 11844,
+  "targets_recovered": [
+   "repair_733_equality_flip",
+   "repair_757_equality_flip",
+   "repair_734_accumulator_reset",
+   "repair_624_lower_upper",
+   "repair_626_comparison_strict"
+  ],
+  "targets_still_failing": [
+   "repair_763_if_negate",
+   "repair_637_equality_flip"
+  ],
+  "collateral_losses": [
+   "repair_566_equality_flip",
+   "repair_577_equality_flip",
+   "repair_588_min_max",
+   "repair_593_index_zero",
+   "repair_637_equality_flip",
+   "repair_763_if_negate",
+   "repair_764_accumulator_reset"
+  ],
+  "gains": [
+   "repair_591_index_zero",
+   "repair_746_if_negate",
+   "repair_747_min_max",
+   "repair_798_plus_minus",
+   "repair_801_if_negate"
+  ],
+  "contaminated": false,
+  "promoted": false,
+  "why_not_promoted": "screen is net negative (31/65 vs R5 33/65) with 7 collateral repair losses, so the full lane was not spent",
+  "verdict": "delta magnitude was a real limiter (5/7 targets recovered vs 2/7 for D1 at 15x the norm) but bounding it is not sufficient: a rank-4 update to six modules still trades seven repairs for five",
+  "next_change": "hold ||delta|| <= 3 as a constraint and change *which* weights move (attention-out only) or supervise paired same-problem/different-mutant contrast"
+ },
+ "repeat": {
+  "model": "spark-r5-q6",
+  "runs": [
+   "out/x3/lane_r5_a",
+   "out/x3/lane_r5_b",
+   "out/x3/lane_r5_c"
+  ],
+  "tasks_compared": 165,
+  "scores": {
+   "out/x3/lane_r5_a": 106,
+   "out/x3/lane_r5_b": 106,
+   "out/x3/lane_r5_c": 106
+  },
+  "score_spread": 0,
+  "flip_rate": 0.0,
+  "flipping_tasks": [],
+  "token_count_differences": 0,
+  "prompt_differences": 0,
+  "per_run_audits": {
+   "out/x3/lane_r5_a": {
+    "available": true,
+    "expected": 165,
+    "served": 165,
+    "foreign_requests": 0,
+    "model_loads": 0,
+    "context_lengths": [],
+    "batch_sizes": [],
+    "kv_cache_types": [],
+    "contaminated": false,
+    "reason": "lane served exactly the harness requests"
+   },
+   "out/x3/lane_r5_b": {
+    "available": true,
+    "expected": 165,
+    "served": 165,
+    "foreign_requests": 0,
+    "model_loads": 0,
+    "context_lengths": [],
+    "batch_sizes": [],
+    "kv_cache_types": [],
+    "contaminated": false,
+    "reason": "lane served exactly the harness requests"
+   },
+   "out/x3/lane_r5_c": {
+    "available": true,
+    "expected": 165,
+    "expected_source": "harness_requests",
+    "served": 165,
+    "foreign_requests": 0,
+    "missing_requests": 0,
+    "model_loads": 1,
+    "context_lengths": [
+     "32768"
+    ],
+    "batch_sizes": [
+     [
+      "1024",
+      "1024"
+     ]
+    ],
+    "kv_cache_types": [
+     "f16"
+    ],
+    "contaminated": false,
+    "reason": "lane served exactly the harness requests"
+   }
+  },
+  "protocol": "greedy, temperature 0, seed 0, num_predict 768, same lane, same suite file; prompts hashed per task",
+  "supports": "the harness itself is repeatable: the same weights and prompt give the same tokens and the same pass/fail vector, so a measured difference of one task is real measurement-wise. It does NOT mean arm comparisons are resolved to one task: D4 showed a single 736-token training row moves the suite by 3 tasks, so arm-to-arm claims need >3 tasks."
+ },
+ "bestofn": {
+  "model": "spark-r5-q6",
+  "suite": "core",
+  "tasks": 165,
+  "k": 4,
+  "temperature": 0.8,
+  "top_p": 0.95,
+  "seed_base": 1000,
+  "max_predict": 768,
+  "generations": 660,
+  "generation_seconds": 2927.7,
+  "mean_seconds_per_generation": 4.44,
+  "wall_seconds": 0.1,
+  "single_sample_greedy_passed": 106,
+  "sample0_temperature": {
+   "all": 104,
+   "debugging": 44,
+   "coding": 34,
+   "reasoning": 26
+  },
+  "pass_at_k_oracle": {
+   "all": 132,
+   "debugging": 58,
+   "coding": 47,
+   "reasoning": 27
+  },
+  "majority_at_k": {
+   "all": 104,
+   "debugging": 44,
+   "coding": 33,
+   "reasoning": 27
+  },
+  "agreement": {
+   "tasks_with_strict_majority": 75,
+   "tasks_all_distinct": 90,
+   "mean_group_size": 1.87
+  },
+  "audit": {
+   "available": true,
+   "expected": 660,
+   "expected_source": "harness_requests",
+   "served": 660,
+   "foreign_requests": 0,
+   "missing_requests": 0,
+   "model_loads": 0,
+   "context_lengths": [],
+   "batch_sizes": [],
+   "kv_cache_types": [],
+   "contaminated": false,
+   "reason": "lane served exactly the harness requests"
+  },
+  "citable": true,
+  "single_seed_promotion": {
+   "selector": "global first-parseable",
+   "core": 111,
+   "superseded_by": "hybrid (two seed sets)"
+  },
+  "selectors": {
+   "parseable_01": {
+    "passed": 106,
+    "k": 2
+   },
+   "parseable_23": {
+    "passed": 105,
+    "k": 2
+   },
+   "hybrid": {
+    "passed": 112,
+    "by_category": {
+     "debugging": 51,
+     "coding": 34,
+     "reasoning": 27
+    },
+    "routed": {
+     "sampled": 135,
+     "greedy": 30
+    }
+   },
+   "majority": {
+    "passed": 104,
+    "by_category": {
+     "debugging": 44,
+     "coding": 33,
+     "reasoning": 27
+    }
+   },
+   "shortest_ok": {
+    "passed": 108,
+    "by_category": {
+     "debugging": 53,
+     "coding": 29,
+     "reasoning": 26
+    }
+   },
+   "parseable": {
+    "passed": 111,
+    "by_category": {
+     "debugging": 51,
+     "coding": 34,
+     "reasoning": 26
+    }
+   },
+   "sample0": {
+    "passed": 104,
+    "by_category": {
+     "debugging": 44,
+     "coding": 34,
+     "reasoning": 26
+    }
+   },
+   "pass_at_k_oracle": {
+    "passed": 132,
+    "by_category": {
+     "coding": 47,
+     "debugging": 58,
+     "reasoning": 27
+    }
+   }
+  },
+  "subset_stability": {
+   "k1": {
+    "min": 100,
+    "max": 104,
+    "mean": 101.0,
+    "subsets": 4
+   },
+   "k2": {
+    "min": 104,
+    "max": 108,
+    "mean": 106.3,
+    "subsets": 6
+   },
+   "k3": {
+    "min": 109,
+    "max": 111,
+    "mean": 109.5,
+    "subsets": 4
+   },
+   "k4": {
+    "min": 111,
+    "max": 111,
+    "mean": 111.0,
+    "subsets": 1
+   }
+  },
+  "noise_band_tasks": 3,
+  "deployable_selector": "first sample whose answer parses as Python and defines a function; fallback to sample 0",
+  "promoted": true,
+  "gate": "hybrid > greedy 106 + band 3 = 109 on BOTH seed sets; hybrid {'1000-1003': 112, '2000-2003': 118} -> True",
+  "served_path": {
+   "model": "spark-r5-q6",
+   "k": 4,
+   "temperature": 0.8,
+   "top_p": 0.95,
+   "seed_sets": {
+    "1000-1003": [
+     1000,
+     1001,
+     1002,
+     1003
+    ],
+    "2000-2003": [
+     2000,
+     2001,
+     2002,
+     2003
+    ]
+   },
+   "router": "code prompts (verify type python_unit) -> sampled selection; all other prompts -> greedy single decode",
+   "selector": "first sample whose answer parses as Python and defines a function; fallback sample 0",
+   "core": 112,
+   "core_by_seed_set": {
+    "1000-1003": 112,
+    "2000-2003": 118
+   },
+   "untouched_single_sample": 106
+  }
+ },
+ "hybrid": {
+  "suite": "core (165)",
+  "greedy": {
+   "core": 106,
+   "by_category": {
+    "debugging": 43,
+    "coding": 36,
+    "reasoning": 27
+   },
+   "source": "out/x3/lane_r5_a"
+  },
+  "seed_sets": {
+   "1000-1003": {
+    "dir": "out/x3/bestofn_r5",
+    "rows": 165,
+    "greedy": 106,
+    "parseable": 111,
+    "hybrid": 112,
+    "hybrid_by_category": {
+     "debugging": 51,
+     "coding": 34,
+     "reasoning": 27
+    },
+    "parseable_by_category": {
+     "debugging": 51,
+     "coding": 34,
+     "reasoning": 26
+    },
+    "routed": {
+     "sampled": 135,
+     "greedy": 30
+    },
+    "oracle_pass_at_k": 132,
+    "sample0_temperature": 104,
+    "majority": 104
+   },
+   "2000-2003": {
+    "dir": "out/x3/bestofn_r5_b",
+    "rows": 165,
+    "greedy": 106,
+    "parseable": 116,
+    "hybrid": 118,
+    "hybrid_by_category": {
+     "debugging": 53,
+     "coding": 38,
+     "reasoning": 27
+    },
+    "parseable_by_category": {
+     "debugging": 53,
+     "coding": 38,
+     "reasoning": 25
+    },
+    "routed": {
+     "sampled": 135,
+     "greedy": 30
+    },
+    "oracle_pass_at_k": 138,
+    "sample0_temperature": 108,
+    "majority": 112
+   }
+  },
+  "oracle_label": "pass@4 uses the suite's own tests and is reported for reference only; it is never a promoted number",
+  "band_tasks": 3,
+  "verdict": {
+   "hybrid_scores": {
+    "1000-1003": 112,
+    "2000-2003": 118
+   },
+   "hybrid_spread": 6,
+   "oracle_pass_at_k": {
+    "1000-1003": 132,
+    "2000-2003": 138
+   },
+   "clears_band_on": {
+    "1000-1003": true,
+    "2000-2003": true
+   },
+   "reasoning_recovered_to_27": {
+    "1000-1003": true,
+    "2000-2003": true
+   },
+   "adopted": true,
+   "gate": "hybrid > greedy 106 + band 3 = 109 on BOTH seed sets"
+  },
+  "served_path": {
+   "model": "spark-r5-q6",
+   "k": 4,
+   "temperature": 0.8,
+   "top_p": 0.95,
+   "seed_sets": {
+    "1000-1003": [
+     1000,
+     1001,
+     1002,
+     1003
+    ],
+    "2000-2003": [
+     2000,
+     2001,
+     2002,
+     2003
+    ]
+   },
+   "router": "code prompts (verify type python_unit) -> sampled selection; all other prompts -> greedy single decode",
+   "selector": "first sample whose answer parses as Python and defines a function; fallback sample 0",
+   "core": 112,
+   "core_by_seed_set": {
+    "1000-1003": 112,
+    "2000-2003": 118
+   },
+   "untouched_single_sample": 106
+  }
+ },
+ "verifier": {
+  "suite": "core (165)",
+  "label": "execution-verified v2 (two modules + eight-mutant family)",
+  "selector": "execution-verified: model-written test modules must agree with the candidate and catch a family of mutants of it",
+  "greedy": 106,
+  "band_tasks": 3,
+  "oracle_label": "pass@4 is verifier-selected on the benchmark's own tests; reported for reference only, never promoted",
+  "seed_sets": {
+   "1000-1003": {
+    "dir": "out/x3/verified2_r5_a",
+    "core": 116,
+    "by_category": {
+     "debugging": 52,
+     "coding": 37,
+     "reasoning": 27
+    },
+    "hybrid": 112,
+    "delta_vs_hybrid": 4,
+    "delta_vs_greedy": 10,
+    "oracle_pass_at_k": 132,
+    "eligible_candidates": 67,
+    "candidates": 540,
+    "tasks_with_eligible": 31,
+    "fallback_selected": 104,
+    "cost": {
+     "test_generations": 754,
+     "test_gen_seconds_total": 2812.8,
+     "sandbox_seconds_total": 40.9,
+     "mean_test_gen_seconds_per_candidate": 5.21,
+     "mean_peak_mb_per_task": 18.3,
+     "max_peak_mb": 1044.8,
+     "timeouts_or_kills": 2
+    },
+    "sandbox": {
+     "timeout_s": 10.0,
+     "mem_cap_mb": 1024,
+     "no_network": true,
+     "no_subprocess": true,
+     "stdin_closed": true
+    },
+    "hidden_suite_reads": 0,
+    "audit": {
+     "available": true,
+     "expected": 754,
+     "expected_source": "harness_requests",
+     "served": 754,
+     "foreign_requests": 0,
+     "missing_requests": 0,
+     "model_loads": 0,
+     "context_lengths": [],
+     "batch_sizes": [],
+     "kv_cache_types": [],
+     "contaminated": false,
+     "reason": "lane served exactly the harness requests"
+    },
+    "citable": true
+   },
+   "2000-2003": {
+    "dir": "out/x3/verified2_r5_b",
+    "core": 120,
+    "by_category": {
+     "debugging": 54,
+     "coding": 39,
+     "reasoning": 27
+    },
+    "hybrid": 118,
+    "delta_vs_hybrid": 2,
+    "delta_vs_greedy": 14,
+    "oracle_pass_at_k": 138,
+    "eligible_candidates": 63,
+    "candidates": 540,
+    "tasks_with_eligible": 27,
+    "fallback_selected": 108,
+    "cost": {
+     "test_generations": 718,
+     "test_gen_seconds_total": 2618.6,
+     "sandbox_seconds_total": 37.0,
+     "mean_test_gen_seconds_per_candidate": 4.85,
+     "mean_peak_mb_per_task": 18.2,
+     "max_peak_mb": 1030.4,
+     "timeouts_or_kills": 1
+    },
+    "sandbox": {
+     "timeout_s": 10.0,
+     "mem_cap_mb": 1024,
+     "no_network": true,
+     "no_subprocess": true,
+     "stdin_closed": true
+    },
+    "hidden_suite_reads": 0,
+    "audit": {
+     "available": true,
+     "expected": 718,
+     "expected_source": "harness_requests",
+     "served": 718,
+     "foreign_requests": 0,
+     "missing_requests": 0,
+     "model_loads": 0,
+     "context_lengths": [],
+     "batch_sizes": [],
+     "kv_cache_types": [],
+     "contaminated": false,
+     "reason": "lane served exactly the harness requests"
+    },
+    "citable": true
+   }
+  },
+  "verdict": {
+   "delta_vs_hybrid": {
+    "1000-1003": 4,
+    "2000-2003": 2
+   },
+   "gate": "verified > hybrid + band 3 on BOTH seed sets",
+   "clears_on": {
+    "1000-1003": true,
+    "2000-2003": false
+   },
+   "adopted": false,
+   "min_delta": 2,
+   "clears_count": 1,
+   "reason": "strengthened arm gains +4 (1000-1003), +2 (2000-2003) over the hybrid; it clears the 3-task band on 1/2 seed sets, so the both-sets gate fails and the hybrid stays served. Surface stayed the constraint: 31/135 prompts produced any eligible candidate, 27/135 prompts produced any eligible candidate, at 2813 s, 2619 s of extra test generation",
+   "served_path": "hybrid (unchanged)"
+  }
+ },
+ "engine_config_evidence": {
+  "context_lengths_seen": {
+   "2048": 45,
+   "262144": 35,
+   "32768": 148
+  },
+  "batch_sizes_seen": {
+   "1024/1024": 123,
+   "2048/2048": 45,
+   "512/512": 60
+  },
+  "kv_cache_types_seen": {
+   "f16": 97,
+   "q8_0": 131
+  },
+  "loads_total": 228,
+  "finding": "Ollama picks the runner graph per load (context, batch and cache type all vary across loads of the same model), so a count taken before those were pinned belongs to one particular graph, not to the model alone."
+ },
+ "reproduction": {
+  "r5": {
+   "model": "spark-r5-q6",
+   "baseline_passed": 106,
+   "baseline_total": 165,
+   "lane_passed": 106,
+   "lane_total": 165,
+   "lane_dirs": [
+    "out/x3/lane_r5_a",
+    "out/x3/lane_r5_b"
+   ],
+   "lane_contaminated": false,
+   "lane_audit": {
+    "available": true,
+    "expected": 165,
+    "served": 165,
+    "foreign_requests": 0,
+    "model_loads": 0,
+    "context_lengths": [],
+    "batch_sizes": [],
+    "kv_cache_types": [],
+    "contaminated": false,
+    "reason": "lane served exactly the harness requests"
+   },
+   "delta": 0,
+   "exact": true,
+   "run_to_run_stable": true,
+   "run_to_run_statuses_stable": true,
+   "stability_runs": {
+    "tasks": 165,
+    "tokens_identical": true,
+    "statuses_identical": true,
+    "requests_identical": true,
+    "token_mismatches": [],
+    "status_flips": []
+   },
+   "superseded_passed": 101,
+   "superseded_dir": "out/x3/base_r5q6",
+   "superseded_why": "shared instance, q8_0 KV, unpinned runner graph",
+   "differs_from_superseded": [
+    {
+     "id": "heplus_HumanEval_105",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "heplus_HumanEval_109",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "heplus_HumanEval_124",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "heplus_HumanEval_126",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "heplus_HumanEval_141",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_566_equality_flip",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_588_min_max",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_595_accumulator_reset",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_733_equality_flip",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_749_sort_reverse",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "repair_757_equality_flip",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_764_accumulator_reset",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_782_range_off_by_one",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "repair_796_plus_minus",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_798_plus_minus",
+     "a": "PASSED",
+     "b": "FAILED"
+    }
+   ],
+   "rescored_passed": 101,
+   "rescore_exact": true
+  },
+  "r6": {
+   "model": "spark-r6-q6",
+   "baseline_passed": 99,
+   "baseline_total": 165,
+   "lane_passed": 99,
+   "lane_total": 165,
+   "lane_dirs": [
+    "out/x3/lane_r6"
+   ],
+   "lane_contaminated": false,
+   "lane_audit": {
+    "available": true,
+    "expected": 165,
+    "served": 165,
+    "foreign_requests": 0,
+    "model_loads": 1,
+    "context_lengths": [
+     "32768"
+    ],
+    "batch_sizes": [
+     [
+      "1024",
+      "1024"
+     ]
+    ],
+    "kv_cache_types": [
+     "f16"
+    ],
+    "contaminated": false,
+    "reason": "lane served exactly the harness requests"
+   },
+   "delta": 0,
+   "exact": true,
+   "run_to_run_stable": null,
+   "run_to_run_statuses_stable": null,
+   "stability_runs": null,
+   "superseded_passed": 102,
+   "superseded_dir": "out/x3/r6",
+   "superseded_why": "shared instance, q8_0 KV, unpinned runner graph; 9 tasks flipped between two runs of the same model",
+   "differs_from_superseded": [
+    {
+     "id": "heplus_HumanEval_141",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "repair_589_equality_flip",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "repair_591_index_zero",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_637_equality_flip",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "repair_738_comparison_strict",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "repair_749_sort_reverse",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "repair_766_plus_minus",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_777_if_negate",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "repair_791_if_negate",
+     "a": "PASSED",
+     "b": "FAILED"
+    },
+    {
+     "id": "repair_796_plus_minus",
+     "a": "FAILED",
+     "b": "PASSED"
+    },
+    {
+     "id": "repair_802_if_negate",
+     "a": "FAILED",
+     "b": "PASSED"
+    }
+   ],
+   "rescored_passed": 102,
+   "rescore_exact": true
+  }
+ },
+ "checks": {
+  "adapter_r6.matches_train_summary": {
+   "ok": true,
+   "detail": "train_summary.adapter_sha256=fba6812d5e85c2c3\u2026",
+   "kind": "integrity"
+  },
+  "corpus.matches_train_summary": {
+   "ok": true,
+   "detail": "data/x3/sft_train.jsonl vs train_summary.data_sha256",
+   "kind": "integrity"
+  },
+  "corpus.row_counts": {
+   "ok": true,
+   "detail": "rows match manifest.json {'sft_all.jsonl': 3902, 'sft_train.jsonl': 3745, 'sft_val.jsonl': 157}",
+   "kind": "integrity"
+  },
+  "r7_lane.lane_not_contaminated": {
+   "ok": true,
+   "detail": "audit: lane served exactly the harness requests",
+   "kind": "integrity"
+  },
+  "r7_lane.served_matches_harness_requests": {
+   "ok": true,
+   "detail": "served 165/165, foreign 0",
+   "kind": "integrity"
+  },
+  "r7.recorded_as_not_promoted": {
+   "ok": true,
+   "detail": "R7 102 vs baseline 106: the baseline is unchanged, the arm is recorded as an experiment",
+   "kind": "integrity"
+  },
+  "r8_lane.lane_not_contaminated": {
+   "ok": true,
+   "detail": "audit: lane served exactly the harness requests",
+   "kind": "integrity"
+  },
+  "r8_lane.served_matches_harness_requests": {
+   "ok": true,
+   "detail": "served 165/165, foreign 0",
+   "kind": "integrity"
+  },
+  "r8.recorded_as_not_promoted": {
+   "ok": true,
+   "detail": "R8 99 vs baseline 106: the baseline is unchanged, the arm is recorded as an experiment",
+   "kind": "integrity"
+  },
+  "x01_lane.lane_not_contaminated": {
+   "ok": true,
+   "detail": "audit: lane served exactly the harness requests",
+   "kind": "integrity"
+  },
+  "x01_lane.served_matches_harness_requests": {
+   "ok": true,
+   "detail": "served 165/165, foreign 0",
+   "kind": "integrity"
+  },
+  "x01.recorded_as_not_promoted": {
+   "ok": true,
+   "detail": "X01 102 vs baseline 106: the baseline is unchanged, the arm is recorded as an experiment",
+   "kind": "integrity"
+  },
+  "d1_lane.lane_not_contaminated": {
+   "ok": true,
+   "detail": "audit: lane served exactly the harness requests",
+   "kind": "integrity"
+  },
+  "d1_lane.served_matches_harness_requests": {
+   "ok": true,
+   "detail": "served 165/165, foreign 0",
+   "kind": "integrity"
+  },
+  "d1.recorded_as_not_promoted": {
+   "ok": true,
+   "detail": "D1 73 vs baseline 106: the baseline is unchanged, the arm is recorded as an experiment",
+   "kind": "integrity"
+  },
+  "d3_lane.lane_not_contaminated": {
+   "ok": true,
+   "detail": "audit: lane served exactly the harness requests",
+   "kind": "integrity"
+  },
+  "d3_lane.served_matches_harness_requests": {
+   "ok": true,
+   "detail": "served 165/165, foreign 0",
+   "kind": "integrity"
+  },
+  "d3.recorded_as_not_promoted": {
+   "ok": true,
+   "detail": "104/165 vs R5 106 -> promoted=False (per-class: coding 33/60, debugging 44/75, reasoning 27/30)",
+   "kind": "integrity"
+  },
+  "d4_lane.lane_not_contaminated": {
+   "ok": true,
+   "detail": "audit: lane served exactly the harness requests",
+   "kind": "integrity"
+  },
+  "d4_lane.served_matches_harness_requests": {
+   "ok": true,
+   "detail": "served 165/165, foreign 0",
+   "kind": "integrity"
+  },
+  "d4.recorded_as_not_promoted": {
+   "ok": true,
+   "detail": "102/165 vs R5 106 -> gate (core > 106) not met -> promoted=False; per-subset coding 35, debugging 43, reasoning 27, repair60 31",
+   "kind": "integrity"
+  },
+  "contamination_test.no_citable_summary": {
+   "ok": true,
+   "detail": "every contaminated scratch run refused and is marked non-citable",
+   "kind": "integrity"
+  },
+  "contamination_test.clean_control_promoted": {
+   "ok": true,
+   "detail": "the clean control run still promotes a citable summary",
+   "kind": "integrity"
+  },
+  "lane_r5_a.counts_match_baseline": {
+   "ok": true,
+   "detail": "106/165 vs baseline 106/165",
+   "kind": "reproduction"
+  },
+  "lane_r5_a.results_sha256": {
+   "ok": true,
+   "detail": "results.jsonl vs summary.results_sha256",
+   "kind": "integrity"
+  },
+  "lane_r5_a.lane_not_contaminated": {
+   "ok": true,
+   "detail": "audit: lane served exactly the harness requests",
+   "kind": "integrity"
+  },
+  "lane_r5_a.lane_runtime": {
+   "ok": true,
+   "detail": "kv=f16 parallel=1 port=11500",
+   "kind": "integrity"
+  },
+  "lane_r5_b.counts_match_baseline": {
+   "ok": true,
+   "detail": "106/165 vs baseline 106/165",
+   "kind": "reproduction"
+  },
+  "lane_r5_b.results_sha256": {
+   "ok": true,
+   "detail": "results.jsonl vs summary.results_sha256",
+   "kind": "integrity"
+  },
+  "lane_r5_b.lane_not_contaminated": {
+   "ok": true,
+   "detail": "audit: lane served exactly the harness requests",
+   "kind": "integrity"
+  },
+  "lane_r5_b.lane_runtime": {
+   "ok": true,
+   "detail": "kv=f16 parallel=1 port=11500",
+   "kind": "integrity"
+  },
+  "rescore_r5.reproduces_superseded_count_exactly": {
+   "ok": true,
+   "detail": "stored share-instance generations re-scored: 101 vs superseded 101",
+   "kind": "provenance"
+  },
+  "lane_r6.counts_match_baseline": {
+   "ok": true,
+   "detail": "99/165 vs baseline 99/165",
+   "kind": "reproduction"
+  },
+  "lane_r6.results_sha256": {
+   "ok": true,
+   "detail": "results.jsonl vs summary.results_sha256",
+   "kind": "integrity"
+  },
+  "lane_r6.lane_not_contaminated": {
+   "ok": true,
+   "detail": "audit: lane served exactly the harness requests",
+   "kind": "integrity"
+  },
+  "lane_r6.lane_runtime": {
+   "ok": true,
+   "detail": "kv=f16 parallel=1 port=11500",
+   "kind": "integrity"
+  },
+  "rescore_r6.reproduces_superseded_count_exactly": {
+   "ok": true,
+   "detail": "stored share-instance generations re-scored: 102 vs superseded 102",
+   "kind": "provenance"
+  },
+  "quantizer.vendored": {
+   "ok": true,
+   "detail": "deploy has no F: dependency",
+   "kind": "integrity"
+  },
+  "quantizer.reproduces_recorded_gguf": {
+   "ok": true,
+   "detail": "deploy --verify output vs recorded Q6_K",
+   "kind": "integrity"
+  },
+  "d2.delta_within_bound": {
+   "ok": true,
+   "detail": "||delta|| 2.8214 vs bound 6.0 (D1 was 43.07)",
+   "kind": "integrity"
+  },
+  "d2.screen_served_matches_harness_requests": {
+   "ok": true,
+   "detail": "served 65/65, scored 65, foreign 0",
+   "kind": "integrity"
+  },
+  "d2.screen_not_contaminated": {
+   "ok": true,
+   "detail": "contaminated=False",
+   "kind": "integrity"
+  },
+  "d2.class_recovery_recorded": {
+   "ok": true,
+   "detail": "5/5 recorded recoveries confirmed in the results file",
+   "kind": "integrity"
+  },
+  "d2.recorded_as_not_promoted": {
+   "ok": true,
+   "detail": "screened out at 31/65 vs R5 33/65, full lane not spent, promoted=False",
+   "kind": "integrity"
+  },
+  "d3.screen_recorded": {
+   "ok": true,
+   "detail": "out/x3/screen/d3/summary.json records the pre-lane screen",
+   "kind": "integrity"
+  },
+  "d3.lane_audit_clean": {
+   "ok": true,
+   "detail": "served 165/165, foreign 0, contaminated False, citable True",
+   "kind": "integrity"
+  },
+  "d4.corpus_balanced_1to1": {
+   "ok": true,
+   "detail": "repair 132 : coding 132 (ratio 1.0)",
+   "kind": "integrity"
+  },
+  "d4.corpus_contamination_free": {
+   "ok": true,
+   "detail": "132 coding rows re-checked against 24944 eval shingles: 0 overlaps",
+   "kind": "integrity"
+  },
+  "d4.lane_audit_clean": {
+   "ok": true,
+   "detail": "served 165/165, foreign 0, loads 1, contaminated False, citable True",
+   "kind": "integrity"
+  },
+  "d4.prescreen_run_withdrawn": {
+   "ok": true,
+   "detail": "the pre-screen run (one row declaring an eval entry point) is kept as evidence and is NOT the referenced result",
+   "kind": "integrity"
+  },
+  "repeat.three_runs_present": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "runs: lane_r5_a, lane_r5_b, lane_r5_c"
+  },
+  "repeat.scores_agree": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "scores {'out/x3/lane_r5_a': 106, 'out/x3/lane_r5_b': 106, 'out/x3/lane_r5_c': 106} (spread 0), flip rate 0.0, 0 token-count differences"
+  },
+  "repeat.protocol_identical": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "0 differing prompt hashes across runs"
+  },
+  "bestofn.audit_clean": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "lane audit ok=True, generations 660"
+  },
+  "bestofn.selectors_separated": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "oracle pass@4 132/165 reported separately from deployable majority@4 104/165; greedy single-sample 106"
+  },
+  "bestofn.subset_stability": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "deployable selector over every k=3 subset: min 109 (the band edge, 106+3), max 111; k=4 111 is above the band"
+  },
+  "bestofn.promotion_recorded": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "hybrid > greedy 106 + band 3 = 109 on BOTH seed sets; hybrid {'1000-1003': 112, '2000-2003': 118} -> True"
+  },
+  "replication.two_seed_sets_complete": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "1000-1003: 165 tasks, served 660/660, foreign 0, contaminated False, citable True; 2000-2003: 165 tasks, served 660/660, foreign 0, contaminated False, citable True"
+  },
+  "hybrid.router_separable": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "router: 135 code prompts (python_unit) sampled, 30 non-code prompts served greedily; per set {'1000-1003': {'sampled': 135, 'greedy': 30}, '2000-2003': {'sampled': 135, 'greedy': 30}}"
+  },
+  "hybrid.clears_band_on_both_sets": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "hybrid > greedy 106 + band 3 = 109 on BOTH seed sets; hybrid {'1000-1003': 112, '2000-2003': 118} (spread 6)"
+  },
+  "hybrid.reasoning_recovered": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "reasoning subscore per seed set: 1000-1003 27, 2000-2003 27"
+  },
+  "parity.promoted_vs_untouched": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "untouched greedy 106/165 (out/x3/lane_r5_a) and hybrid {'1000-1003': 112, '2000-2003': 118} measured on the same frozen suite, lane and audit protocol"
+  },
+  "verifier.strengthened_mutant_family": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "family ['constant_zero', 'echo_first', 'empty_container', 'first_arg_shadowed', 'null', 'sign_flip', 'swapped_order', 'type_wrong']; every eligible candidate caught all mutants (missed=0 count equals eligible count per set: 1000-1003 67==67, 2000-2003 63==63); weak-test rejections 1000-1003 111, 2000-2003 112 (order mutants are arity-gated, so they only apply where a test could distinguish them)"
+  },
+  "verifier.multi_module_eligibility": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "modules per candidate {2}; 1000-1003 754 generations for 540 candidates (1.40/candidate); 2000-2003 718 generations for 540 candidates (1.33/candidate) (module 2 is the adversarial edge-case suite; a candidate needs at least one module consistent with it and all mutants caught)"
+  },
+  "verifier.sandbox_caps_enforced": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "caps {'timeout_s': 10.0, 'mem_cap_mb': 1024, 'no_network': True, 'no_subprocess': True, 'stdin_closed': True} | 2 run(s) measured above the cap mid-run and every one was killed (2/2); observed max 1044.8 MB; timeouts/kills 1000-1003 2, 2000-2003 1"
+  },
+  "verifier.no_hidden_suite_contact": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "hidden_suite_reads per seed set: 1000-1003 0, 2000-2003 0 (prompt-only projection before execution; any other key raises and is counted)"
+  },
+  "verifier.verdict_recorded": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "verified > hybrid + band 3 on BOTH seed sets; deltas {'1000-1003': 4, '2000-2003': 2} -> adopted False; served path hybrid (unchanged)"
+  },
+  "parity.verified_vs_untouched": {
+   "ok": true,
+   "kind": "integrity",
+   "detail": "strengthened cores {'1000-1003': 116, '2000-2003': 120} vs untouched 106, same frozen suite, lane, grader and audit; audits 1000-1003 754/754 foreign 0, 2000-2003 718/718 foreign 0"
+  }
+ },
+ "not_required_in_root": [
+  {
+   "path": "out/rawfix_v5/rawfix-v5-r5-Q8_0.gguf",
+   "why": "superseded Q8_0 export of the same adapter"
+  },
+  {
+   "path": "out/x3/gguf/verify",
+   "why": "re-quantisation evidence written by deploy --verify"
+  },
+  {
+   "path": "out/x3/pinned2_r5_b, out/x3/pinned2_r6, out/x3/pinned3_r5_a",
+   "why": "partial runs from protocol experiments that were stopped when the protocol changed; their results.jsonl has no summary.json and must not be cited"
+  },
+  {
+   "path": "out/x3/lane_smoke, out/x3/lane_smoke2",
+   "why": "2-3 task lane smoke tests used to validate the audit; not measurements"
+  }
+ ],
+ "hash_stats": {
+  "cached": 332,
+  "computed": 0,
+  "seconds": 5.3
+ }
+}

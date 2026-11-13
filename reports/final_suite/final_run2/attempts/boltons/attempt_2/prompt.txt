@@ -1,0 +1,118 @@
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. Return a complete, syntactically valid replacement for the target function.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Keep the function's public signature and documented behavior.
+
+## Issue
+
+`isoparse` in `boltons/timeutils.py` mishandles fractional seconds.
+
+`isoparse('1970-01-01T00:00:00.851')` must produce microsecond 851000 (851
+thousandths of a second), but it produces 851. The fractional digits after the
+decimal point are a decimal fraction of one second and must be scaled to
+microseconds: one digit means tenths, three digits mean thousandths, six digits
+mean millionths.
+
+More than six fractional digits must truncate to microsecond precision instead
+of raising `ValueError: microsecond must be in 0..999999`; for example
+`.123456789` must produce microsecond 123456.
+
+Plain timestamps with no fraction, and timezone suffixes such as `Z` and
+`+05:30`, must keep working unchanged.
+
+## Current implementation of `isoparse`
+
+This is the version that produced the results below:
+
+```python
+def isoparse(iso_str):
+    """Parses the limited subset of `ISO8601-formatted time`_ strings as
+    returned by :meth:`datetime.datetime.isoformat`.
+
+    >>> epoch_dt = datetime.fromtimestamp(0, timezone.utc).replace(tzinfo=None)
+    >>> iso_str = epoch_dt.isoformat()
+    >>> print(iso_str)
+    1970-01-01T00:00:00
+    >>> isoparse(iso_str)
+    datetime.datetime(1970, 1, 1, 0, 0)
+
+    >>> utcnow = datetime.now(timezone.utc).replace(tzinfo=None)
+    >>> utcnow == isoparse(utcnow.isoformat())
+    True
+
+    For further datetime parsing, see the `iso8601`_ package for strict
+    ISO parsing and `dateutil <https://pypi.python.org/pypi/python-dateutil>`__
+    package for loose parsing and more.
+
+    .. _ISO8601-formatted time: https://en.wikipedia.org/wiki/ISO_8601
+    .. _iso8601: https://pypi.python.org/pypi/iso8601
+
+    >>> isoparse('1970-01-01T00:00:00.851')
+    datetime.datetime(1970, 1, 1, 0, 0, 0, 851000)
+
+    Timezone suffixes (``Z``, ``+HH:MM``, ``-HHMM``, and so on) yield
+    timezone-aware datetimes, so aware
+    :meth:`~datetime.datetime.isoformat` output round-trips, too.
+
+    >>> isoparse('1970-01-01T00:00:00+05:30')
+    datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=19800)))
+    >>> aware_now = datetime.now(timezone.utc)
+    >>> aware_now == isoparse(aware_now.isoformat())
+    True
+
+    """
+    tzinfo = None
+    tz_match = _ISO_TZ_RE.search(iso_str)
+    if tz_match:
+        iso_str = iso_str[:tz_match.start()]
+        tz = tz_match.group(1)
+        if tz == 'Z':
+            tzinfo = timezone.utc
+        else:
+            digits = tz[1:].replace(':', '').split('.')[0]
+            hh, mm = int(digits[0:2]), int(digits[2:4])
+            ss = int(digits[4:6] or 0)
+            sign = -1 if tz[0] == '-' else 1
+            tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
+    parts = _NONDIGIT_RE.split(iso_str)
+    dt_args = [int(p) for p in parts]
+    microsecond = 0
+    if len(parts) > 6:
+        microsecond = int(parts[6])
+    return datetime(*dt_args[:6], microsecond=microsecond, tzinfo=tzinfo)
+
+```
+
+## Test results from that implementation
+
+9/17 cases passed. Failing cases:
+- `dt_to_timestamp_fraction`
+- `frac_1_digit_5`
+- `frac_2_digits_05`
+- `frac_3_digits_851`
+- `frac_4_digits_0001`
+- `frac_leading_zero_051`
+- `frac_overprecise_truncates`
+- `isoformat_milliseconds`
+
+Exact outcomes:
+- `test_01_frac_3_digits_851`: AssertionError: assert 851 == 851000
+- `test_02_frac_leading_zero_051`: AssertionError: assert 51 == 51000
+- `test_04_frac_overprecise_truncates`: ValueError: microsecond must be in 0..999999
+- `test_05_frac_1_digit_5`: AssertionError: assert 5 == 500000
+- `test_06_frac_2_digits_05`: AssertionError: assert 5 == 50000
+- `test_07_frac_4_digits_0001`: AssertionError: assert 1 == 100
+- `test_08_isoformat_milliseconds`: AssertionError: assert datetime.datetime(2020, 1, 2, 3, 4, 5, 851) == datetime.datetime(2020, 1, 2, 3, 4, 5, 851000)
+- `test_16_dt_to_timestamp_fraction`: AssertionError: assert 0.8501489999999999 < 1e-09
+
+## Repair hint
+
+Fractional seconds are a fixed-width six-digit field. Append zeros on the right with str.ljust(6, '0'); never prepend them with str.rjust. Then slice to six characters and convert to int: '851'.ljust(6, '0') == '851000', '000001'.ljust(6, '0') == '000001', and '123456789'.ljust(6, '0')[:6] == '123456'. Do not use float arithmetic or multiply/divide after parsing. The result must be an int in 0..999999.
+
+## Repair task
+
+Diagnose the root cause of every listed failure. Return a complete corrected `isoparse` function in one ```python code block. Keep the parts that already pass working, and do not return a diff. Re-check the listed failures against your new implementation before returning.

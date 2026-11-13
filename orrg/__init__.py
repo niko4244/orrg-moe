@@ -1,6 +1,13 @@
 """ORRG: lossless, model-agnostic dense -> mixture-of-experts conversion."""
 
-from .cluster import balanced_kmeans, clustering_stats, collect_activations, contiguous_indices
+from .cluster import (
+    balanced_kmeans,
+    clustering_stats,
+    collect_activations,
+    collect_hidden_states,
+    contiguous_indices,
+    kmeans,
+)
 from .config import MoEConfig, RouterConfig
 from .convert import ConversionReport, convert_model, freeze_non_moe, freeze_skeleton, load_converted, save_converted
 from .distill import contribution_targets, kl_divergence, on_policy_kd, router_distill_loss
@@ -52,6 +59,8 @@ __all__ = [
     "router_distill_total",
     "balanced_kmeans",
     "collect_activations",
+    "collect_hidden_states",
     "clustering_stats",
     "contiguous_indices",
+    "kmeans",
 ]

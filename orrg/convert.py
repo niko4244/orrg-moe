@@ -8,7 +8,13 @@ from typing import Any, Iterable, Mapping
 import torch
 from torch import nn
 
-from .cluster import ClusterStats, clustering_stats, collect_activations, index_sets_for
+from .cluster import (
+    ClusterStats,
+    clustering_stats,
+    collect_activations,
+    collect_hidden_states,
+    index_sets_for,
+)
 from .config import MoEConfig
 from .ffn import FFNSpec, discover_ffn_modules, unsupported_ffn_candidates
 from .moe import MoELayer
@@ -34,16 +40,40 @@ class ConversionReport:
     residual_params: int = 0
     router_params: int = 0
     clustering: list[ClusterStats] = field(default_factory=list)
+    warm_start: list[dict] = field(default_factory=list)
 
     @property
     def mode(self) -> str:
         return self.cfg.mode
 
     @property
-    def expert_params(self) -> int:
-        """Parameters of one residual expert (a single shard)."""
+    def expert_width(self) -> int:
+        """Neurons per residual expert (equals the shard width when ratio=1)."""
 
-        return int(self.per_layer[0]["expert_params"]) if self.per_layer else 0
+        return int(self.per_layer[0]["expert_width"]) if self.per_layer else 0
+
+    @property
+    def conversion_kl(self) -> float | None:
+        """Alias for ``logit_kl``: the measured conversion cost, None if unverified."""
+
+        return self.logit_kl
+
+    @property
+    def lossless(self) -> bool:
+        """Whether the converted model can reproduce the seed exactly.
+
+        ``additive`` + zero-init residuals + a full skeleton is exact for *any*
+        router state. ``replace`` is exact when every group routes to variant 0
+        (its base shard), which is the state the conversion check forces; under
+        released routing it is approximate by construction. A skeleton below the
+        full intermediate axis is never exact -- it drops neurons.
+        """
+
+        if self.cfg.skeleton_scale < 1.0:
+            return False
+        if self.cfg.expert_mode == "replace":
+            return True
+        return self.cfg.residual_init == "zero"
 
     def active_params(self, top_residuals: int | None = None) -> int:
         """Parameters touched by one token, measured from the built modules."""
@@ -53,6 +83,10 @@ class ConversionReport:
             return int(self.non_moe_params + self.skeleton_params * self.cfg.top_k_partition / n_skeleton)
         k = self.cfg.top_residuals if top_residuals is None else top_residuals
         k = max(0, min(k, self.cfg.residual_experts_per_group))
+        if self.cfg.expert_mode == "replace":
+            # One variant per group replaces its base and no expert is wider than
+            # a base, so exactly the skeleton is active -- independent of k.
+            return int(self.non_moe_params + self.router_params + self.skeleton_params)
         active = float(self.non_moe_params + self.skeleton_params + self.router_params)
         if k and self.residual_params:
             per_expert = self.residual_params / self.cfg.n_residuals
@@ -65,6 +99,27 @@ class ConversionReport:
             f"layers          : {len(self.layer_names)}",
             f"hidden/inter    : {self.hidden} / {self.intermediate}",
             f"shard width     : {self.shard_width}",
+        ]
+        if self.cfg.skeleton_scale < 1.0:
+            lines.append(
+                f"skeleton        : {100 * self.cfg.skeleton_scale:5.1f}% of the intermediate axis "
+                f"(approximate conversion)"
+            )
+        if self.cfg.expert_width_ratio < 1.0:
+            lines.append(
+                f"expert width    : {self.expert_width} / {self.shard_width} neurons "
+                f"({self.cfg.expert_width_ratio:g}x shard)"
+            )
+        if self.cfg.expert_mode != "additive":
+            lines.append(
+                f"expert mode     : {self.cfg.expert_mode} (one variant per group replaces)"
+            )
+            if self.logit_kl is not None:
+                lines.append("conversion check : variant 0 forced (replace-mode exactness)")
+        if self.warm_start:
+            mean = sum(w["cluster_agreement"] for w in self.warm_start) / len(self.warm_start)
+            lines.append(f"router warm start: cluster (argmax agreement {mean:.2f})")
+        lines += [
             f"dense params    : {self.dense_params/1e9:8.3f} B",
             f"converted total : {self.total_params/1e9:8.3f} B",
             f"active (k={self.cfg.top_residuals})     : {self.active_params()/1e9:8.3f} B",
@@ -141,6 +196,10 @@ def convert_model(
     cfg = cfg or MoEConfig()
     if verify and probe is None:
         raise ValueError("verify=True requires a probe batch (input_ids or tensor)")
+    # Materialise once: the same batches may be read by neuron clustering and by
+    # the router warm start, and a generator would be empty the second time.
+    if calibration is not None:
+        calibration = list(calibration)
 
     specs = discover_ffn_modules(
         model,
@@ -184,6 +243,18 @@ def convert_model(
                 clustering_stats(spec.name, layer_acts, index_sets, seed=cfg.cluster_seed)
             )
 
+    hidden_states_by_layer: dict[str, torch.Tensor] = {}
+    if cfg.router_warm_start == "cluster":
+        if calibration is None:
+            raise ValueError("router_warm_start='cluster' requires calibration batches")
+        hidden_states_by_layer = collect_hidden_states(
+            model,
+            specs,
+            calibration,
+            max_tokens=cfg.cluster_tokens,
+            seed=cfg.cluster_seed,
+        )
+
     hidden = specs[0].hidden
     intermediate = specs[0].intermediate
     dense_params = sum(p.numel() for p in model.parameters())
@@ -198,20 +269,30 @@ def convert_model(
         layer = MoELayer(
             spec, cfg, layer_name=spec.name, index_sets=index_sets_by_layer.get(spec.name)
         )
-        expert_params = sum(p.numel() for p in layer.groups[0].residuals[0].parameters()) if cfg.variants > 1 else 0
         per_layer.append(
             {
                 "name": spec.name,
                 "hidden": spec.hidden,
                 "intermediate": spec.intermediate,
                 "dense_params": spec.dense_params,
-                "expert_params": expert_params,
-                "residual_params": sum(
-                    p.numel() for g in layer.groups for e in g.residuals for p in e.parameters()
-                ),
+                "skeleton_width": int(layer.skeleton_width),
+                "expert_width": int(layer.expert_widths[0]),
             }
         )
         _set_submodule(model, spec.name, layer)
+
+    warm_start: list[dict] = []
+    if cfg.router_warm_start == "cluster":
+        for spec in specs:
+            layer = model.get_submodule(spec.name)
+            stats = layer.router.warm_start_cluster(
+                hidden_states_by_layer[spec.name],
+                iters=cfg.cluster_iters,
+                seed=cfg.cluster_seed,
+            )
+            if stats:
+                stats["layer"] = spec.name
+                warm_start.append(stats)
 
     total_params = sum(p.numel() for p in model.parameters())
     skeleton_total = 0
@@ -247,7 +328,20 @@ def convert_model(
         residual_params=residual_total,
         router_params=router_total,
         clustering=cluster_stats,
+        warm_start=warm_start,
     )
+
+    # In replace mode the conversion is exact only when every group routes to
+    # variant 0 (its base shard). Force that state for the check, then restore the
+    # routers, so the reported error measures the guarantee rather than random
+    # routing.
+    saved_routers: list[tuple[torch.Tensor, torch.Tensor]] = []
+    if verify and cfg.expert_mode == "replace" and cfg.mode == "growth":
+        for spec in specs:
+            router = model.get_submodule(spec.name).router
+            saved_routers.append((router.weight.detach().clone(), router.bias.detach().clone()))
+            nn.init.zeros_(router.weight)
+            nn.init.zeros_(router.bias)
 
     if verify:
         converted_outputs, logits_after = _capture_outputs(model, specs, probe)
@@ -268,6 +362,12 @@ def convert_model(
         report.logit_kl = float((log_q.exp() * (log_q - log_p)).sum(-1).mean())
         for entry in per_layer:
             entry.setdefault("carve_error", report.max_carve_error)
+
+    if saved_routers:
+        for spec, (weight, bias) in zip(specs, saved_routers):
+            router = model.get_submodule(spec.name).router
+            router.weight.data.copy_(weight)
+            router.bias.data.copy_(bias)
 
     if cfg.freeze_non_moe:
         freeze_non_moe(model)

@@ -1,0 +1,157 @@
+## Current implementation of `isoparse`
+
+This is the version that produced the results below:
+
+```python
+def isoparse(iso_str):
+    """Parses the limited subset of `ISO8601-formatted time`_ strings as
+    returned by :meth:`datetime.datetime.isoformat`.
+
+    >>> epoch_dt = datetime.fromtimestamp(0, timezone.utc).replace(tzinfo=None)
+    >>> iso_str = epoch_dt.isoformat()
+    >>> print(iso_str)
+    1970-01-01T00:00:00
+    >>> isoparse(iso_str)
+    datetime.datetime(1970, 1, 1, 0, 0)
+
+    >>> utcnow = datetime.now(timezone.utc).replace(tzinfo=None)
+    >>> utcnow == isoparse(utcnow.isoformat())
+    True
+
+    For further datetime parsing, see the `iso8601`_ package for strict
+    ISO parsing and `dateutil <https://pypi.python.org/pypi/python-dateutil>`__
+    package for loose parsing and more.
+
+    .. _ISO8601-formatted time: https://en.wikipedia.org/wiki/ISO_8601
+    .. _iso8601: https://pypi.python.org/pypi/iso8601
+
+    >>> isoparse('1970-01-01T00:00:00.851')
+    datetime.datetime(1970, 1, 1, 0, 0, 0, 851000)
+
+    Timezone suffixes (``Z``, ``+HH:MM``, ``-HHMM``, and so on) yield
+    timezone-aware datetimes, so aware
+    :meth:`~datetime.datetime.isoformat` output round-trips, too.
+
+    >>> isoparse('1970-01-01T00:00:00+05:30')
+    datetime.datetime(1970, 1, 1, 0, 0, tzinfo=datetime.timezone(datetime.timedelta(seconds=19800)))
+    >>> aware_now = datetime.now(timezone.utc)
+    >>> aware_now == isoparse(aware_now.isoformat())
+    True
+
+    """
+    tzinfo = None
+    tz_match = _ISO_TZ_RE.search(iso_str)
+    if tz_match:
+        iso_str = iso_str[:tz_match.start()]
+        tz = tz_match.group(1)
+        if tz == 'Z':
+            tzinfo = timezone.utc
+        else:
+            digits = tz[1:].replace(':', '').split('.')[0]
+            hh, mm = int(digits[0:2]), int(digits[2:4])
+            ss = int(digits[4:6] or 0)
+            sign = -1 if tz[0] == '-' else 1
+            tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
+    parts = _NONDIGIT_RE.split(iso_str)
+    dt_args = [int(p) for p in parts]
+    microsecond = 0
+    if len(parts) > 6:
+        microsecond = int(parts[6])
+    return datetime(*dt_args[:6], microsecond=microsecond, tzinfo=tzinfo)
+
+```
+
+## Test results from that implementation
+
+9/17 cases passed. Failing cases:
+- `dt_to_timestamp_fraction`
+- `frac_1_digit_5`
+- `frac_2_digits_05`
+- `frac_3_digits_851`
+- `frac_4_digits_0001`
+- `frac_leading_zero_051`
+- `frac_overprecise_truncates`
+- `isoformat_milliseconds`
+
+Actual vs expected:
+- `test_01_frac_3_digits_851`: AssertionError: assert 851 == 851000
+- `test_02_frac_leading_zero_051`: AssertionError: assert 51 == 51000
+- `test_04_frac_overprecise_truncates`: ValueError: microsecond must be in 0..999999
+- `test_05_frac_1_digit_5`: AssertionError: assert 5 == 500000
+- `test_06_frac_2_digits_05`: AssertionError: assert 5 == 50000
+- `test_07_frac_4_digits_0001`: AssertionError: assert 1 == 100
+- `test_08_isoformat_milliseconds`: AssertionError: assert datetime.datetime(2020, 1, 2, 3, 4, 5, 851) == datetime.datetime(2020, 1, 2, 3, 4, 5, 851000)
+- `test_16_dt_to_timestamp_fraction`: AssertionError: assert 0.8501489999999999 < 1e-09
+
+Raw test output:
+```text
+================================== FAILURES ===================================
+__________________________ test_01_frac_3_digits_851 __________________________
+..\attempts\boltons\attempt_4\test_oracle_feedback.py:8: in test_01_frac_3_digits_851
+    assert isoparse('1970-01-01T00:00:00.851').microsecond == 851000
+E   AssertionError: assert 851 == 851000
+E    +  where 851 = datetime.datetime(1970, 1, 1, 0, 0, 0, 851).microsecond
+E    +    where datetime.datetime(1970, 1, 1, 0, 0, 0, 851) = isoparse('1970-01-01T00:00:00.851')
+________________________ test_02_frac_leading_zero_051 ________________________
+..\attempts\boltons\attempt_4\test_oracle_feedback.py:11: in test_02_frac_leading_zero_051
+    assert isoparse('2020-01-02T03:04:05.051').microsecond == 51000
+E   AssertionError: assert 51 == 51000
+E    +  where 51 = datetime.datetime(2020, 1, 2, 3, 4, 5, 51).microsecond
+E    +    where datetime.datetime(2020, 1, 2, 3, 4, 5, 51) = isoparse('2020-01-02T03:04:05.051')
+_____________________ test_04_frac_overprecise_truncates ______________________
+..\attempts\boltons\attempt_4\test_oracle_feedback.py:17: in test_04_frac_overprecise_truncates
+    assert isoparse('2020-01-01T00:00:00.123456789').microsecond == 123456
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:157: in isoparse
+    return datetime(*dt_args[:6], microsecond=microsecond, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ValueError: microsecond must be in 0..999999
+___________________________ test_05_frac_1_digit_5 ____________________________
+..\attempts\boltons\attempt_4\test_oracle_feedback.py:20: in test_05_frac_1_digit_5
+    assert isoparse('2020-01-02T03:04:05.5').microsecond == 500000
+E   AssertionError: assert 5 == 500000
+E    +  where 5 = datetime.datetime(2020, 1, 2, 3, 4, 5, 5).microsecond
+E    +    where datetime.datetime(2020, 1, 2, 3, 4, 5, 5) = isoparse('2020-01-02T03:04:05.5')
+__________________________ test_06_frac_2_digits_05 ___________________________
+..\attempts\boltons\attempt_4\test_oracle_feedback.py:23: in test_06_frac_2_digits_05
+    assert isoparse('2020-01-02T03:04:05.05').microsecond == 50000
+E   AssertionError: assert 5 == 50000
+E    +  where 5 = datetime.datetime(2020, 1, 2, 3, 4, 5, 5).microsecond
+E    +    where datetime.datetime(2020, 1, 2, 3, 4, 5, 5) = isoparse('2020-01-02T03:04:05.05')
+_________________________ test_07_frac_4_digits_0001 __________________________
+..\attempts\boltons\attempt_4\test_oracle_feedback.py:26: in test_07_frac_4_digits_0001
+    assert isoparse('2020-01-02T03:04:05.0001').microsecond == 100
+E   AssertionError: assert 1 == 100
+E    +  where 1 = datetime.datetime(2020, 1, 2, 3, 4, 5, 1).microsecond
+E    +    where datetime.datetime(2020, 1, 2, 3, 4, 5, 1) = isoparse('2020-01-02T03:04:05.0001')
+_______________________ test_08_isoformat_milliseconds ________________________
+..\attempts\boltons\attempt_4\test_oracle_feedback.py:29: in test_08_isoformat_milliseconds
+    dt=datetime(2020,1,2,3,4,5,851000); assert isoparse(dt.isoformat(timespec='milliseconds')) == dt
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert datetime.datetime(2020, 1, 2, 3, 4, 5, 851) == datetime.datetime(2020, 1, 2, 3, 4, 5, 851000)
+E    +  where datetime.datetime(2020, 1, 2, 3, 4, 5, 851) = isoparse('2020-01-02T03:04:05.851')
+E    +    where '2020-01-02T03:04:05.851' = <built-in method isoformat of datetime.datetime object at 0x0000028E488088D0>(timespec='milliseconds')
+E    +      where <built-in method isoformat of datetime.datetime object at 0x0000028E488088D0> = datetime.datetime(2020, 1, 2, 3, 4, 5, 851000).isoformat
+______________________ test_16_dt_to_timestamp_fraction _______________________
+..\attempts\boltons\attempt_4\test_oracle_feedback.py:55: in test_16_dt_to_timestamp_fraction
+    assert abs(dt_to_timestamp(isoparse('1970-01-01T00:00:00.851')) - 0.851) < 1e-9
+E   AssertionError: assert 0.8501489999999999 < 1e-09
+E    +  where 0.8501489999999999 = abs((0.000851 - 0.851))
+E    +    where 0.000851 = dt_to_timestamp(datetime.datetime(1970, 1, 1, 0, 0, 0, 851))
+E    +      where datetime.datetime(1970, 1, 1, 0, 0, 0, 851) = isoparse('1970-01-01T00:00:00.851')
+=========================== short test summary info ===========================
+FAILED ..\attempts\boltons\attempt_4\test_oracle_feedback.py::test_01_frac_3_digits_851
+FAILED ..\attempts\boltons\attempt_4\test_oracle_feedback.py::test_02_frac_leading_zero_051
+FAILED ..\attempts\boltons\attempt_4\test_oracle_feedback.py::test_04_frac_overprecise_truncates
+FAILED ..\attempts\boltons\attempt_4\test_oracle_feedback.py::test_05_frac_1_digit_5
+FAILED ..\attempts\boltons\attempt_4\test_oracle_feedback.py::test_06_frac_2_digits_05
+FAILED ..\attempts\boltons\attempt_4\test_oracle_feedback.py::test_07_frac_4_digits_0001
+FAILED ..\attempts\boltons\attempt_4\test_oracle_feedback.py::test_08_isoformat_milliseconds
+FAILED ..\attempts\boltons\attempt_4\test_oracle_feedback.py::test_16_dt_to_timestamp_fraction
+8 failed, 9 passed in 0.25s
+```
+
+## Repair task
+
+Diagnose the root cause of every listed failure. Return a complete corrected `isoparse` function in one ```python code block. Keep the parts that already pass working, and do not return a diff. Re-check the listed failures against your new implementation before returning.

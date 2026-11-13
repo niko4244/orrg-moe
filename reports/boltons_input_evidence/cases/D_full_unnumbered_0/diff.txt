@@ -1,0 +1,26 @@
+--- a/boltons/timeutils.py
++++ b/boltons/timeutils.py
+@@ -120,6 +120,10 @@ def isoparse(iso_str):
+     tzinfo = None
+     tz_match = _ISO_TZ_RE.search(iso_str)
+     if tz_match:
+         iso_str = iso_str[:tz_match.start()]
+         tz = tz_match.group(1)
+         if tz == 'Z':
+             tzinfo = timezone.utc
+         else:
+             digits = tz[1:].replace(':', '').split('.')[0]
+             hh, mm = int(digits[0:2]), int(digits[2:4])
+             ss = int(digits[4:6] or 0)
+             sign = -1 if tz[0] == '-' else 1
+             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
++    if '.' in iso_str:
++        frac = iso_str.split('.', 1)[1]
++        if len(frac) > 6:
++            frac = frac[:6]
++        micro = int(frac.ljust(6, '0')[:6])
++        iso_str = iso_str[:iso_str.index('.')] + f'{micro:06d}'
+     parts = _NONDIGIT_RE.split(iso_str)
+     dt_args = [int(p) for p in parts]
+     return datetime(*dt_args, tzinfo=tzinfo)

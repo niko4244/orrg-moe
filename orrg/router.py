@@ -73,6 +73,48 @@ class TokenRouter(nn.Module):
         return RouteResult(index=index, weight=weight, probs=probs, logits=logits)
 
     @torch.no_grad()
+    def warm_start_cluster(
+        self,
+        hidden_states: torch.Tensor,
+        *,
+        iters: int = 12,
+        seed: int = 0,
+        scale: float = 1.0,
+    ) -> dict:
+        """Initialise the router as a nearest-centroid classifier.
+
+        Tokens are clustered in the seed's hidden space; each variant row is set
+        to its cluster centroid direction and the bias to zero, so
+        ``argmax(w·x)`` picks the nearest centroid. Rows are shared across groups
+        (the clusters describe *token kinds*, and every group has the same kind
+        space). The task loss takes over from here.
+
+        Returns diagnostics, including agreement between the router's argmax and
+        the cluster labels on the calibration tokens.
+        """
+
+        from .cluster import kmeans
+
+        x = hidden_states.detach().float()
+        if x.numel() == 0 or x.shape[0] < self.n_variants:
+            return {}
+        labels, centroids = kmeans(x, self.n_variants, iters=iters, seed=seed)
+        unit = centroids / centroids.norm(dim=1, keepdim=True).clamp_min(1e-6)
+        self.weight.data.copy_(
+            (unit * scale).repeat(self.n_groups, 1).to(self.weight.dtype)
+        )
+        self.bias.data.zero_()
+        scores = F.linear(x, self.weight.float(), self.bias.float()).view(
+            -1, self.n_groups, self.n_variants
+        )
+        agreement = float((scores.argmax(-1)[:, 0] == labels).float().mean())
+        return {
+            "cluster_agreement": agreement,
+            "tokens": int(x.shape[0]),
+            "clusters": int(self.n_variants),
+        }
+
+    @torch.no_grad()
     def assign(self, x: torch.Tensor) -> torch.Tensor:
         """Hard assignment without building an autograd graph (analysis / export)."""
 

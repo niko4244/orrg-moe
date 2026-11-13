@@ -1,0 +1,75 @@
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. Return a complete, syntactically valid replacement for the target function.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Keep the function's public signature and documented behavior.
+
+## Issue
+
+Signature introspection in `toolz.functoolz` is broken.
+
+`_check_sigspec` now unconditionally returns `(None, False)`, so
+`is_valid_args`, `is_partial_args`, `num_required_args`, `has_varargs`,
+`has_keywords`, and `is_arity` report that every callable is invalid. For
+example `num_required_args(lambda x: None)` returns `False` instead of `1`.
+
+Restore `_check_sigspec` so it:
+1. accepts an already-supplied `inspect.Signature`;
+2. otherwise resolves `inspect.signature(func)`;
+3. falls back to the builtin signature registry via
+   `builtin_func(*builtin_args)` when no signature is available;
+4. still returns `(None, False)` for a callable whose `__signature__` is
+   present but invalid.
+
+Do not change the public helpers.
+
+## Current implementation of `_check_sigspec`
+
+This is the version that produced the results below:
+
+```python
+def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+    if sigspec is None:
+        try:
+            sigspec = inspect.signature(func)
+        except (ValueError, TypeError) as e:
+            sigspec = e
+    if isinstance(sigspec, ValueError):
+        return None, builtin_func(*builtin_args)
+    if not isinstance(sigspec, inspect.Signature):
+        return None, False
+    return sigspec, None
+
+```
+
+## Test results from that implementation
+
+16/17 cases passed. Failing cases:
+- `toolz/tests/test_inspect_args.py::test_inspect_signature_property`
+
+Exact outcomes:
+- `test_inspect_signature_property`: AssertionError: assert False == 1
+
+## Repair hint
+
+Use this control flow exactly, inside the required function definition:
+
+```python
+if sigspec is None:
+    try:
+        sigspec = inspect.signature(func)
+    except (ValueError, TypeError) as e:
+        sigspec = e
+if isinstance(sigspec, ValueError):
+    return None, builtin_func(*builtin_args)
+if not isinstance(sigspec, inspect.Signature):
+    return None, False
+return sigspec, None
+```
+Do not replace the caught exception with None, and never put a bool in the first slot.
+
+## Repair task
+
+Diagnose the root cause of every listed failure. Return a complete corrected `_check_sigspec` function in one ```python code block. Keep the parts that already pass working, and do not return a diff. Re-check the listed failures against your new implementation before returning.

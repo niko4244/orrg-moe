@@ -1,0 +1,52 @@
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. The diff must apply cleanly to the repository at the stated path.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Return only the diff, no prose or fences.
+
+## Issue
+
+Signature introspection in `toolz.functoolz` is broken.
+
+`_check_sigspec` now unconditionally returns `(None, False)`, so
+`is_valid_args`, `is_partial_args`, `num_required_args`, `has_varargs`,
+`has_keywords`, and `is_arity` report that every callable is invalid. For
+example `num_required_args(lambda x: None)` returns `False` instead of `1`.
+
+Restore `_check_sigspec` so it:
+1. accepts an already-supplied `inspect.Signature`;
+2. otherwise resolves `inspect.signature(func)`;
+3. falls back to the builtin signature registry via
+   `builtin_func(*builtin_args)` when no signature is available;
+4. still returns `(None, False)` for a callable whose `__signature__` is
+   present but invalid.
+
+Do not change the public helpers.
+
+## Repository context
+
+Repository: toolz
+File: toolz/functoolz.py
+
+```python
+ 911|                 exc_name = exc.__name__
+ 912|             return f'{self.func.__name__}_excepting_{exc_name}'
+ 913|         except AttributeError:
+ 914|             return 'excepting'
+ 915| 
+ 916| 
+ 917| def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+ 918|     return None, False
+ 919| 
+ 920| 
+ 921| if PYPY:  # pragma: no cover
+ 922|     _check_sigspec_orig = _check_sigspec
+ 923| 
+ 924|     def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+```
+
+Return only the unified diff that fixes the issue.
+
+Return the complete corrected `_check_sigspec` function in one ```python code block. Do not return a diff.

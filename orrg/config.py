@@ -15,7 +15,8 @@ Design invariants (see spec/ORRG-SPEC-v3.md):
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field, asdict
+import warnings
+from dataclasses import dataclass, asdict, replace
 from typing import Sequence
 
 
@@ -40,6 +41,11 @@ class RouterConfig:
             raise ValueError("jitter must be >= 0")
 
 
+# Tag set on a RouterConfig that ``MoEConfig`` derived, so a later
+# ``dataclasses.replace`` is not mistaken for a caller conflict.
+_DERIVED_ROUTER = "_orrg_derived_group_top_k"
+
+
 @dataclass
 class MoEConfig:
     """Shape of the converted mixture of experts."""
@@ -49,6 +55,11 @@ class MoEConfig:
     variants: int = 4  # shards per group (variant 0 = base, 1..V-1 = residuals)
     top_residuals: int = 1  # residual experts active per token per group
     mode: str = "growth"  # "growth" (additive residuals) | "partition" (top-k over shards)
+    expert_mode: str = "additive"  # "additive" (base + Σ residuals) | "replace" (one variant, replaces)
+    expert_width_ratio: float = 1.0  # residual width as a fraction of its group shard (1.0 = legacy)
+    skeleton_scale: float = 1.0  # fraction of the intermediate axis the skeleton tiles (1.0 = lossless)
+    router_warm_start: str = "none"  # "none" | "cluster" (nearest-centroid on seed hidden states)
+    dispatch: str = "python"  # "python" (reference) | "fused" (grouped-GEMM inference path)
     residual_init: str = "zero"  # "zero" (lossless) | "copy" (naive) | "scaled" (magnitude lever)
     top_k_partition: int = 1  # only for mode="partition"
     hidden_size: int | None = None  # overrides auto-detection
@@ -65,11 +76,77 @@ class MoEConfig:
     distill_target_temp: float = 1.0  # <1 sharpens the contribution target
     residual_noise: float = 0.0  # symmetry-breaking jitter on residual up-projections
     down_init_scale: float = 0.05  # residual down-projection scale when residual_init="scaled"
-    router: RouterConfig = field(default_factory=RouterConfig)
+    router: RouterConfig | None = None
 
     def __post_init__(self) -> None:
+        # The routed-expert count is not independently configurable. The reference
+        # forward loops over ``route.index.shape[-1]``, i.e. the router's k, while
+        # the report quotes ``top_residuals``; if they disagree the model claims k
+        # experts and routes one. Make the router follow ``top_residuals``.
+        routed = self.mode == "growth" and self.expert_mode == "additive"
+        wanted = max(1, self.top_residuals)
+        if self.router is None:
+            self.router = RouterConfig(group_top_k=wanted if routed else 1)
+        elif routed and self.router.group_top_k != wanted:
+            # ``dataclasses.replace(cfg, top_residuals=N)`` carries the old router
+            # over, which is the normal way to change k and must stay quiet. A
+            # router this class derived is tagged, so an untagged one that
+            # disagrees can only have come from the caller.
+            if not getattr(self.router, _DERIVED_ROUTER, False):
+                warnings.warn(
+                    f"router.group_top_k={self.router.group_top_k} disagrees with "
+                    f"top_residuals={self.top_residuals}; routing k={wanted} instead. "
+                    f"Pass RouterConfig(group_top_k={wanted}) to set it explicitly.",
+                    stacklevel=2,
+                )
+            self.router = replace(self.router, group_top_k=wanted)
+        if routed:
+            # Tag a copy so the caller's object is untouched and a later
+            # ``replace(cfg, top_residuals=N)`` stays quiet.
+            self.router = replace(self.router)
+            setattr(self.router, _DERIVED_ROUTER, True)
         if self.mode not in ("growth", "partition"):
             raise ValueError(f"mode must be 'growth' or 'partition', got {self.mode!r}")
+        if self.expert_mode not in ("additive", "replace"):
+            raise ValueError(
+                f"expert_mode must be 'additive' or 'replace', got {self.expert_mode!r}"
+            )
+        if not (0.0 < self.expert_width_ratio <= 1.0):
+            raise ValueError(
+                f"expert_width_ratio must be in (0, 1], got {self.expert_width_ratio!r}"
+            )
+        if not (0.0 < self.skeleton_scale <= 1.0):
+            raise ValueError(
+                f"skeleton_scale must be in (0, 1], got {self.skeleton_scale!r}"
+            )
+        if self.cluster_shards and self.skeleton_scale != 1.0:
+            raise ValueError(
+                "cluster_shards needs the whole intermediate axis; "
+                "skeleton_scale < 1 is only supported with contiguous shards"
+            )
+        if self.router_warm_start not in ("none", "cluster"):
+            raise ValueError(
+                f"router_warm_start must be 'none' or 'cluster', got {self.router_warm_start!r}"
+            )
+        if self.dispatch not in ("python", "fused"):
+            raise ValueError(f"dispatch must be 'python' or 'fused', got {self.dispatch!r}")
+        if self.dispatch == "fused":
+            if self.mode != "growth":
+                raise ValueError("dispatch='fused' is only defined for growth mode")
+            if self.expert_mode != "additive":
+                raise ValueError("dispatch='fused' is only defined for expert_mode='additive'")
+            if self.top_k_partition != 1:
+                raise ValueError("dispatch='fused' does not use top_k_partition")
+        if self.expert_mode == "replace":
+            if self.mode == "partition":
+                raise ValueError("expert_mode='replace' is only defined for growth mode")
+            if self.top_residuals < 1:
+                raise ValueError("expert_mode='replace' needs top_residuals >= 1")
+            if self.router.routing == "grouped" and self.router.group_top_k != 1:
+                raise ValueError(
+                    "expert_mode='replace' selects exactly one variant per group; "
+                    "set router.group_top_k=1"
+                )
         if self.residual_init not in ("zero", "copy", "scaled"):
             raise ValueError(
                 f"residual_init must be 'zero', 'copy' or 'scaled', got {self.residual_init!r}"
@@ -127,9 +204,19 @@ class MoEConfig:
         return cls(**payload)
 
     def describe(self) -> str:
-        return (
+        text = (
             f"shared={self.shared} groups={self.groups} variants={self.variants} "
             f"residuals/group={self.residual_experts_per_group} "
             f"active_residuals={self.top_residuals} shards={self.n_shards} mode={self.mode} "
             f"sharding={'clustered' if self.cluster_shards else 'contiguous'}"
         )
+        # Only annotate non-defaults, so the historical string is unchanged.
+        if self.expert_mode != "additive":
+            text += f" experts={self.expert_mode}"
+        if self.expert_width_ratio != 1.0:
+            text += f" expert_width={self.expert_width_ratio:g}x"
+        if self.skeleton_scale != 1.0:
+            text += f" skeleton={self.skeleton_scale:g}x"
+        if self.router_warm_start != "none":
+            text += f" warm_start={self.router_warm_start}"
+        return text

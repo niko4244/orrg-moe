@@ -1,0 +1,11 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "layer": "model.layers.0.mlp",
+  "chunks": 8,
+  "tokens": 97,
+  "relative_max_error": {
+    "bf16_split_vs_bf16_dense": 0.0027173913549631834,
+    "fp32_split_vs_fp32_dense": 3.312589456072601e-07,
+    "bf16_dense_vs_fp32_dense": 0.002661914099007845
+  }
+}

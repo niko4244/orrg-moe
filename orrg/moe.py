@@ -21,7 +21,6 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 
 import torch
-import torch.nn.functional as F
 from torch import nn
 
 from .config import MoEConfig
@@ -40,6 +39,15 @@ class LayerStats:
     counts: torch.Tensor  # raw counts, used for bias updates
 
 
+def _expert_range(indices: torch.Tensor, ratio: float) -> torch.Tensor:
+    """The first ``ratio`` fraction of a group's neurons (ratio=1 returns all)."""
+
+    if ratio >= 1.0:
+        return indices
+    # ratio <= 1 is validated in MoEConfig, so this never exceeds the shard.
+    return indices[: max(1, int(round(indices.numel() * ratio)))]
+
+
 def _contiguous(index_sets: list[torch.Tensor]) -> bool:
     for indices in index_sets:
         if indices.numel() and int(indices[-1] - indices[0]) != indices.numel() - 1:
@@ -48,18 +56,12 @@ def _contiguous(index_sets: list[torch.Tensor]) -> bool:
 
 
 class MoEGroup(nn.Module):
-    """One base shard plus its additive residual experts."""
+    """One base shard plus its residual experts; dispatch lives in ``MoELayer``."""
 
     def __init__(self, base: nn.Module, residuals: list[nn.Module]):
         super().__init__()
         self.base = base
         self.residuals = nn.ModuleList(residuals)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:  # analysis helper
-        out = self.base(x)
-        for expert in self.residuals:
-            out = out + expert(x)
-        return out
 
 
 class MoELayer(nn.Module):
@@ -82,20 +84,47 @@ class MoELayer(nn.Module):
         # The skeleton (shared + one base per group) partitions the whole
         # intermediate axis, which is what makes the conversion exactly function
         # preserving. Residual variants are independent copies of their group's
-        # neurons, not extra slices of the axis.
+        # neurons, not extra slices of the axis. ``skeleton_scale`` < 1 keeps a
+        # prefix of that axis, so the skeleton no longer reproduces the seed FFN
+        # and the conversion is approximate; MoEConfig rejects it together with
+        # cluster_shards, which needs the whole axis.
+        self.skeleton_width = max(1, int(round(spec.intermediate * cfg.skeleton_scale)))
+        if cfg.dispatch == "fused" and (
+            len(spec.up) != 2
+            or len(spec.down) != 1
+            or spec.up_bias
+            or spec.out_bias
+            or not hasattr(spec.module, "gate_proj")
+        ):
+            raise ValueError(
+                "dispatch='fused' needs a gated FFN with gate_proj/up_proj/down_proj "
+                "and no biases"
+            )
         if index_sets is None:
-            bounds = shard_bounds(spec.intermediate, cfg.shared + cfg.groups)
+            bounds = shard_bounds(self.skeleton_width, cfg.shared + cfg.groups)
             index_sets = [torch.arange(start, end) for start, end in bounds]
         if len(index_sets) != cfg.shared + cfg.groups:
             raise ValueError(
                 f"expected {cfg.shared + cfg.groups} index sets, got {len(index_sets)}"
             )
         union = torch.cat([idx.long() for idx in index_sets])
-        if union.numel() != spec.intermediate or union.unique().numel() != spec.intermediate:
-            raise ValueError("index sets must partition the intermediate axis exactly")
+        if union.numel() != self.skeleton_width or union.unique().numel() != self.skeleton_width:
+            raise ValueError(
+                f"index sets must partition the retained intermediate range exactly "
+                f"({self.skeleton_width} neurons)"
+            )
         self.index_sets = [idx.long() for idx in index_sets]
         self.widths = [int(idx.numel()) for idx in self.index_sets]
         self.mode = cfg.mode
+        self.expert_mode = cfg.expert_mode
+        self.dispatch = cfg.dispatch
+        self._fused = None
+        # Expert width is a fraction of the group's shard. ratio=1 gives the
+        # historical "residual is a copy of the base range" behaviour.
+        self.expert_indices = [
+            _expert_range(indices, cfg.expert_width_ratio) for indices in self.index_sets[cfg.shared :]
+        ]
+        self.expert_widths = [int(idx.numel()) for idx in self.expert_indices]
 
         modules: list[nn.Module] = []
         for i in range(cfg.shared):
@@ -115,11 +144,12 @@ class MoELayer(nn.Module):
                 indices=indices,
                 keep_out_bias=(cfg.shared == 0 and g == 0),
             )
+            expert_idx = self.expert_indices[g]
             residuals = [
                 narrow_module(
                     spec.module,
                     spec,
-                    indices=indices,
+                    indices=expert_idx,
                     keep_out_bias=False,
                     zero_down=(cfg.residual_init == "zero"),
                 )
@@ -151,12 +181,19 @@ class MoELayer(nn.Module):
         router_cfg = cfg.router
         if self.mode == "partition":
             router_cfg = replace(cfg.router, routing="flat", flat_top_k=cfg.top_k_partition)
+        if self.mode == "growth" and cfg.expert_mode == "replace":
+            # Variant 0 is the group's base shard, so the router chooses among
+            # ``variants`` options instead of ``variants - 1`` residuals.
+            n_groups_router, n_variants_router = cfg.groups, cfg.variants
+            n_experts = cfg.groups * cfg.variants
+        elif self.mode == "growth":
+            n_groups_router, n_variants_router = cfg.groups, max(1, cfg.variants - 1)
+        else:
+            n_groups_router, n_variants_router = 1, cfg.shared + cfg.groups
         self.router = TokenRouter(
             hidden=spec.hidden,
-            n_groups=cfg.groups if self.mode == "growth" else 1,
-            n_variants=max(1, cfg.variants - 1)
-            if self.mode == "growth"
-            else cfg.shared + cfg.groups,
+            n_groups=n_groups_router,
+            n_variants=n_variants_router,
             cfg=router_cfg,
         )
 
@@ -189,18 +226,39 @@ class MoELayer(nn.Module):
         if self.mode == "partition":
             return self._forward_partition(flat).reshape(shape)
 
+        if self.expert_mode == "replace":
+            return self._forward_replace(flat).reshape(shape)
+
+        if self.dispatch == "fused":
+            if torch.is_grad_enabled():
+                raise RuntimeError(
+                    "dispatch='fused' has no autograd path; run it under torch.no_grad() "
+                    "or set dispatch='python'"
+                )
+            if self._fused is None:
+                from .dispatch import FusedDispatch
+
+                self._fused = FusedDispatch(self)
+            return self._fused.forward(flat).reshape(shape)
+
+        # Recombination is a sum of shard outputs. Under bf16/fp16 every partial
+        # sum rounds, and eight shards cost ~1e-2 relative per block, so the
+        # accumulator is float32: the only error left is the final cast.
+        acc = torch.float32 if flat.dtype in (torch.bfloat16, torch.float16) else flat.dtype
         out = None
         for module in self.shared:
-            out = module(flat) if out is None else out + module(flat)
+            part = module(flat).to(acc)
+            out = part if out is None else out + part
         for group in self.groups:
-            out = group.base(flat) if out is None else out + group.base(flat)
+            part = group.base(flat).to(acc)
+            out = part if out is None else out + part
         if out is None:  # cfg with zero shards is rejected in MoEConfig
-            out = torch.zeros_like(flat)
+            out = torch.zeros_like(flat, dtype=acc)
 
         if self.cfg.n_residuals > 0 and self.cfg.top_residuals > 0:
             route = self.router(flat)
             index, weight = route.index, route.weight  # [N, G, k]
-            contribution = flat.new_zeros(flat.shape)
+            contribution = torch.zeros(flat.shape, dtype=acc, device=flat.device)
             for gi, group in enumerate(self.groups):
                 if not group.residuals:
                     continue
@@ -217,9 +275,11 @@ class MoELayer(nn.Module):
                         end = ends[ei]
                         if end > start:
                             tokens = order[start:end]
-                            contribution.index_add_(
-                                0, tokens, expert(flat[tokens]) * selected_w[tokens].unsqueeze(-1)
-                            )
+                            # The router computes probabilities in float32; line the
+                            # operands up with the accumulator or a bf16 checkpoint
+                            # raises (and fp32 inputs would silently promote).
+                            scale = selected_w[tokens].to(acc).unsqueeze(-1)
+                            contribution.index_add_(0, tokens, expert(flat[tokens]).to(acc) * scale)
                         start = end
             out = out + contribution
             self._record(route, flat.shape[0], groups=True)
@@ -227,6 +287,7 @@ class MoELayer(nn.Module):
         if (
             self.training
             and self.cfg.router_distill_coef > 0
+            and self.expert_mode == "additive"  # targets are residual-only
             and self.router.n_variants > 1  # with one residual the target is trivially 1.0
         ):
             # Router-level supervision: the loss depends on the router directly,
@@ -242,11 +303,50 @@ class MoELayer(nn.Module):
         else:
             self.last_distill_loss = None
 
-        return out.reshape(shape)
+        return out.to(flat.dtype).reshape(shape)
+
+    def _forward_replace(self, flat: torch.Tensor) -> torch.Tensor:
+        """Group top-1 over ``{base} ∪ residuals``; the selected variant replaces."""
+
+        acc = torch.float32 if flat.dtype in (torch.bfloat16, torch.float16) else flat.dtype
+        out = None
+        for module in self.shared:
+            part = module(flat).to(acc)
+            out = part if out is None else out + part
+        if out is None:
+            out = torch.zeros_like(flat, dtype=acc)
+
+        route = self.router(flat)
+        index = route.index[:, :, 0]  # [N, G] one variant per group
+        probability = route.weight[:, :, 0]
+        # A replacement is a hard switch: the selected variant contributes its
+        # full output, so selecting variant 0 reproduces the dense block exactly.
+        # Subtracting the detached value keeps the forward pass at exactly 1 while
+        # still passing a gradient to the router probability (straight-through).
+        weight = (probability - probability.detach() + 1.0).to(acc)
+        contribution = torch.zeros(flat.shape, dtype=acc, device=flat.device)
+        for gi, group in enumerate(self.groups):
+            variants = [group.base, *group.residuals]
+            selected = index[:, gi]
+            order = torch.argsort(selected)
+            counts = torch.bincount(selected, minlength=len(variants))
+            ends = counts.cumsum(0).tolist()
+            start = 0
+            for ei, module in enumerate(variants):
+                end = ends[ei]
+                if end > start:
+                    tokens = order[start:end]
+                    scale = weight[tokens, gi].unsqueeze(-1)
+                    contribution.index_add_(0, tokens, module(flat[tokens]).to(acc) * scale)
+                start = end
+        self._record(route, flat.shape[0], groups=True)
+        self.last_distill_loss = None
+        return (out + contribution).to(flat.dtype)
 
     def _forward_partition(self, flat: torch.Tensor) -> torch.Tensor:
         route = self.router(flat)
-        out = torch.zeros_like(flat)
+        acc = torch.float32 if flat.dtype in (torch.bfloat16, torch.float16) else flat.dtype
+        out = torch.zeros_like(flat, dtype=acc)
         index = route.index.reshape(flat.shape[0], -1)
         # Partitioned neuron shards recombine by *sum*, not by a convex
         # combination, so the softmax weights are scaled back up by n_shards.
@@ -259,10 +359,10 @@ class MoELayer(nn.Module):
                 if not bool(mask.any()):
                     continue
                 tokens = mask.nonzero(as_tuple=True)[0]
-                weighted = expert(flat[tokens]) * selected_w[tokens].unsqueeze(-1)
+                weighted = expert(flat[tokens]).to(acc) * selected_w[tokens].to(acc).unsqueeze(-1)
                 out = out.index_add(0, tokens, weighted)
         self._record(route, flat.shape[0], groups=False)
-        return out
+        return out.to(flat.dtype)
 
     # ------------------------------------------------------------------- stats
     @torch.no_grad()
@@ -327,9 +427,15 @@ class MoELayer(nn.Module):
         return stats["load_imbalance"]
 
     def extra_repr(self) -> str:
+        geometry = ""
+        if self.cfg.skeleton_scale != 1.0:
+            geometry += f", skeleton={self.skeleton_width}/{self.intermediate}"
+        if self.cfg.expert_width_ratio != 1.0:
+            geometry += f", expert_width={self.expert_widths[0]}"
         return (
             f"{self.layer_name}: hidden={self.hidden}, intermediate={self.intermediate}, "
             f"skeleton_shards={len(self.widths)}, width={self.widths[0]}, "
-            f"variants={self.cfg.variants}, mode={self.mode}, "
+            f"variants={self.cfg.variants}, mode={self.mode}, experts={self.expert_mode}"
+            f"{geometry}, "
             f"clustered={self.widths != sorted(self.widths) or not _contiguous(self.index_sets)}"
         )

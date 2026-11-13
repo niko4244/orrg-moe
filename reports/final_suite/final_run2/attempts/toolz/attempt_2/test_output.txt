@@ -1,0 +1,36 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\nikma\AppData\Local\Programs\Python\Python311\python.exe
+rootdir: I:\.freebuff\reports\final_suite\final_run2\toolz
+configfile: pyproject.toml
+plugins: anyio-4.12.1, langsmith-0.4.32, libtmux-0.62.0, asyncio-0.26.0, typeguard-4.4.3
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 17 items
+
+toolz/tests/test_inspect_args.py::test_make_func PASSED                  [  5%]
+toolz/tests/test_inspect_args.py::test_is_valid PASSED                   [ 11%]
+toolz/tests/test_inspect_args.py::test_is_valid_py3 PASSED               [ 17%]
+toolz/tests/test_inspect_args.py::test_is_partial PASSED                 [ 23%]
+toolz/tests/test_inspect_args.py::test_is_valid_curry PASSED             [ 29%]
+toolz/tests/test_inspect_args.py::test_func_keyword PASSED               [ 35%]
+toolz/tests/test_inspect_args.py::test_has_unknown_args PASSED           [ 41%]
+toolz/tests/test_inspect_args.py::test_num_required_args PASSED          [ 47%]
+toolz/tests/test_inspect_args.py::test_has_keywords PASSED               [ 52%]
+toolz/tests/test_inspect_args.py::test_has_varargs PASSED                [ 58%]
+toolz/tests/test_inspect_args.py::test_is_arity PASSED                   [ 64%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3 PASSED [ 70%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3 PASSED [ 76%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_py3 PASSED       [ 82%]
+toolz/tests/test_inspect_args.py::test_introspect_builtin_modules PASSED [ 88%]
+toolz/tests/test_inspect_args.py::test_inspect_signature_property FAILED [ 94%]
+toolz/tests/test_inspect_args.py::test_inspect_wrapped_property PASSED   [100%]
+
+================================== FAILURES ===================================
+_______________________ test_inspect_signature_property _______________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:467: in test_inspect_signature_property
+    assert num_required_args(AddX) == 1
+E   AssertionError: assert False == 1
+E    +  where False = num_required_args(<class 'toolz.tests.test_inspect_args.test_inspect_signature_property.<locals>.AddX'>)
+=========================== short test summary info ===========================
+FAILED toolz/tests/test_inspect_args.py::test_inspect_signature_property - As...
+======================== 1 failed, 16 passed in 0.30s =========================
+

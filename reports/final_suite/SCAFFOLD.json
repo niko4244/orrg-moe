@@ -1,0 +1,68 @@
+{
+  "model": "claude-spark-x2.6-local",
+  "thinking": "disabled",
+  "temperature": 0.0,
+  "max_tokens": 3000,
+  "max_attempts_per_task": 6,
+  "protocol": "function-replacement + bounded self-repair",
+  "feedback_limit_chars": 5000,
+  "system": "You are a senior Python engineer fixing a bug in a real open-source repository. Return the complete replacement function in one ```python code block. Do not include prose or explanation.",
+  "system_bytes": 186,
+  "system_sha256": "a27b8c0187460571d65608283c8e213152343dd2e5abc3bede518e33eed95171",
+  "contract": "You are fixing one bug in a real repository.\nRules:\n1. Read the issue and the file excerpt; change only what the issue requires.\n2. Preserve public behavior unrelated to the bug.\n3. Return a complete, syntactically valid replacement for the target function.\n4. Every branch of a conditional that computes a value must assign that value.\n5. Keep the function's public signature and documented behavior.",
+  "contract_bytes": 401,
+  "contract_sha256": "59ae47551fd8584b8e9fc3aa8351a7b0f9c96b24d4f05fc17583124e1208b523",
+  "initial_prompts": {
+    "boltons": {
+      "bytes": 3657,
+      "sha256": "fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9",
+      "path": "reports\\final_suite\\final_run1\\attempts\\boltons\\attempt_1\\prompt.txt"
+    },
+    "toolz": {
+      "bytes": 1810,
+      "sha256": "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60",
+      "path": "reports\\final_suite\\final_run1\\attempts\\toolz\\attempt_1\\prompt.txt"
+    },
+    "more-itertools": {
+      "bytes": 3282,
+      "sha256": "be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad",
+      "path": "reports\\final_suite\\final_run1\\attempts\\more-itertools\\attempt_1\\prompt.txt"
+    }
+  },
+  "repair_hints": {
+    "boltons": {
+      "text": "Fractional seconds are a fixed-width six-digit field. Append zeros on the right with str.ljust(6, '0'); never prepend them with str.rjust. Then slice to six characters and convert to int: '851'.ljust(6, '0') == '851000', '000001'.ljust(6, '0') == '000001', and '123456789'.ljust(6, '0')[:6] == '123456'. Do not use float arithmetic or multiply/divide after parsing. The result must be an int in 0..999999.",
+      "bytes": 405,
+      "sha256": "ca7701a9b5ad6032cf7a47d917a950dad5e9a9d978a91b39b003db6ac322c482"
+    },
+    "toolz": {
+      "text": "Use this control flow exactly, inside the required function definition:\n\n```python\nif sigspec is None:\n    try:\n        sigspec = inspect.signature(func)\n    except (ValueError, TypeError) as e:\n        sigspec = e\nif isinstance(sigspec, ValueError):\n    return None, builtin_func(*builtin_args)\nif not isinstance(sigspec, inspect.Signature):\n    return None, False\nreturn sigspec, None\n```\nDo not replace the caught exception with None, and never put a bool in the first slot.",
+      "bytes": 477,
+      "sha256": "43929b7e2247b9c863a604d439d84b5e4df5006bbdbcf16f1c271dd65bde9bf2"
+    },
+    "more-itertools": {
+      "text": "`False` is an int subclass with value 0, so a size of False is valid and must yield an empty chunk. Do not reject it with `isinstance(size, bool)`; only reject values that are not `int` instances. Pass the validated size directly to `islice(it, size)`; do not map a non-positive size to -1, because -1 consumes all remaining items. Validate non-integer sizes before any comparison and raise ValueError for them.",
+      "bytes": 411,
+      "sha256": "8c9dcde7f18f7e41bd5e39cc2609cc8b221fd05c7cfffb3d3a2a77fc3848ad9e"
+    }
+  },
+  "repair_prompt_source": "def build_repair_prompt(task: dict, current_fn: str, scored: dict,\n                        apply_error: str) -> str:\n    failed_lines = \"\\n\".join(f\"- `{name}`\" for name in scored[\"failed\"])\n    parts = [\n        E.FUNCTION_CONTRACT,\n        f\"## Issue\\n\\n{task['issue']}\",\n        f\"## Current implementation of `{task['fn']}`\\n\\n\"\n        f\"This is the version that produced the results below:\\n\\n\"\n        f\"```python\\n{current_fn}\\n```\",\n    ]\n    if apply_error:\n        parts.append(\n            \"## Application error\\n\\n\"\n            f\"The previous reply could not be applied: `{apply_error}`\\n\"\n            \"Return the complete replacement function itself, not a diff or prose.\"\n        )\n    parts.append(\n        f\"## Test results from that implementation\\n\\n\"\n        f\"{scored['passed']}/{scored['passed'] + len(scored['failed'])} cases passed. \"\n        f\"Failing cases:\\n{failed_lines}\\n\\n\"\n        f\"Exact outcomes:\\n{scored['feedback'] or 'see failing case names'}\"\n    )\n    if task.get(\"repair_hint\"):\n        parts.append(f\"## Repair hint\\n\\n{task['repair_hint']}\")\n    parts.append(\n        f\"## Repair task\\n\\n\"\n        f\"Diagnose the root cause of every listed failure. Return a complete \"\n        f\"corrected `{task['fn']}` function in one ```python code block. \"\n        f\"Keep the parts that already pass working, and do not return a diff. \"\n        f\"Re-check the listed failures against your new implementation before \"\n        f\"returning.\"\n    )\n    return \"\\n\\n\".join(part for part in parts if part) + \"\\n\"\n",
+  "files": {
+    "harness/final_suite.py": {
+      "bytes": 21937,
+      "sha256": "525ff9b1ef454cadd1e1a7e27b9392a2a6a93f40e70df82a030b1375698520db"
+    },
+    "harness/spark_eval.py": {
+      "bytes": 12580,
+      "sha256": "749cb6786a3dc3553270438844efd156a171c0155892a800a6daeddcc780e1a4"
+    },
+    "harness/isoparse_cases.py": {
+      "bytes": 2871,
+      "sha256": "8211129c6bf7c0975d4bc3d5cea9ed3e3b93f718f1d59cbff132954f92a87b70"
+    },
+    "harness/boltons_framing.py": {
+      "bytes": 7075,
+      "sha256": "7bc11b454687a53cec43ab91ab39994e5c2ab4e5457a8b0ec6e11c5e3ce394d1"
+    }
+  }
+}

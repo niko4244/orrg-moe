@@ -1,0 +1,64 @@
+{
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "geometry": {
+    "shared": 4,
+    "groups": 4,
+    "variants": 14,
+    "expert_mode": "additive",
+    "expert_width_ratio": 1.0
+  },
+  "rows": [
+    {
+      "skeleton_scale": 1.0,
+      "total_params": 9060309936,
+      "active_k1": 2123979696,
+      "lossless_label": true,
+      "logit_kl": 0.0013878525933250785,
+      "logit_max_abs": 1.0625,
+      "max_carve_error": 0.04989035055041313,
+      "first_layer_carve": 0.0027173913549631834,
+      "last_layer_carve": 0.04989035055041313,
+      "median_carve": 0.015037594363093376,
+      "seconds": 54.37228536605835
+    },
+    {
+      "skeleton_scale": 0.9,
+      "total_params": 8193268656,
+      "active_k1": 1950571440,
+      "lossless_label": false,
+      "logit_kl": 0.4306875765323639,
+      "logit_max_abs": 15.875,
+      "max_carve_error": 0.9239583611488342,
+      "first_layer_carve": 0.19701087474822998,
+      "last_layer_carve": 0.7927631735801697,
+      "median_carve": 0.36057692766189575,
+      "seconds": 47.920825719833374
+    },
+    {
+      "skeleton_scale": 0.75,
+      "total_params": 6892706736,
+      "active_k1": 1690459056,
+      "lossless_label": false,
+      "logit_kl": 1.1639864444732666,
+      "logit_max_abs": 18.25,
+      "max_carve_error": 0.9211805462837219,
+      "first_layer_carve": 0.260869562625885,
+      "last_layer_carve": 0.6239035129547119,
+      "median_carve": 0.6239035129547119,
+      "seconds": 48.62460398674011
+    },
+    {
+      "skeleton_scale": 0.5,
+      "total_params": 4725103536,
+      "active_k1": 1256938416,
+      "lossless_label": false,
+      "logit_kl": 3.174999237060547,
+      "logit_max_abs": 18.90625,
+      "max_carve_error": 1.1319875717163086,
+      "first_layer_carve": 0.411005437374115,
+      "last_layer_carve": 0.7127193212509155,
+      "median_carve": 0.807692289352417,
+      "seconds": 42.38845753669739
+    }
+  ]
+}

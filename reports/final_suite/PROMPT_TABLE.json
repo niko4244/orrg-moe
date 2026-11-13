@@ -1,0 +1,58 @@
+{
+  "boltons": [
+    {
+      "attempt": "attempt_1",
+      "bytes": 3657,
+      "sha256": "fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9"
+    },
+    {
+      "attempt": "attempt_2",
+      "bytes": 5031,
+      "sha256": "80a3cd03be62b73122f8ab1f68fb6181f624025eaf0a40034b781a6545617ef6"
+    }
+  ],
+  "toolz": [
+    {
+      "attempt": "attempt_1",
+      "bytes": 1810,
+      "sha256": "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60"
+    },
+    {
+      "attempt": "attempt_2",
+      "bytes": 4467,
+      "sha256": "abaf7b2a4119cd61af72fd661c02012cee5bef5ef9a6d206ea67ee1c6e4664fa"
+    },
+    {
+      "attempt": "attempt_3",
+      "bytes": 2692,
+      "sha256": "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c"
+    },
+    {
+      "attempt": "attempt_4",
+      "bytes": 2692,
+      "sha256": "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c"
+    },
+    {
+      "attempt": "attempt_5",
+      "bytes": 2692,
+      "sha256": "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c"
+    },
+    {
+      "attempt": "attempt_6",
+      "bytes": 2692,
+      "sha256": "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c"
+    }
+  ],
+  "more-itertools": [
+    {
+      "attempt": "attempt_1",
+      "bytes": 3282,
+      "sha256": "be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad"
+    },
+    {
+      "attempt": "attempt_2",
+      "bytes": 4000,
+      "sha256": "1fb26aabc0f028f82f7d157ecf0ab3b37bb7cc91df5c120cd03cfd13a5b345ca"
+    }
+  ]
+}

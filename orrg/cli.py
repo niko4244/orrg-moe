@@ -28,7 +28,15 @@ def cmd_scale(args) -> int:
     from .scale import converted_scale, estimate_training, format_scale
 
     shape = _shape_from_args(args)
-    scale = converted_scale(shape, args.shared, args.groups, args.variants)
+    scale = converted_scale(
+        shape,
+        args.shared,
+        args.groups,
+        args.variants,
+        skeleton_scale=args.skeleton_scale,
+        expert_width_ratio=args.expert_ratio,
+        expert_mode=args.expert_mode,
+    )
     print(format_scale(scale))
     if args.tokens:
         for k, row in scale["converted"].items():
@@ -71,30 +79,80 @@ def cmd_inspect(args) -> int:
     return 0
 
 
-def cmd_convert(args) -> int:
-    from transformers import AutoModelForCausalLM, AutoTokenizer
+def moe_config_from_args(args) -> "object":
+    """Turn parsed ``convert`` arguments into a ``MoEConfig``.
+
+    ``--top-k`` and ``--top-residuals`` are two spellings of "experts routed per
+    group per token". The accounting (``top_residuals``) and the router
+    (``RouterConfig.group_top_k``) have to agree: the reference forward takes its
+    slot count from the router, so setting only ``top_residuals`` reports k
+    experts and routes one.
+    """
 
     from .config import MoEConfig
-    from .convert import convert_model, save_converted
 
-    cfg = MoEConfig(
+    if args.mode == "partition" and args.top_residuals is not None:
+        # Partition mode routes over disjoint skeleton shards and disables the
+        # residual variants, so a flag named --top-residuals cannot mean anything
+        # here; letting it pick the shard count was the confusing part.
+        raise SystemExit(
+            "partition mode has no residual experts; use --top-k for the shard count"
+        )
+    if (
+        args.top_k is not None
+        and args.top_residuals is not None
+        and args.top_k != args.top_residuals
+    ):
+        raise SystemExit("--top-k and --top-residuals disagree; pass only one of them")
+    routed = args.top_k if args.top_k is not None else args.top_residuals
+    routed = 1 if routed is None else routed
+    if routed < 0:
+        raise SystemExit("--top-k / --top-residuals must be >= 0")
+    # ``MoEConfig`` makes the router follow ``top_residuals``, so the router is not
+    # set here; partition mode reports no residual experts and routes shards via
+    # ``top_k_partition`` instead.
+    return MoEConfig(
         shared=args.shared,
         groups=args.groups,
         variants=args.variants,
-        top_residuals=args.top_residuals,
+        top_residuals=0 if args.mode == "partition" else routed,
         mode=args.mode,
-        top_k_partition=args.top_k,
+        # Only partition mode reads top_k_partition; setting it in growth mode
+        # trips unrelated validations (e.g. dispatch='fused' rejects it).
+        top_k_partition=max(1, routed) if args.mode == "partition" else 1,
         residual_init=args.residual_init,
+        expert_mode=args.expert_mode,
+        expert_width_ratio=args.expert_ratio,
+        skeleton_scale=args.skeleton_scale,
+        router_warm_start=args.router_warm_start,
+        dispatch=args.dispatch,
         include=tuple(args.include or ()),
         exclude=tuple(args.exclude or ()),
     )
+
+
+def cmd_convert(args) -> int:
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    from .convert import convert_model, save_converted
+
+    cfg = moe_config_from_args(args)
     model = AutoModelForCausalLM.from_pretrained(args.model, torch_dtype=torch.bfloat16)
     probe = None
     if args.verify:
         tokenizer = AutoTokenizer.from_pretrained(args.model)
         batch = tokenizer("The quick brown fox jumps over", return_tensors="pt")
         probe = dict(batch)
-    model, report = convert_model(model, cfg, verify=args.verify, probe=probe)
+    calibration = None
+    if cfg.router_warm_start == "cluster":
+        if probe is None:
+            raise SystemExit(
+                "--router-warm-start cluster needs calibration data; pass --verify"
+            )
+        calibration = [probe]
+    model, report = convert_model(
+        model, cfg, verify=args.verify, probe=probe, calibration=calibration
+    )
     print(report.summary())
     if args.out:
         save_converted(model, cfg, args.out)
@@ -116,6 +174,9 @@ def build_parser() -> argparse.ArgumentParser:
     scale.add_argument("--shared", type=int, default=2)
     scale.add_argument("--groups", type=int, default=6)
     scale.add_argument("--variants", type=int, default=8)
+    scale.add_argument("--skeleton-scale", type=float, default=1.0)
+    scale.add_argument("--expert-ratio", type=float, default=1.0)
+    scale.add_argument("--expert-mode", choices=["additive", "replace"], default="additive")
     scale.add_argument("--ungated", action="store_true")
     scale.add_argument("--untied", action="store_true")
     scale.add_argument("--tokens", type=float, default=0)
@@ -140,10 +201,31 @@ def build_parser() -> argparse.ArgumentParser:
     conv.add_argument("--shared", type=int, default=2)
     conv.add_argument("--groups", type=int, default=6)
     conv.add_argument("--variants", type=int, default=8)
-    conv.add_argument("--top-residuals", type=int, default=1)
+    conv.add_argument(
+        "--top-residuals",
+        type=int,
+        default=None,
+        help="experts routed per group per token (alias of --top-k)",
+    )
     conv.add_argument("--mode", choices=["growth", "partition"], default="growth")
-    conv.add_argument("--top-k", type=int, default=1)
+    conv.add_argument(
+        "--top-k",
+        type=int,
+        default=None,
+        help="experts routed per group per token: residual experts in growth mode, "
+        "shards in partition mode",
+    )
     conv.add_argument("--residual-init", choices=["zero", "copy"], default="zero")
+    conv.add_argument("--expert-mode", choices=["additive", "replace"], default="additive")
+    conv.add_argument("--expert-ratio", type=float, default=1.0)
+    conv.add_argument("--skeleton-scale", type=float, default=1.0)
+    conv.add_argument("--router-warm-start", choices=["none", "cluster"], default="none")
+    conv.add_argument(
+        "--dispatch",
+        choices=["python", "fused"],
+        default="python",
+        help="fused = grouped-GEMM inference path (needs torch.no_grad)",
+    )
     conv.add_argument("--include", nargs="*", default=None)
     conv.add_argument("--exclude", nargs="*", default=None)
     conv.add_argument("--verify", action="store_true")

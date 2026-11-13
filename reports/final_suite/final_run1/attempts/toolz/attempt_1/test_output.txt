@@ -1,0 +1,123 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\nikma\AppData\Local\Programs\Python\Python311\python.exe
+rootdir: I:\.freebuff\reports\final_suite\final_run1\toolz
+configfile: pyproject.toml
+plugins: anyio-4.12.1, langsmith-0.4.32, libtmux-0.62.0, asyncio-0.26.0, typeguard-4.4.3
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 17 items
+
+toolz/tests/test_inspect_args.py::test_make_func PASSED                  [  5%]
+toolz/tests/test_inspect_args.py::test_is_valid FAILED                   [ 11%]
+toolz/tests/test_inspect_args.py::test_is_valid_py3 FAILED               [ 17%]
+toolz/tests/test_inspect_args.py::test_is_partial FAILED                 [ 23%]
+toolz/tests/test_inspect_args.py::test_is_valid_curry FAILED             [ 29%]
+toolz/tests/test_inspect_args.py::test_func_keyword PASSED               [ 35%]
+toolz/tests/test_inspect_args.py::test_has_unknown_args FAILED           [ 41%]
+toolz/tests/test_inspect_args.py::test_num_required_args FAILED          [ 47%]
+toolz/tests/test_inspect_args.py::test_has_keywords FAILED               [ 52%]
+toolz/tests/test_inspect_args.py::test_has_varargs FAILED                [ 58%]
+toolz/tests/test_inspect_args.py::test_is_arity FAILED                   [ 64%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3 FAILED [ 70%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3 FAILED [ 76%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_py3 PASSED       [ 82%]
+toolz/tests/test_inspect_args.py::test_introspect_builtin_modules PASSED [ 88%]
+toolz/tests/test_inspect_args.py::test_inspect_signature_property FAILED [ 94%]
+toolz/tests/test_inspect_args.py::test_inspect_wrapped_property PASSED   [100%]
+
+================================== FAILURES ===================================
+________________________________ test_is_valid ________________________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:114: in test_is_valid
+    assert check_valid(1) is False
+E   assert True is False
+E    +  where True = <function test_is_valid.<locals>.<lambda> at 0x000001C147000EA0>(1)
+______________________________ test_is_valid_py3 ______________________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:190: in test_is_valid_py3
+    assert check_valid(f) is False
+E   assert True is False
+E    +  where True = <function test_is_valid_py3.<locals>.<lambda> at 0x000001C14707B1A0>(<function func at 0x000001C14707B2E0>)
+_______________________________ test_is_partial _______________________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:204: in test_is_partial
+    test_is_valid(check_valid=is_partial_args, incomplete=True)
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:114: in test_is_valid
+    assert check_valid(1) is False
+E   assert True is False
+E    +  where True = <function test_is_valid.<locals>.<lambda> at 0x000001C14707B4C0>(1)
+_____________________________ test_is_valid_curry _____________________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:225: in test_is_valid_curry
+    test_is_valid_py3(check_valid=check_valid, incomplete=True)
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:190: in test_is_valid_py3
+    assert check_valid(f) is False
+E   assert True is False
+E    +  where True = <function test_is_valid_py3.<locals>.<lambda> at 0x000001C14707B1A0>(<function func at 0x000001C14707B9C0>)
+____________________________ test_has_unknown_args ____________________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:246: in test_has_unknown_args
+    assert has_varargs(1) is False
+E   assert True is False
+E    +  where True = has_varargs(1)
+___________________________ test_num_required_args ____________________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:277: in test_num_required_args
+    assert num_required_args(map) == 2
+           ^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:959: in num_required_args
+    return sum(1 for p in sigspec.parameters.values()
+                          ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'int' object has no attribute 'parameters'
+______________________________ test_has_keywords ______________________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:286: in test_has_keywords
+    assert has_keywords(int)
+           ^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:978: in has_keywords
+    for p in sigspec.parameters.values())
+             ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'bool' object has no attribute 'parameters'
+______________________________ test_has_varargs _______________________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:298: in test_has_varargs
+    assert has_varargs(map)
+           ^^^^^^^^^^^^^^^^
+toolz\functoolz.py:969: in has_varargs
+    for p in sigspec.parameters.values())
+             ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'bool' object has no attribute 'parameters'
+________________________________ test_is_arity ________________________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:310: in test_is_arity
+    assert is_arity(2, map) is False
+           ^^^^^^^^^^^^^^^^
+toolz\functoolz.py:1023: in is_arity
+    num = num_required_args(func, sigspec)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:959: in num_required_args
+    return sum(1 for p in sigspec.parameters.values()
+                          ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'bool' object has no attribute 'parameters'
+_______________________ test_introspect_curry_valid_py3 _______________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:338: in test_introspect_curry_valid_py3
+    assert check_valid(f) is False
+E   assert True is False
+E    +  where True = <function test_introspect_curry_valid_py3.<locals>.<lambda> at 0x000001C14707B560>(<function func at 0x000001C14707B600>)
+______________________ test_introspect_curry_partial_py3 ______________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:355: in test_introspect_curry_partial_py3
+    test_introspect_curry_valid_py3(check_valid=is_partial_args, incomplete=True)
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:338: in test_introspect_curry_valid_py3
+    assert check_valid(f) is False
+E   assert True is False
+E    +  where True = <function test_introspect_curry_valid_py3.<locals>.<lambda> at 0x000001C14707B420>(<function func at 0x000001C14707BB00>)
+_______________________ test_inspect_signature_property _______________________
+..\..\..\..\coding_research\work\toolz_buggy\toolz\tests\test_inspect_args.py:465: in test_inspect_signature_property
+    assert num_required_args(AddX) is False
+E   AssertionError: assert True is False
+E    +  where True = num_required_args(<class 'toolz.tests.test_inspect_args.test_inspect_signature_property.<locals>.AddX'>)
+=========================== short test summary info ===========================
+FAILED toolz/tests/test_inspect_args.py::test_is_valid - assert True is False
+FAILED toolz/tests/test_inspect_args.py::test_is_valid_py3 - assert True is F...
+FAILED toolz/tests/test_inspect_args.py::test_is_partial - assert True is False
+FAILED toolz/tests/test_inspect_args.py::test_is_valid_curry - assert True is...
+FAILED toolz/tests/test_inspect_args.py::test_has_unknown_args - assert True ...
+FAILED toolz/tests/test_inspect_args.py::test_num_required_args - AttributeEr...
+FAILED toolz/tests/test_inspect_args.py::test_has_keywords - AttributeError: ...
+FAILED toolz/tests/test_inspect_args.py::test_has_varargs - AttributeError: '...
+FAILED toolz/tests/test_inspect_args.py::test_is_arity - AttributeError: 'boo...
+FAILED toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3 - as...
+FAILED toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3 - ...
+FAILED toolz/tests/test_inspect_args.py::test_inspect_signature_property - As...
+======================== 12 failed, 5 passed in 0.52s =========================
+

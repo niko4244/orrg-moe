@@ -1,0 +1,28 @@
+```diff
+--- a/boltons/timeutils.py
++++ b/boltons/timeutils.py
+@@ -138,6 +138,10 @@ def isoparse(iso_str):
+     tzinfo = None
+     tz_match = _ISO_TZ_RE.search(iso_str)
+     if tz_match:
+         iso_str = iso_str[:tz_match.start()]
+         tz = tz_match.group(1)
+         if tz == 'Z':
+             tzinfo = timezone.utc
+         else:
+             digits = tz[1:].replace(':', '').split('.')[0]
+             hh, mm = int(digits[0:2]), int(digits[2:4])
+             ss = int(digits[4:6] or 0)
+             sign = -1 if tz[0] == '-' else 1
+             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
++    parts = _NONDIGIT_RE.split(iso_str)
++    dt_args = [int(p) for p in parts]
++    if len(parts) > 6:
++        dt_args = dt_args[:6]
++    microsecond = int(parts[6] or 0)
++    if microsecond >= 1000000:
++        microsecond = microsecond // 1000000
++    return datetime(*dt_args, tzinfo=tzinfo, microsecond=microsecond)
+```
+```

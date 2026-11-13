@@ -1,0 +1,146 @@
+{
+  "repo": "toolz",
+  "module": "toolz/functoolz.py",
+  "fn": "_check_sigspec",
+  "kind": "pytest",
+  "issue": "Signature introspection in `toolz.functoolz` is broken.\n\n`_check_sigspec` now unconditionally returns `(None, False)`, so\n`is_valid_args`, `is_partial_args`, `num_required_args`, `has_varargs`,\n`has_keywords`, and `is_arity` report that every callable is invalid. For\nexample `num_required_args(lambda x: None)` returns `False` instead of `1`.\n\nRestore `_check_sigspec` so it:\n1. accepts an already-supplied `inspect.Signature`;\n2. otherwise resolves `inspect.signature(func)`;\n3. falls back to the builtin signature registry via\n   `builtin_func(*builtin_args)` when no signature is available;\n4. still returns `(None, False)` for a callable whose `__signature__` is\n   present but invalid.\n\nDo not change the public helpers.",
+  "excerpt": " 911|                 exc_name = exc.__name__\n 912|             return f'{self.func.__name__}_excepting_{exc_name}'\n 913|         except AttributeError:\n 914|             return 'excepting'\n 915| \n 916| \n 917| def _check_sigspec(sigspec, func, builtin_func, *builtin_args):\n 918|     return None, False\n 919| \n 920| \n 921| if PYPY:  # pragma: no cover\n 922|     _check_sigspec_orig = _check_sigspec\n 923| \n 924|     def _check_sigspec(sigspec, func, builtin_func, *builtin_args):",
+  "prompt_sha256": "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60",
+  "prompt_bytes": 1810,
+  "function_sha256": "1a8300da487166c7aafe479ed968735bd5c71994e7f25754144a8ea192e7efbd",
+  "stop_reason": "end_turn",
+  "apply_ok": true,
+  "apply_error": "",
+  "touched_functions": [
+    "_check_sigspec"
+  ],
+  "attempts": [
+    {
+      "attempt": 1,
+      "prompt_sha256": "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60",
+      "prompt_bytes": 1810,
+      "response_sha256": "43a23db127b1cccc31df0fef3e2d3144b8f320211b79f8556cb9e752d664374f",
+      "function_sha256": "b0260eeb664b33f83ac06d5688bed40dc2a66f601f75dea7a7337267f92959f1",
+      "apply_ok": true,
+      "apply_error": "",
+      "passed": 5,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_has_keywords",
+        "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+        "toolz/tests/test_inspect_args.py::test_has_varargs",
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_is_arity",
+        "toolz/tests/test_inspect_args.py::test_is_partial",
+        "toolz/tests/test_inspect_args.py::test_is_valid",
+        "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+        "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_num_required_args"
+      ],
+      "stop_reason": "end_turn",
+      "error": null
+    },
+    {
+      "attempt": 2,
+      "prompt_sha256": "abaf7b2a4119cd61af72fd661c02012cee5bef5ef9a6d206ea67ee1c6e4664fa",
+      "prompt_bytes": 4467,
+      "response_sha256": "0d8a63d5c87e881099d592e7b9d20d1a2a291bc673a000530fcd89a985aa0b16",
+      "function_sha256": "1a8300da487166c7aafe479ed968735bd5c71994e7f25754144a8ea192e7efbd",
+      "apply_ok": true,
+      "apply_error": "",
+      "passed": 16,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+      ],
+      "stop_reason": "end_turn",
+      "error": null
+    },
+    {
+      "attempt": 3,
+      "prompt_sha256": "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c",
+      "prompt_bytes": 2692,
+      "response_sha256": "0d8a63d5c87e881099d592e7b9d20d1a2a291bc673a000530fcd89a985aa0b16",
+      "function_sha256": "1a8300da487166c7aafe479ed968735bd5c71994e7f25754144a8ea192e7efbd",
+      "apply_ok": true,
+      "apply_error": "",
+      "passed": 16,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+      ],
+      "stop_reason": "end_turn",
+      "error": null
+    },
+    {
+      "attempt": 4,
+      "prompt_sha256": "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c",
+      "prompt_bytes": 2692,
+      "response_sha256": "0d8a63d5c87e881099d592e7b9d20d1a2a291bc673a000530fcd89a985aa0b16",
+      "function_sha256": "1a8300da487166c7aafe479ed968735bd5c71994e7f25754144a8ea192e7efbd",
+      "apply_ok": true,
+      "apply_error": "",
+      "passed": 16,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+      ],
+      "stop_reason": "end_turn",
+      "error": null
+    },
+    {
+      "attempt": 5,
+      "prompt_sha256": "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c",
+      "prompt_bytes": 2692,
+      "response_sha256": "0d8a63d5c87e881099d592e7b9d20d1a2a291bc673a000530fcd89a985aa0b16",
+      "function_sha256": "1a8300da487166c7aafe479ed968735bd5c71994e7f25754144a8ea192e7efbd",
+      "apply_ok": true,
+      "apply_error": "",
+      "passed": 16,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+      ],
+      "stop_reason": "end_turn",
+      "error": null
+    },
+    {
+      "attempt": 6,
+      "prompt_sha256": "3df75c915e91fa01dd2ef6f224fed9a0c329b1263e5b5c9e3aad0fb2edc4a73c",
+      "prompt_bytes": 2692,
+      "response_sha256": "0d8a63d5c87e881099d592e7b9d20d1a2a291bc673a000530fcd89a985aa0b16",
+      "function_sha256": "1a8300da487166c7aafe479ed968735bd5c71994e7f25754144a8ea192e7efbd",
+      "apply_ok": true,
+      "apply_error": "",
+      "passed": 16,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+      ],
+      "stop_reason": "end_turn",
+      "error": null
+    }
+  ],
+  "tests": {
+    "toolz/tests/test_inspect_args.py::test_make_func": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_is_valid": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_is_valid_py3": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_is_partial": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_is_valid_curry": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_func_keyword": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_has_unknown_args": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_num_required_args": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_has_keywords": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_has_varargs": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_is_arity": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_introspect_curry_py3": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_introspect_builtin_modules": "PASSED",
+    "toolz/tests/test_inspect_args.py::test_inspect_signature_property": "FAILED",
+    "toolz/tests/test_inspect_args.py::test_inspect_wrapped_property": "PASSED"
+  },
+  "cases": 17,
+  "passed": 16,
+  "failed": [
+    "toolz/tests/test_inspect_args.py::test_inspect_signature_property"
+  ],
+  "function.txt": "def _check_sigspec(sigspec, func, builtin_func, *builtin_args):\n    if sigspec is None:\n        try:\n            sigspec = inspect.signature(func)\n        except (ValueError, TypeError) as e:\n            sigspec = e\n    if isinstance(sigspec, ValueError):\n        return None, builtin_func(*builtin_args)\n    if not isinstance(sigspec, inspect.Signature):\n        return None, False\n    return sigspec, None\n",
+  "test_output.txt": "============================= test session starts =============================\nplatform win32 -- Python 3.11.9, pytest-8.4.2, pluggy-1.6.0 -- C:\\Users\\nikma\\AppData\\Local\\Programs\\Python\\Python311\\python.exe\nrootdir: I:\\.freebuff\\reports\\final_suite\\final_run2\\toolz\nconfigfile: pyproject.toml\nplugins: anyio-4.12.1, langsmith-0.4.32, libtmux-0.62.0, asyncio-0.26.0, typeguard-4.4.3\nasyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 17 items\n\ntoolz/tests/test_inspect_args.py::test_make_func PASSED                  [  5%]\ntoolz/tests/test_inspect_args.py::test_is_valid PASSED                   [ 11%]\ntoolz/tests/test_inspect_args.py::test_is_valid_py3 PASSED               [ 17%]\ntoolz/tests/test_inspect_args.py::test_is_partial PASSED                 [ 23%]\ntoolz/tests/test_inspect_args.py::test_is_valid_curry PASSED             [ 29%]\ntoolz/tests/test_inspect_args.py::test_func_keyword PASSED               [ 35%]\ntoolz/tests/test_inspect_args.py::test_has_unknown_args PASSED           [ 41%]\ntoolz/tests/test_inspect_args.py::test_num_required_args PASSED          [ 47%]\ntoolz/tests/test_inspect_args.py::test_has_keywords PASSED               [ 52%]\ntoolz/tests/test_inspect_args.py::test_has_varargs PASSED                [ 58%]\ntoolz/tests/test_inspect_args.py::test_is_arity PASSED                   [ 64%]\ntoolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3 PASSED [ 70%]\ntoolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3 PASSED [ 76%]\ntoolz/tests/test_inspect_args.py::test_introspect_curry_py3 PASSED       [ 82%]\ntoolz/tests/test_inspect_args.py::test_introspect_builtin_modules PASSED [ 88%]\ntoolz/tests/test_inspect_args.py::test_inspect_signature_property FAILED [ 94%]\ntoolz/tests/test_inspect_args.py::test_inspect_wrapped_property PASSED   [100%]\n\n================================== FAILURES ===================================\n_______________________ test_inspect_signature_property _______________________\n..\\..\\..\\..\\coding_research\\work\\toolz_buggy\\toolz\\tests\\test_inspect_args.py:467: in test_inspect_signature_property\n    assert num_required_args(AddX) == 1\nE   AssertionError: assert False == 1\nE    +  where False = num_required_args(<class 'toolz.tests.test_inspect_args.test_inspect_signature_property.<locals>.AddX'>)\n=========================== short test summary info ===========================\nFAILED toolz/tests/test_inspect_args.py::test_inspect_signature_property - As...\n======================== 1 failed, 16 passed in 0.31s =========================\n\n"
+}

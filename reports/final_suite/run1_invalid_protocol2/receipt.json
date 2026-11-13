@@ -1,0 +1,83 @@
+{
+  "run": "run1",
+  "model": "claude-spark-x2.6-local",
+  "thinking": "disabled",
+  "temperature": 0.0,
+  "max_tokens": 3000,
+  "protocol": "function-replacement",
+  "contract": "You are fixing one bug in a real repository.\nRules:\n1. Read the issue and the file excerpt; change only what the issue requires.\n2. Preserve public behavior unrelated to the bug.\n3. Return a complete, syntactically valid replacement for the target function.\n4. Every branch of a conditional that computes a value must assign that value.\n5. Keep the function's public signature and documented behavior.",
+  "contract_sha256": "59ae47551fd8584b8e9fc3aa8351a7b0f9c96b24d4f05fc17583124e1208b523",
+  "system": "You are a senior Python engineer fixing a bug in a real open-source repository. Return the complete replacement function in one ```python code block. Do not include prose or explanation.",
+  "system_sha256": "a27b8c0187460571d65608283c8e213152343dd2e5abc3bede518e33eed95171",
+  "per_repo": {
+    "boltons": {
+      "passed": 2,
+      "cases": 17,
+      "failed": [
+        "basic_epoch",
+        "dt_to_timestamp_fraction",
+        "frac_1_digit_5",
+        "frac_2_digits_05",
+        "frac_3_digits_851",
+        "frac_4_digits_0001",
+        "frac_6_digits_000001",
+        "frac_leading_zero_051",
+        "frac_overprecise_truncates",
+        "isoformat_default",
+        "isoformat_microseconds",
+        "isoformat_milliseconds",
+        "tz_aware_isoformat_roundtrip",
+        "tz_offset_plus_0530",
+        "tz_zulu"
+      ],
+      "apply_ok": true,
+      "touched": [
+        "isoparse"
+      ]
+    },
+    "toolz": {
+      "passed": 4,
+      "cases": 17,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_func_keyword",
+        "toolz/tests/test_inspect_args.py::test_has_keywords",
+        "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+        "toolz/tests/test_inspect_args.py::test_has_varargs",
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_is_arity",
+        "toolz/tests/test_inspect_args.py::test_is_partial",
+        "toolz/tests/test_inspect_args.py::test_is_valid",
+        "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+        "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_num_required_args"
+      ],
+      "apply_ok": true,
+      "touched": [
+        "_check_sigspec"
+      ]
+    },
+    "more-itertools": {
+      "passed": 16,
+      "cases": 16,
+      "failed": [],
+      "apply_ok": true,
+      "touched": [
+        "split_into"
+      ]
+    }
+  },
+  "total_passed": 22,
+  "total_cases": 50,
+  "prompt_sha256": {
+    "boltons": "8d697129954318d9f161a4c5a75b204aa007d41ce721ef64f62c28deb68f3681",
+    "toolz": "31563fa4adcb6c786cf248bea7119abac3f9a25d459c7121b4f2d231ee02f32d",
+    "more-itertools": "4c55380c350c625ffb98f9f756349d528ec4eed2218b6a19d4909427ba4be556"
+  },
+  "function_sha256": {
+    "boltons": "753a5c991de7201c4a3e39de97a30e5b63d2ab71209d3ef426c848395e148e14",
+    "toolz": "b0260eeb664b33f83ac06d5688bed40dc2a66f601f75dea7a7337267f92959f1",
+    "more-itertools": "1a761a957e64ca872a425724e6a89ff2cca6cebda0b5b60df8366cd5bcbbcaa6"
+  }
+}

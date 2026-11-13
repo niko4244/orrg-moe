@@ -1,0 +1,120 @@
+{
+  "args": {
+    "seeds": 1,
+    "steps": 40,
+    "batch": 8,
+    "seq": 128,
+    "lr": 0.002,
+    "hidden": 128,
+    "inter": 256,
+    "layers": 2,
+    "heads": 4,
+    "kv_heads": 4,
+    "max_bytes": 2000000,
+    "out": "experiments/results/t1_smoke.json",
+    "offsets_n": 1959870
+  },
+  "corpus": {
+    "bytes": 2000000,
+    "train": 1960000,
+    "val": 40000
+  },
+  "rows": [
+    {
+      "seed": 0,
+      "inter": 256,
+      "params": 361088,
+      "steps": 40,
+      "tokens": 40960,
+      "tokens_per_param": 0.11343495214462956,
+      "seconds": 2.0377771854400635,
+      "seconds_per_step": 0.050944429636001584,
+      "tokens_per_second": 20100.33299649224,
+      "trace": [
+        {
+          "step": 10,
+          "fraction": 0.25,
+          "val": 3.457431733608246,
+          "train": 4.475584173202515,
+          "tokens": 10240
+        },
+        {
+          "step": 20,
+          "fraction": 0.5,
+          "val": 3.2180031736691794,
+          "train": 3.877683734893799,
+          "tokens": 20480
+        },
+        {
+          "step": 40,
+          "fraction": 1.0,
+          "val": 3.193890313307444,
+          "train": 3.5303103268146514,
+          "tokens": 40960
+        }
+      ],
+      "final_val": 3.193890313307444,
+      "final_train": 3.5303103268146514,
+      "train_val_gap": 0.3364200135072073,
+      "arm": "dense"
+    },
+    {
+      "seed": 0,
+      "inter": 384,
+      "params": 459392,
+      "steps": 40,
+      "tokens": 40960,
+      "tokens_per_param": 0.08916132627472834,
+      "seconds": 0.9093236923217773,
+      "seconds_per_step": 0.022733092308044434,
+      "tokens_per_second": 45044.46584407889,
+      "trace": [
+        {
+          "step": 10,
+          "fraction": 0.25,
+          "val": 3.4051300485928855,
+          "train": 4.423630738258362,
+          "tokens": 10240
+        },
+        {
+          "step": 20,
+          "fraction": 0.5,
+          "val": 3.213483532269796,
+          "train": 3.8426794528961183,
+          "tokens": 20480
+        },
+        {
+          "step": 40,
+          "fraction": 1.0,
+          "val": 3.190406560897827,
+          "train": 3.5111979126930235,
+          "tokens": 40960
+        }
+      ],
+      "final_val": 3.190406560897827,
+      "final_train": 3.5111979126930235,
+      "train_val_gap": 0.32079135179519636,
+      "arm": "wide"
+    }
+  ],
+  "paired": {
+    "n": 1,
+    "per_seed": {
+      "0": {
+        "wide": 3.190406560897827,
+        "dense": 3.193890313307444,
+        "delta": -0.003483752409616958
+      }
+    },
+    "deltas": [
+      -0.003483752409616958
+    ],
+    "mean": -0.003483752409616958,
+    "sd": NaN,
+    "two_sigma": NaN,
+    "ci95": null,
+    "gate_threshold": 0.005,
+    "gate_pass": false
+  },
+  "seconds": 11.418160915374756
+}

@@ -1,0 +1,85 @@
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. The diff must apply cleanly to the repository at the stated path.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Return only the diff, no prose or fences.
+
+## Issue
+
+`split_into` returns chunks that are one item too short.
+
+`list(split_into([1, 2, 3, 4, 5, 6, 7, 8, 9], [2, 3, 4]))` returns
+`[[1], [3, 4], [6, 7, 8]]` instead of `[[1, 2], [3, 4, 5], [6, 7, 8, 9]]`.
+Each requested size must produce exactly that many items (fewer only when the
+iterable is exhausted), a `None` size must consume all remaining items, and
+the existing behavior for empty inputs, bool sizes, and invalid sizes must be
+preserved.
+
+## Repository context
+
+Repository: more-itertools
+File: more_itertools/more.py
+
+```python
+1741|         buf.append(next_item)
+1742|         cur_item = next_item
+1743| 
+1744|     yield buf
+1745| 
+1746| 
+1747| def split_into(iterable, sizes):
+1748|     """Yield a list of sequential items from *iterable* of length 'n' for each
+1749|     integer 'n' in *sizes*.
+1750| 
+1751|         >>> list(split_into([1,2,3,4,5,6], [1,2,3]))
+1752|         [[1], [2, 3], [4, 5, 6]]
+1753| 
+1754|     If the sum of *sizes* is smaller than the length of *iterable*, then the
+1755|     remaining items of *iterable* will not be returned.
+1756| 
+1757|         >>> list(split_into([1,2,3,4,5,6], [2,3]))
+1758|         [[1, 2], [3, 4, 5]]
+1759| 
+1760|     If the sum of *sizes* is larger than the length of *iterable*, fewer items
+1761|     will be returned in the iteration that overruns the *iterable* and further
+1762|     lists will be empty:
+1763| 
+1764|         >>> list(split_into([1,2,3,4], [1,2,3,4]))
+1765|         [[1], [2, 3], [4], []]
+1766| 
+1767|     When a ``None`` object is encountered in *sizes*, the returned list will
+1768|     contain items up to the end of *iterable* the same way that
+1769|     :func:`itertools.slice` does:
+1770| 
+1771|         >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
+1772|         [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
+1773| 
+1774|     :func:`split_into` can be useful for grouping a series of items where the
+1775|     sizes of the groups are not uniform. An example would be where in a row
+1776|     from a table, multiple columns represent elements of the same feature
+1777|     (e.g. a point represented by x,y,z) but, the format is not the same for
+1778|     all columns.
+1779|     """
+1780|     # convert the iterable argument into an iterator so its contents can
+1781|     # be consumed by islice in case it is a generator
+1782|     it = iter(iterable)
+1783| 
+1784|     for size in sizes:
+1785|         if size is None:
+1786|             yield list(it)
+1787|             return
+1788|         else:
+1789|             yield list(islice(it, max(size - 1, 0)))
+1790| 
+1791| 
+1792| def padded(iterable, fillvalue=None, n=None, next_multiple=False):
+1793|     """Yield the elements from *iterable*, followed by *fillvalue*, such that
+1794|     at least *n* items are emitted.
+1795| 
+```
+
+Return only the unified diff that fixes the issue.
+
+Return the complete corrected `split_into` function in one ```python code block. Do not return a diff.

@@ -216,6 +216,103 @@ def _neuron_profiles(activations: torch.Tensor) -> torch.Tensor:
     return activations.transpose(0, 1).contiguous()
 
 
+@torch.no_grad()
+def collect_hidden_states(
+    model: nn.Module,
+    specs: list[FFNSpec],
+    batches: Iterable[Mapping],
+    *,
+    max_tokens: int = 4096,
+    seed: int = 0,
+) -> dict[str, torch.Tensor]:
+    """Sample the hidden states *entering* each FFN block.
+
+    This is the router's only input, so it is the right signal for a
+    nearest-centroid router warm start (``collect_activations`` samples the
+    post-activation states used for neuron clustering instead).
+    """
+
+    generator = torch.Generator().manual_seed(seed)
+    chunks: dict[str, list[torch.Tensor]] = {spec.name: [] for spec in specs}
+    counts: dict[str, int] = {spec.name: 0 for spec in specs}
+    handles = []
+
+    def make_hook(name: str):
+        def hook(_module, args):
+            if not args or not torch.is_tensor(args[0]):
+                return
+            tensor = args[0]
+            flat = tensor.reshape(-1, tensor.shape[-1]).detach()
+            remaining = max_tokens - counts[name]
+            if remaining <= 0:
+                return
+            if flat.shape[0] > remaining:
+                pick = torch.randperm(flat.shape[0], generator=generator)[:remaining]
+                flat = flat[pick]
+            chunks[name].append(flat.to(torch.float32).cpu())
+            counts[name] += flat.shape[0]
+
+        return hook
+
+    for spec in specs:
+        handles.append(
+            model.get_submodule(spec.name).register_forward_pre_hook(make_hook(spec.name))
+        )
+
+    was_training = model.training
+    model.eval()
+    try:
+        for batch in batches:
+            if isinstance(batch, Mapping):
+                model(**batch)
+            else:
+                model(batch)
+            if all(counts[s.name] >= max_tokens for s in specs):
+                break
+    finally:
+        for handle in handles:
+            handle.remove()
+        model.train(was_training)
+
+    return {
+        name: torch.cat(parts) if parts else torch.zeros(0, 0)
+        for name, parts in chunks.items()
+    }
+
+
+@torch.no_grad()
+def kmeans(
+    features: torch.Tensor,
+    n_clusters: int,
+    *,
+    iters: int = 12,
+    seed: int = 0,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Plain k-means over the rows of ``features``.
+
+    Returns ``(labels, centroids)``. Empty clusters keep their previous centroid
+    rather than failing, which is enough for a router warm start.
+    """
+
+    if features.numel() == 0:
+        raise ValueError("no features to cluster")
+    n = features.shape[0]
+    k = min(n_clusters, n)
+    x = features.float()
+    generator = torch.Generator().manual_seed(seed)
+    centroids = x[torch.randperm(n, generator=generator)[:k]].clone()
+
+    labels = torch.zeros(n, dtype=torch.long)
+    for _ in range(max(1, iters)):
+        distances = torch.cdist(x, centroids)
+        labels = distances.argmin(dim=1)
+        for c in range(k):
+            members = labels == c
+            if bool(members.any()):
+                centroids[c] = x[members].mean(dim=0)
+    return labels, centroids
+
+
 def index_sets_for(
     activations: torch.Tensor | None,
     intermediate: int,

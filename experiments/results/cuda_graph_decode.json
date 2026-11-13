@@ -1,0 +1,59 @@
+{
+  "segments": 60,
+  "capture": {
+    "dispatch": "RuntimeError: Cannot copy between CPU and CUDA tensors during CUDA graph capture unless the CPU tensor is pinned. Please use tensor.pin_memory() or allocate the tensor with pin_memory=True."
+  },
+  "prologue": {
+    "64": {
+      "eager_ms": 1.064575970172882,
+      "graphed_ms": 0.0790879987180233
+    },
+    "512": {
+      "eager_ms": 0.9411520063877106,
+      "graphed_ms": 0.16809599846601486
+    }
+  },
+  "grouped": {
+    "4": {
+      "grouped_ms": 1.7243840098381042,
+      "plain_ms": 0.11576000228524208
+    },
+    "8": {
+      "grouped_ms": 1.706704020500183,
+      "plain_ms": 0.07640000060200691
+    },
+    "16": {
+      "grouped_ms": 1.7046560049057007,
+      "plain_ms": 0.10292800143361092
+    },
+    "32": {
+      "grouped_ms": 1.7549279928207397,
+      "plain_ms": 0.10222400352358818
+    },
+    "64": {
+      "grouped_ms": 1.612720012664795,
+      "plain_ms": 0.1480799987912178
+    },
+    "128": {
+      "grouped_ms": 1.5602880120277405,
+      "plain_ms": 0.23761600255966187
+    }
+  },
+  "budget_64": {
+    "layer_ms": 5.156719923019409,
+    "prologue_ms": 0.9485920071601868,
+    "gemms_ms": 3.561728000640869
+  },
+  "decode": {
+    "8": {
+      "eager": 167.57256219228452,
+      "graphed": 200.69454948097982,
+      "dense": 441.7722337405591
+    },
+    "64": {
+      "eager": 1082.6311531691174,
+      "graphed": 1204.352605587938,
+      "dense": 3863.076084984803
+    }
+  }
+}

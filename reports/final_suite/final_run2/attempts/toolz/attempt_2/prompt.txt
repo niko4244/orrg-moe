@@ -1,0 +1,109 @@
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. Return a complete, syntactically valid replacement for the target function.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Keep the function's public signature and documented behavior.
+
+## Issue
+
+Signature introspection in `toolz.functoolz` is broken.
+
+`_check_sigspec` now unconditionally returns `(None, False)`, so
+`is_valid_args`, `is_partial_args`, `num_required_args`, `has_varargs`,
+`has_keywords`, and `is_arity` report that every callable is invalid. For
+example `num_required_args(lambda x: None)` returns `False` instead of `1`.
+
+Restore `_check_sigspec` so it:
+1. accepts an already-supplied `inspect.Signature`;
+2. otherwise resolves `inspect.signature(func)`;
+3. falls back to the builtin signature registry via
+   `builtin_func(*builtin_args)` when no signature is available;
+4. still returns `(None, False)` for a callable whose `__signature__` is
+   present but invalid.
+
+Do not change the public helpers.
+
+## Current implementation of `_check_sigspec`
+
+This is the version that produced the results below:
+
+```python
+def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+    if sigspec is not None:
+        try:
+            return sigspec, True
+        except (TypeError, ValueError):
+            return None, False
+
+    try:
+        sig = inspect.signature(func)
+    except (ValueError, TypeError):
+        try:
+            sig = builtin_func(*builtin_args)
+        except (TypeError, ValueError):
+            return None, False
+
+    return sig, True
+
+```
+
+## Test results from that implementation
+
+5/17 cases passed. Failing cases:
+- `toolz/tests/test_inspect_args.py::test_has_keywords`
+- `toolz/tests/test_inspect_args.py::test_has_unknown_args`
+- `toolz/tests/test_inspect_args.py::test_has_varargs`
+- `toolz/tests/test_inspect_args.py::test_inspect_signature_property`
+- `toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3`
+- `toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3`
+- `toolz/tests/test_inspect_args.py::test_is_arity`
+- `toolz/tests/test_inspect_args.py::test_is_partial`
+- `toolz/tests/test_inspect_args.py::test_is_valid`
+- `toolz/tests/test_inspect_args.py::test_is_valid_curry`
+- `toolz/tests/test_inspect_args.py::test_is_valid_py3`
+- `toolz/tests/test_inspect_args.py::test_num_required_args`
+
+Exact outcomes:
+- `test_is_valid`: assert True is False
+- `test_is_valid_py3`: assert True is False
+- `test_is_partial`: assert True is False
+- `test_is_valid_curry`: assert True is False
+- `test_has_unknown_args`: assert True is False
+- `test_num_required_args`: AttributeError: 'int' object has no attribute 'parameters'
+- `test_has_keywords`: AttributeError: 'bool' object has no attribute 'parameters'
+- `test_has_varargs`: AttributeError: 'bool' object has no attribute 'parameters'
+- `test_is_arity`: AttributeError: 'bool' object has no attribute 'parameters'
+- `test_introspect_curry_valid_py3`: assert True is False
+- `test_introspect_curry_partial_py3`: assert True is False
+- `test_inspect_signature_property`: AssertionError: assert True is False
+
+Direct helper checks (actual vs expected):
+- num_required_args(map): raised AttributeError: 'int' object has no attribute 'parameters'
+- num_required_args(dict): actual True, expected None
+- has_keywords(int): raised AttributeError: 'bool' object has no attribute 'parameters'
+- has_varargs(map): raised AttributeError: 'bool' object has no attribute 'parameters'
+- num_required_args(Bad()): actual True, expected False
+
+## Repair hint
+
+Use this control flow exactly, inside the required function definition:
+
+```python
+if sigspec is None:
+    try:
+        sigspec = inspect.signature(func)
+    except (ValueError, TypeError) as e:
+        sigspec = e
+if isinstance(sigspec, ValueError):
+    return None, builtin_func(*builtin_args)
+if not isinstance(sigspec, inspect.Signature):
+    return None, False
+return sigspec, None
+```
+Do not replace the caught exception with None, and never put a bool in the first slot.
+
+## Repair task
+
+Diagnose the root cause of every listed failure. Return a complete corrected `_check_sigspec` function in one ```python code block. Keep the parts that already pass working, and do not return a diff. Re-check the listed failures against your new implementation before returning.

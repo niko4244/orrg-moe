@@ -1,0 +1,14 @@
+[
+  {
+    "repo": "C:\\Users\\nikma\\AppData\\Local\\Temp\\spark-r5v2-public-git-discovery-20261111\\go-logr--logr.git",
+    "parent": "6151b2fb393dfc6610deb5887d2895d099cc5a76",
+    "fixed": "58f101ea73be4259b3998beeeb05bc2ede045fe5",
+    "name": "go-logr"
+  },
+  {
+    "repo": "C:\\Users\\nikma\\AppData\\Local\\Temp\\spark-r5v2-public-git-discovery-20261111h\\segmentio--ksuid.git",
+    "parent": "439e86b958bb72a7d63bb41d9f31133fab1ad913",
+    "fixed": "a63498603d80cb4b9d0bed6ac888a705835d9187",
+    "name": "ksuid"
+  }
+]

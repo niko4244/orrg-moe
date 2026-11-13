@@ -1,0 +1,13 @@
+```python
+def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+    if sigspec is None:
+        try:
+            sigspec = inspect.signature(func)
+        except (ValueError, TypeError) as e:
+            sigspec = e
+    if isinstance(sigspec, ValueError):
+        return None, builtin_func(*builtin_args)
+    if not isinstance(sigspec, inspect.Signature):
+        return None, False
+    return sigspec, None
+```

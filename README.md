@@ -98,7 +98,7 @@ defined in a way that is measurable.
 
 ## Verified in this repository
 
-`python -m pytest tests/test_orrg.py -q` → **34 passed**
+`python -m pytest tests -q` → **47 passed**
 
 * Lossless conversion across 5 architectures (`carve error < 1e-5`, logits
   `< 1e-5`).
@@ -128,8 +128,14 @@ tests/           pytest suite
 experiments/     smoke.py (numerical checks), toy_scale.py (head-to-head run),
                  p1_real.py + p1_report.py (real-checkpoint rung),
                  p1_long_report.py (long-rung trajectories)
-reports/         P1-RUNG.md, P1-LONG.md, P1-ORTHO.md, P1-MAGNITUDE.md, P1-INTERACTION.md
-spec/            ORRG-SPEC-v3.md — scale-up protocol and budgets
+reports/         P1-RUNG.md, P1-LONG.md, P1-ORTHO.md, P1-MAGNITUDE.md, P1-INTERACTION.md,
+                 T1-CAPACITY.md (dense vs 1.5x wider: capacity pays, gate PASS),
+                 T2-REAL-CONVERSION.md (9.06B built from Qwen2.5-1.5B: KL 1.3e-3,
+                 warm-start 0.99, exactness confirmed against an fp32 control),
+                 T3-FOUR-PROBES.md (serving throughput, clustered shards, residual
+                 init dynamics, conversion-debt cliff)
+spec/            ORRG-SPEC-v3.md — measured protocol and budgets to 27B
+                 ORRG-SPEC-v4.md — 9B-A3B / 27B-A9B plan, gates, test matrix
 ```
 
 ## Measured head-to-head (toy scale, 2 seeds)
@@ -241,6 +247,22 @@ weights, optimizer and OneCycle state, and RNG are written atomically to
 skips the deterministic data stream to the saved step, so a resumed run sees
 exactly the batches the uninterrupted run would have seen. A restart costs at
 most N steps instead of the whole arm; completed arms delete their checkpoint.
+
+## Plan for 9B and 27B
+
+`spec/ORRG-SPEC-v4.md` sets both targets and the gates to reach them. Active budget
+is `A(1) = N0 + r·F` with `r = g/(s+g)`, so the seed is chosen to fit the active
+target. With the checkpoints actually on this machine:
+
+| seed | geometry | total | A@k=1 | lossless |
+|---|---|---|---|---|
+| Qwen2.5-1.5B (1.544B) | `s4 g4 v14` | 9.06B | 2.12B | yes |
+| Qwen3-1.7B (1.721B) | `s4 g4 v15` | 9.12B | 2.25B | yes |
+| Qwen3-8B (8.191B, no weights) | `s4 g4 v8` | 27.22B | 10.91B | yes |
+| Qwen3-8B, `f=0.5` | `s4 g4 v17` | 27.22B | 6.83B | no (KD) |
+
+9B is runnable losslessly from local weights; 27B-A9B needs a ~6B seed that is not
+here, and 27B-A6B becomes a KD target via `skeleton_scale=0.5`.
 
 ## Honest limitations
 

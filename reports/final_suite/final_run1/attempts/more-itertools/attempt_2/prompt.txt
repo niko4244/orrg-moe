@@ -1,0 +1,90 @@
+You are fixing one bug in a real repository.
+Rules:
+1. Read the issue and the file excerpt; change only what the issue requires.
+2. Preserve public behavior unrelated to the bug.
+3. Return a complete, syntactically valid replacement for the target function.
+4. Every branch of a conditional that computes a value must assign that value.
+5. Keep the function's public signature and documented behavior.
+
+## Issue
+
+`split_into` returns chunks that are one item too short.
+
+`list(split_into([1, 2, 3, 4, 5, 6, 7, 8, 9], [2, 3, 4]))` returns
+`[[1], [3, 4], [6, 7, 8]]` instead of `[[1, 2], [3, 4, 5], [6, 7, 8, 9]]`.
+Each requested size must produce exactly that many items (fewer only when the
+iterable is exhausted), a `None` size must consume all remaining items, and
+the existing behavior for empty inputs, bool sizes, and invalid sizes must be
+preserved.
+
+## Current implementation of `split_into`
+
+This is the version that produced the results below:
+
+```python
+def split_into(iterable, sizes):
+    """Yield a list of sequential items from *iterable* of length 'n' for each
+    integer 'n' in *sizes*.
+
+        >>> list(split_into([1,2,3,4,5,6], [1,2,3]))
+        [[1], [2, 3], [4, 5, 6]]
+
+    If the sum of *sizes* is smaller than the length of *iterable*, then the
+    remaining items of *iterable* will not be returned.
+
+        >>> list(split_into([1,2,3,4,5,6], [2,3]))
+        [[1, 2], [3, 4, 5]]
+
+    If the sum of *sizes* is larger than the length of *iterable*, fewer items
+    will be returned in the iteration that overruns the *iterable* and further
+    lists will be empty:
+
+        >>> list(split_into([1,2,3,4], [1,2,3,4]))
+        [[1], [2, 3], [4], []]
+
+    When a ``None`` object is encountered in *sizes*, the returned list will
+    contain items up to the end of *iterable* the same way that
+    :func:`itertools.slice` does:
+
+        >>> list(split_into([1,2,3,4,5,6,7,8,9,0], [2,3,None]))
+        [[1, 2], [3, 4, 5], [6, 7, 8, 9, 0]]
+
+    :func:`split_into` can be useful for grouping a series of items where the
+    sizes of the groups are not uniform. An example would be where in a row
+    from a table, multiple columns represent elements of the same feature
+    (e.g. a point represented by x,y,z) but, the format is not the same for
+    all columns.
+    """
+    # convert the iterable argument into an iterator so its contents can
+    # be consumed by islice in case it is a generator
+    it = iter(iterable)
+
+    for size in sizes:
+        if size is None:
+            yield list(it)
+            return
+        else:
+            # islice with a positive length yields exactly that many items,
+            # while islice with a negative length yields the remaining items
+            # (matching the behavior of itertools.slice).
+            yield list(islice(it, size if size > 0 else -1))
+
+```
+
+## Test results from that implementation
+
+14/16 cases passed. Failing cases:
+- `tests/test_more.py::SplitIntoTests::test_bool_in_sizes`
+- `tests/test_more.py::SplitIntoTests::test_invalid_in_sizes`
+
+Exact outcomes:
+- `SplitIntoTests.test_bool_in_sizes`: ValueError: Stop argument for islice() must be None or an integer: 0 <= x <= sys.maxsize.
+- `SplitIntoTests.test_invalid_in_sizes`: TypeError: '>' not supported between instances of 'list' and 'int'
+
+## Repair hint
+
+`False` is an int subclass with value 0, so a size of False is valid and must yield an empty chunk. Do not reject it with `isinstance(size, bool)`; only reject values that are not `int` instances. Pass the validated size directly to `islice(it, size)`; do not map a non-positive size to -1, because -1 consumes all remaining items. Validate non-integer sizes before any comparison and raise ValueError for them.
+
+## Repair task
+
+Diagnose the root cause of every listed failure. Return a complete corrected `split_into` function in one ```python code block. Keep the parts that already pass working, and do not return a diff. Re-check the listed failures against your new implementation before returning.

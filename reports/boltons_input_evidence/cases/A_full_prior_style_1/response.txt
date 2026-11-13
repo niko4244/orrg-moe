@@ -1,0 +1,462 @@
+```diff
+--- a/boltons/timeutils.py
++++ b/boltons/timeutils.py
+@@ -138,6 +138,10 @@ def isoparse(iso_str):
+     tzinfo = None
+     tz_match = _ISO_TZ_RE.search(iso_str)
+     if tz_match:
+         iso_str = iso_str[:tz_match.start()]
+         tz = tz_match.group(1)
+         if tz == 'Z':
+             tzinfo = timezone.utc
+         else:
+             digits = tz[1:].replace(':', '').split('.')[0]
+             hh, mm = int(digits[0:2]), int(digits[2:4])
+             ss = int(digits[4:6] or 0)
+             sign = -1 if tz[0] == '-' else 1
+             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
++        if '.' in iso_str:
++            frac = iso_str.split('.')[1]
++            if len(frac) > 6:
++                frac = frac[:6]
++            microsecond = int(frac.ljust(6, '0') or 0)
++            dt_args = dt_args[:6] + [microsecond]
++        else:
++            dt_args = dt_args[:6]
+     parts = _NONDIGIT_RE.split(iso_str)
+     dt_args = [int(p) for p in parts]
+     return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Wait — the above has a bug: `dt_args` is referenced before assignment. Let me produce the correct diff.
+
+```diff
+--- a/boltons/timeutils.py
++++ b/boltons/timeutils.py
+@@ -138,6 +138,10 @@ def isoparse(iso_str):
+     tzinfo = None
+     tz_match = _ISO_TZ_RE.search(iso_str)
+     if tz_match:
+         iso_str = iso_str[:tz_match.start()]
+         tz = tz_match.group(1)
+         if tz == 'Z':
+             tzinfo = timezone.utc
+         else:
+             digits = tz[1:].replace(':', '').split('.')[0]
+             hh, mm = int(digits[0:2]), int(digits[2:4])
+             ss = int(digits[4:6] or 0)
+             sign = -1 if tz[0] == '-' else 1
+             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
++        if '.' in iso_str:
++            frac = iso_str.split('.')[1]
++            if len(frac) > 6:
++                frac = frac[:6]
++            microsecond = int(frac.ljust(6, '0') or 0)
++            dt_args = dt_args[:6] + [microsecond]
++        else:
++            dt_args = dt_args[:6]
+     parts = _NONDIGIT_RE.split(iso_str)
+     dt_args = [int(p) for p in parts]
+     return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Hmm, but `dt_args` is still assigned after the if/else, so the `dt_args = dt_args[:6]` would fail. Let me restructure properly.
+
+Correct approach: compute dt_args from parts, then handle fractional seconds.
+
+```diff
+--- a/boltons/timeutils.py
++++ b/boltons/timeutils.py
+@@ -138,6 +138,10 @@ def isoparse(iso_str):
+     tzinfo = None
+     tz_match = _ISO_TZ_RE.search(iso_str)
+     if tz_match:
+         iso_str = iso_str[:tz_match.start()]
+         tz = tz_match.group(1)
+         if tz == 'Z':
+             tzinfo = timezone.utc
+         else:
+             digits = tz[1:].replace(':', '').split('.')[0]
+             hh, mm = int(digits[0:2]), int(digits[2:4])
+             ss = int(digits[4:6] or 0)
+             sign = -1 if tz[0] == '-' else 1
+             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
++        if '.' in iso_str:
++            frac = iso_str.split('.')[1]
++            if len(frac) > 6:
++                frac = frac[:6]
++            microsecond = int(frac.ljust(6, '0') or 0)
++            dt_args = dt_args[:6] + [microsecond]
++        else:
++            dt_args = dt_args[:6]
+     parts = _NONDIGIT_RE.split(iso_str)
+     dt_args = [int(p) for p in parts]
+     return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Still wrong. Let me write the actual correct diff.
+
+The original code:
+```python
+    parts = _NONDIGIT_RE.split(iso_str)
+    dt_args = [int(p) for p in parts]
+    return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+I need to insert fractional handling. Best:
+
+```python
+    parts = _NONDIGIT_RE.split(iso_str)
+    dt_args = [int(p) for p in parts]
+    if '.' in iso_str:
+        frac = iso_str.split('.')[1]
+        if len(frac) > 6:
+            frac = frac[:6]
+        microsecond = int(frac.ljust(6, '0') or 0)
+        dt_args = dt_args[:6] + [microsecond]
+    return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Wait, but `_NONDIGIT_RE.split` splits on non-digits. For `1970-01-01T00:00:00.851`, the split gives `['1970', '01', '01', 'T', '00', '00', '00', '.851']`? No — `.` is non-digit, so `.851` becomes a single token `.851`. Then `int('.851')` would fail. Hmm, but the original code works for `1970-01-01T00:00:00.851`? Let's check: `_NONDIGIT_RE.split('1970-01-01T00:00:00.851')` → `['1970', '01', '01', 'T', '00', '00', '00', '.851']`. `int('.851')` raises ValueError. So the original code indeed fails on fractional seconds — that's the bug.
+
+So the fix must handle the fractional part. The docstring shows expected output `datetime.datetime(1970, 1, 1, 0, 0, 0, 851000)`.
+
+Approach: strip the fractional part before splitting, or handle it separately.
+
+Better approach: remove the fractional part from iso_str before splitting, then append microsecond.
+
+```python
+    parts = _NONDIGIT_RE.split(iso_str)
+    dt_args = [int(p) for p in parts]
+    if '.' in iso_str:
+        frac = iso_str.split('.')[1]
+        if len(frac) > 6:
+            frac = frac[:6]
+        microsecond = int(frac.ljust(6, '0') or 0)
+        dt_args = dt_args[:6] + [microsecond]
+    return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+But the split includes `.851` as a token. So we need to strip the fractional part from iso_str before splitting.
+
+Let me restructure:
+
+```python
+    if '.' in iso_str:
+        iso_str = iso_str.split('.')[0]
+        frac = iso_str.split('.')[1]
+        if len(frac) > 6:
+            frac = frac[:6]
+        microsecond = int(frac.ljust(6, '0') or 0)
+    else:
+        microsecond = 0
+    parts = _NONDIGIT_RE.split(iso_str)
+    dt_args = [int(p) for p in parts]
+    if microsecond:
+        dt_args = dt_args[:6] + [microsecond]
+    return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Hmm, but careful: `iso_str.split('.')[0]` — if there's a timezone with `.`? The regex `_ISO_TZ_RE` allows `[+-]\d{2}:?\d{2}(?::?\d{2}(?:\.\d+)?)?` — so timezone can contain a `.` in seconds. But we strip tz first, so iso_str at this point has no tz. Actually wait, the tz stripping happens inside `if tz_match:`. After that, iso_str is the date/time part. So no tz. Good.
+
+But careful: what if the fractional part is in the timezone? Not possible after stripping.
+
+Actually, simpler and safer: split on '.' only if there's a '.' in the remaining string. Let me write:
+
+```python
+    if '.' in iso_str:
+        iso_str, frac = iso_str.split('.', 1)
+        if len(frac) > 6:
+            frac = frac[:6]
+        microsecond = int(frac.ljust(6, '0') or 0)
+    else:
+        microsecond = 0
+    parts = _NONDIGIT_RE.split(iso_str)
+    dt_args = [int(p) for p in parts]
+    if microsecond:
+        dt_args = dt_args[:6] + [microsecond]
+    return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Wait, but `iso_str.split('.', 1)` — if iso_str contains '.' only in fractional part, fine. But what about the case where the original string has no '.'? Then microsecond=0 and dt_args has 6 elements. Good.
+
+Hmm, but there's a subtlety: `int(frac.ljust(6, '0') or 0)`. If frac is empty string, `''.ljust(6,'0')` = '000000', int = 0. Fine. `or 0` handles empty frac. Actually `''.ljust(6,'0')` is never empty. So `or 0` is unnecessary but harmless. Actually if frac is '' then ljust gives '000000'. So fine.
+
+But wait — what about `.123456789`? frac = '123456789', len > 6 → frac = '123456', microsecond = 123456. Good, truncates.
+
+What about `.851`? frac='851', ljust(6,'0') = '851000', microsecond=851000. Good.
+
+Now, does the diff need to handle the case where dt_args has fewer than 6 elements? E.g., date-only string '1970-01-01' — but isoparse is for datetime. The original code would produce datetime with 3 args. Not our concern.
+
+Now, the rule "Every branch of a conditional that computes a value must assign that value." This refers to the conditional branches. My code: `if '.' in iso_str: ... else: microsecond = 0`. Both assign microsecond. Good.
+
+Let me also double check the `dt_args = dt_args[:6] + [microsecond]` — if dt_args has fewer than 6 elements, slicing works fine.
+
+Actually, maybe simpler to not slice but just append? No, because dt_args includes the fractional token if we didn't strip. We strip, so dt_args has exactly 6 elements for datetime strings. But to be safe, slicing is fine.
+
+Hmm, but actually there's a concern: what if the string is like `1970-01-01T00:00:00.851+05:30`? We strip tz first, so iso_str becomes `1970-01-01T00:00:00.851`. Then split on '.' → iso_str = `1970-01-01T00:00:00`, frac = `851`. Good.
+
+Now let me write the final diff with correct hunk range. The original file lines 138-154:
+
+```
+138|     tzinfo = None
+139|     tz_match = _ISO_TZ_RE.search(iso_str)
+140|     if tz_match:
+141|         iso_str = iso_str[:tz_match.start()]
+142|         tz = tz_match.group(1)
+143|         if tz == 'Z':
+144|             tzinfo = timezone.utc
+145|         else:
+146|             digits = tz[1:].replace(':', '').split('.')[0]
+147|             hh, mm = int(digits[0:2]), int(digits[2:4])
+148|             ss = int(digits[4:6] or 0)
+149|             sign = -1 if tz[0] == '-' else 1
+150|             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+151|                                                seconds=ss))
+152|     parts = _NONDIGIT_RE.split(iso_str)
+153|     dt_args = [int(p) for p in parts]
+154|     return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+I'll insert after line 151 (the tzinfo assignment) and modify lines 152-154.
+
+Hunk: `@@ -138,6 +138,14 @@` — let me count. Original lines from 138 to 154 = 17 lines. But I only need to change a subset. Let me make the hunk cover lines 138-154 (17 lines) with additions.
+
+Actually, let me structure the diff:
+
+```
+--- a/boltons/timeutils.py
++++ b/boltons/timeutils.py
+@@ -138,6 +138,14 @@ def isoparse(iso_str):
+     tzinfo = None
+     tz_match = _ISO_TZ_RE.search(iso_str)
+     if tz_match:
+         iso_str = iso_str[:tz_match.start()]
+         tz = tz_match.group(1)
+         if tz == 'Z':
+             tzinfo = timezone.utc
+         else:
+             digits = tz[1:].replace(':', '').split('.')[0]
+             hh, mm = int(digits[0:2]), int(digits[2:4])
+             ss = int(digits[4:6] or 0)
+             sign = -1 if tz[0] == '-' else 1
+             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
++        if '.' in iso_str:
++            iso_str, frac = iso_str.split('.', 1)
++            if len(frac) > 6:
++                frac = frac[:6]
++            microsecond = int(frac.ljust(6, '0') or 0)
++        else:
++            microsecond = 0
+     parts = _NONDIGIT_RE.split(iso_str)
+     dt_args = [int(p) for p in parts]
+-    return datetime(*dt_args, tzinfo=tzinfo)
++    if microsecond:
++        dt_args = dt_args[:6] + [microsecond]
++    return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Wait, but the `if '.' in iso_str:` block is inside the `if tz_match:` block (indented 8 spaces). That's fine — it's inside the tz handling. But is it semantically right? The fractional handling should apply regardless of tz. But since tz is stripped first, it's fine to put it inside. However, if there's no tz_match, the fractional handling wouldn't run! That's a bug.
+
+So I should put the fractional handling outside the `if tz_match:` block. Let me restructure:
+
+```python
+    tzinfo = None
+    tz_match = _ISO_TZ_RE.search(iso_str)
+    if tz_match:
+        iso_str = iso_str[:tz_match.start()]
+        tz = tz_match.group(1)
+        if tz == 'Z':
+            tzinfo = timezone.utc
+        else:
+            digits = tz[1:].replace(':', '').split('.')[0]
+            hh, mm = int(digits[0:2]), int(digits[2:4])
+            ss = int(digits[4:6] or 0)
+            sign = -1 if tz[0] == '-' else 1
+            tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                               seconds=ss))
+    if '.' in iso_str:
+        iso_str, frac = iso_str.split('.', 1)
+        if len(frac) > 6:
+            frac = frac[:6]
+        microsecond = int(frac.ljust(6, '0') or 0)
+    else:
+        microsecond = 0
+    parts = _NONDIGIT_RE.split(iso_str)
+    dt_args = [int(p) for p in parts]
+    if microsecond:
+        dt_args = dt_args[:6] + [microsecond]
+    return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+This is correct. Now the hunk. Original lines 138-154. I'll produce:
+
+```
+@@ -138,17 +138,25 @@ def isoparse(iso_str):
+     tzinfo = None
+     tz_match = _ISO_TZ_RE.search(iso_str)
+     if tz_match:
+         iso_str = iso_str[:tz_match.start()]
+         tz = tz_match.group(1)
+         if tz == 'Z':
+             tzinfo = timezone.utc
+         else:
+             digits = tz[1:].replace(':', '').split('.')[0]
+             hh, mm = int(digits[0:2]), int(digits[2:4])
+             ss = int(digits[4:6] or 0)
+             sign = -1 if tz[0] == '-' else 1
+             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
++    if '.' in iso_str:
++        iso_str, frac = iso_str.split('.', 1)
++        if len(frac) > 6:
++            frac = frac[:6]
++        microsecond = int(frac.ljust(6, '0') or 0)
++    else:
++        microsecond = 0
+     parts = _NONDIGIT_RE.split(iso_str)
+     dt_args = [int(p) for p in parts]
+-    return datetime(*dt_args, tzinfo=tzinfo)
++    if microsecond:
++        dt_args = dt_args[:6] + [microsecond]
++    return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Hunk header: original 17 lines (138-154), new 25 lines. Let me count new: 17 original lines + 9 added (the if/else block: 6 lines for if, 1 for else, 1 for microsecond=0... let me count added lines:
+
+```
++    if '.' in iso_str:
++        iso_str, frac = iso_str.split('.', 1)
++        if len(frac) > 6:
++            frac = frac[:6]
++        microsecond = int(frac.ljust(6, '0') or 0)
++    else:
++        microsecond = 0
+```
+That's 7 added lines.
+
+Then:
+```
+-    return datetime(*dt_args, tzinfo=tzinfo)
++    if microsecond:
++        dt_args = dt_args[:6] + [microsecond]
++    return datetime(*dt_args, tzinfo=tzinfo)
+```
+That's 1 removed, 3 added.
+
+Total added = 7 + 3 = 10. Removed = 1. New count = 17 + 10 - 1 = 26. Hmm let me recount.
+
+Original lines in hunk: 17 (138 through 154).
+Added lines: 7 + 3 = 10.
+Removed lines: 1.
+New total = 17 + 10 - 1 = 26.
+
+So `@@ -138,17 +138,26 @@`.
+
+Let me verify the line numbers. Line 138 is `tzinfo = None`. Line 154 is `return datetime(...)`. 154-138+1 = 17. Yes.
+
+New: 138 + 26 - 1 = 157. So new lines 138-157.
+
+Let me double-check the added block indentation. The `if '.' in iso_str:` is at 4 spaces (module-level function body). Yes, since it's after the `if tz_match:` block which ends at 4 spaces.
+
+Wait, the original line 152 `parts = ...` is at 4 spaces. So my added `if '.' in iso_str:` at 4 spaces is consistent.
+
+Now, one concern: `iso_str, frac = iso_str.split('.', 1)` — if iso_str has no '.', we don't reach this. If it has '.', split with maxsplit=1 gives 2 parts. Good.
+
+Another concern: `frac.ljust(6, '0')` — if frac is e.g. '851', gives '851000'. If frac is '123456789', we truncate to '123456' first, then ljust gives '123456'. Good. If frac is '12345', ljust gives '1234500'. Good.
+
+Edge: frac could be something like '1234567' → truncate to '123456'. Good.
+
+What about negative? Not applicable.
+
+Now, does `int(frac.ljust(6, '0') or 0)` handle frac being empty? If iso_str = '1970-01-01T00:00:00.' then split gives frac = '' → ljust(6,'0') = '000000' → int 0. Fine.
+
+Now, the rule about "Every branch of a conditional that computes a value must assign that value." The `if '.' in iso_str:` / `else:` both assign microsecond. Good. The `if len(frac) > 6:` doesn't compute a value that's used... actually it assigns frac. Fine.
+
+Hmm, but is there a concern that `dt_args = dt_args[:6] + [microsecond]` when dt_args has fewer than 6 elements? For datetime strings it's 6. Fine.
+
+Actually, wait. Let me reconsider: should I use `dt_args[:6]` or just append? If the string is a datetime with 6 components, dt_args has 6. If somehow fewer, slicing is safe. Keep slicing.
+
+Let me also double check: does the original code's `_NONDIGIT_RE.split` on `1970-01-01T00:00:00` give `['1970','01','01','T','00','00','00']` → 7 elements, int each → 7 args. datetime accepts 7 args (year, month, day, hour, minute, second, microsecond). Good.
+
+Now let me verify the diff applies cleanly. The context lines must match exactly. Let me re-read the provided excerpt lines 138-154:
+
+```
+138|     tzinfo = None
+139|     tz_match = _ISO_TZ_RE.search(iso_str)
+140|     if tz_match:
+141|         iso_str = iso_str[:tz_match.start()]
+142|         tz = tz_match.group(1)
+143|         if tz == 'Z':
+144|             tzinfo = timezone.utc
+145|         else:
+146|             digits = tz[1:].replace(':', '').split('.')[0]
+147|             hh, mm = int(digits[0:2]), int(digits[2:4])
+148|             ss = int(digits[4:6] or 0)
+149|             sign = -1 if tz[0] == '-' else 1
+150|             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+151|                                                seconds=ss))
+152|     parts = _NONDIGIT_RE.split(iso_str)
+153|     dt_args = [int(p) for p in parts]
+154|     return datetime(*dt_args, tzinfo=tzinfo)
+```
+
+Yes matches. Good.
+
+Now produce final diff. No prose, no fences.
+
+Let me write it carefully with correct @@ range.
+
+Actually, I want to double check the hunk header counts once more.
+
+Old side: lines 138-154 inclusive = 17 lines.
+New side: 17 + 10 added - 1 removed = 26 lines.
+
+So `@@ -138,17 +138,26 @@`.
+
+Let me write the final answer.
+
+Actually, let me reconsider whether to include the `if microsecond:` guard. If microsecond is 0 (no fraction), we don't append, so dt_args stays 6 elements. Good. If microsecond nonzero, append. Good.
+
+Alternatively, always append microsecond (even 0) — but then datetime would get 7 args with microsecond=0, which is fine too. But guard is cleaner. Keep guard.
+
+One more consideration: the issue says "Inputs with more than six fractional digits ... raise ValueError instead of truncating to microsecond precision." Our truncation handles that. Good.
+
+Also "isoparse('1970-01-01T00:00:00.851') returns a datetime whose microsecond field is 851 instead of 851000". Our fix gives 851000. Good.
+
+Now final diff.</think>```diff
+--- a/boltons/timeutils.py
++++ b/boltons/timeutils.py
+@@ -138,17 +138,26 @@ def isoparse(iso_str):
+     tzinfo = None
+     tz_match = _ISO_TZ_RE.search(iso_str)
+     if tz_match:
+         iso_str = iso_str[:tz_match.start()]
+         tz = tz_match.group(1)
+         if tz == 'Z':
+             tzinfo = timezone.utc
+         else:
+             digits = tz[1:].replace(':', '').split('.')[0]
+             hh, mm = int(digits[0:2]), int(digits[2:4])
+             ss = int(digits[4:6] or 0)
+             sign = -1 if tz[0] == '-' else 1
+             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                seconds=ss))
++    if '.' in iso_str:
++        iso_str, frac = iso_str.split('.', 1)
++        if len(frac) > 6:
++            frac = frac[:6]
++        microsecond = int(frac.ljust(6, '0') or 0)
++    else:
++        microsecond = 0
+     parts = _NONDIGIT_RE.split(iso_str)
+     dt_args = [int(p) for p in parts]
+-    return datetime(*dt_args, tzinfo=tzinfo)
++    if microsecond:
++        dt_args = dt_args[:6] + [microsecond]
++    return datetime(*dt_args, tzinfo=tzinfo)
+```

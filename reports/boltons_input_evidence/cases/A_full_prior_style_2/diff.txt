@@ -1,0 +1,13 @@
+--- a/boltons/timeutils.py
++++ b/boltons/timeutils.py
+@@ -146,6 +146,10 @@ def isoparse(iso_str):
+             digits = tz[1:].replace(':', '').split('.')[0]
+             hh, mm = int(digits[0:2]), int(digits[2:4])
+             ss = int(digits[4:6] or 0)
++            tz_seconds = int(digits[6:8] or 0)
++            tz_seconds = tz_seconds * 60
++            tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
++                                                seconds=ss + tz_seconds))
+             sign = -1 if tz[0] == '-' else 1
+             tzinfo = timezone(sign * timedelta(hours=hh, minutes=mm,
+                                                 seconds=ss))

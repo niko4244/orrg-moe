@@ -62,14 +62,49 @@ class ModelShape:
     def dense_params(self) -> int:
         return self.non_ffn_params + self.layers * self.ffn_params_per_layer
 
-    def converted(self, shared: int, groups: int, variants: int, top_residuals: int = 1) -> dict:
-        """Total and active parameters for an ORRG carving."""
+    def converted(
+        self,
+        shared: int,
+        groups: int,
+        variants: int,
+        top_residuals: int = 1,
+        *,
+        skeleton_scale: float = 1.0,
+        expert_width_ratio: float = 1.0,
+        expert_mode: str = "additive",
+    ) -> dict:
+        """Total and active parameters for an ORRG carving.
 
-        n_shards = shared + groups * variants
-        # The skeleton tiles the seed exactly: its shard width is inter/(shared+groups).
-        shard_width = self.intermediate / (shared + groups)
-        total_width = shard_width * n_shards
-        active_width = shard_width * (shared + groups * (1 + top_residuals))
+        ``skeleton_scale`` is the fraction of the intermediate axis the skeleton
+        tiles (1.0 = lossless), ``expert_width_ratio`` is an expert's width as a
+        fraction of its group shard (1.0 = a copy), and ``expert_mode`` selects
+        additive residuals or one-variant-per-group replacement.
+
+        The geometry guard mirrors ``MoEConfig``: the planner must not report a
+        conversion the converter refuses, so a ratio above 1 (an expert wider
+        than its group shard) is rejected here as well.
+        """
+
+        if not (0.0 < expert_width_ratio <= 1.0):
+            raise ValueError(
+                "expert_width_ratio must be in (0, 1], got "
+                f"{expert_width_ratio!r}: an expert is a copy of at most one group "
+                "shard, so the converter cannot build this geometry"
+            )
+        shard_width = self.intermediate * skeleton_scale / (shared + groups)
+        expert_width = shard_width * expert_width_ratio
+        # Both widths are one multiply by a shard count, so the counts are folded
+        # into a factor instead of adding separately-rounded products. At
+        # ratio=1 the factor is the same integer the v3 closed form used, which
+        # is why the reported integers stay bit-identical at the default.
+        skeleton = shared + groups
+        total_width = shard_width * (skeleton + groups * (variants - 1) * expert_width_ratio)
+        if expert_mode == "replace":
+            # One variant per group replaces its base, and no expert is wider than
+            # a base, so exactly the skeleton is active -- independent of k.
+            active_width = shard_width * skeleton
+        else:
+            active_width = shard_width * (skeleton + groups * top_residuals * expert_width_ratio)
         ffn_total = self.layers * self.ffn_multiplier * self.hidden * total_width
         ffn_active = self.layers * self.ffn_multiplier * self.hidden * active_width
         total = int(self.non_ffn_params + ffn_total)
@@ -78,8 +113,14 @@ class ModelShape:
             "shared": shared,
             "groups": groups,
             "variants": variants,
-            "n_shards": n_shards,
+            "n_shards": skeleton + groups * (variants - 1),
             "shard_width": shard_width,
+            "skeleton_width": self.intermediate * skeleton_scale,
+            "expert_width": expert_width,
+            "skeleton_scale": skeleton_scale,
+            "expert_width_ratio": expert_width_ratio,
+            "expert_mode": expert_mode,
+            "lossless": skeleton_scale == 1.0,
             "total_params": total,
             "active_params": active,
             "active_fraction": active / total,
@@ -93,9 +134,9 @@ class ModelShape:
             * 2,  # bf16 k and v
         }
 
-    def active_sweep(self, shared: int, groups: int, variants: int) -> dict[int, dict]:
+    def active_sweep(self, shared: int, groups: int, variants: int, **kwargs) -> dict[int, dict]:
         return {
-            k: self.converted(shared, groups, variants, top_residuals=k)
+            k: self.converted(shared, groups, variants, top_residuals=k, **kwargs)
             for k in range(0, variants)
         }
 
@@ -144,8 +185,8 @@ def finetune_memory_bytes(total_params: int, *, bytes_per_param: float = 16.0) -
     }
 
 
-def converted_scale(shape: ModelShape, shared: int, groups: int, variants: int) -> dict:
-    sweep = shape.active_sweep(shared, groups, variants)
+def converted_scale(shape: ModelShape, shared: int, groups: int, variants: int, **kwargs) -> dict:
+    sweep = shape.active_sweep(shared, groups, variants, **kwargs)
     return {
         "dense": {
             "params": shape.dense_params,
@@ -159,10 +200,27 @@ def converted_scale(shape: ModelShape, shared: int, groups: int, variants: int) 
 
 def format_scale(scale: dict) -> str:
     dense = scale["dense"]
+    row0 = next(iter(scale["converted"].values()))
     lines = [
         f"dense seed      : {dense['params']/1e9:8.3f} B total / active",
         f"expansion       : {scale['expansion']:8.2f} x",
         f"full finetune   : {scale['memory']['full_finetune_gb']:8.1f} GB of optimizer state",
+    ]
+    if row0.get("skeleton_scale", 1.0) != 1.0:
+        lines.append(
+            f"skeleton        : {row0['skeleton_width']:.0f} neurons "
+            f"({row0['skeleton_scale']:g}x, approximate conversion)"
+        )
+    if row0.get("expert_width_ratio", 1.0) != 1.0:
+        lines.append(
+            f"expert width    : {row0['expert_width']:.0f} neurons "
+            f"({row0['expert_width_ratio']:g}x shard)"
+        )
+    if row0.get("expert_mode", "additive") != "additive":
+        lines.append(
+            f"expert mode     : {row0['expert_mode']} (one variant per group replaces; active is flat in k)"
+        )
+    lines += [
         "",
         "k_res   total(B)   active(B)   active%   TFLOPs/token",
     ]
