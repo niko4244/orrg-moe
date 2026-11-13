@@ -26,6 +26,7 @@ import torch.nn.functional as F
 from experiments.harness import (
     DEVICE, GROUPS, HIDDEN, SHARED, VARIANTS, build_model, moe_layers,
 )
+import orrg.dispatch as dispatch_mod
 from orrg import MoEConfig, convert_model
 from orrg.dispatch import grouped_mm
 
@@ -34,20 +35,31 @@ PREFILL_SEQ, BATCH, REPS, ROUNDS = 128, 64, 5, 3
 BATCHES = (16, 32, 48, 64, 96)
 
 
+_HALVES: dict[tuple, tuple] = {}
+
+
+def split_halves(state):
+    """Contiguous halves of the stacked gate/up weights, cached by weight identity."""
+
+    halves = _HALVES.get(state._key)
+    if halves is None:
+        gate_up_w = state._stacked()[0]
+        width = gate_up_w.shape[-1] // 2
+        halves = (
+            gate_up_w[..., :width].contiguous(), gate_up_w[..., width:].contiguous(),
+        )
+        _HALVES[state._key] = halves
+    return halves
+
+
 def split_forward(state, flat):
     """The library forward with gate/up as two N=I GEMMs instead of one N=2I."""
 
     packed, offs, rows_sorted, scales_sorted = state._prepare(flat)
     tokens, n_shards = flat.shape[0], len(state.shards)
     acc = torch.float32 if flat.dtype in (torch.bfloat16, torch.float16) else flat.dtype
-    gate_up_w, down_w = state._stacked()
-    if getattr(state, "_half_key", None) != state._key:
-        width = gate_up_w.shape[-1] // 2
-        state._half = (
-            gate_up_w[..., :width].contiguous(), gate_up_w[..., width:].contiguous(),
-        )
-        state._half_key = state._key
-    gate_w, up_w = state._half
+    _, down_w = state._stacked()
+    gate_w, up_w = split_halves(state)
     gate = grouped_mm(packed, gate_w, offs)
     up = grouped_mm(packed, up_w, offs)
     out = grouped_mm(F.silu(gate) * up, down_w, offs)
@@ -81,6 +93,10 @@ def main() -> int:
                         top_residuals=k, hidden_size=HIDDEN, dispatch="fused")
         model, _ = convert_model(build_model(max_pos=PREFILL_SEQ + 8), cfg, verify=False)
         models[k] = model
+        # Force the library's own structure choice out of the way: it switches to
+        # two GEMMs above 1.4 GB, which would make the two arms identical exactly
+        # where the comparison matters.
+        dispatch_mod.SPLIT_ABOVE_BYTES = 10**12
         with torch.no_grad():  # one forward builds every layer's fused state
             model(input_ids=ids_by_batch[BATCH], use_cache=False)
         layers = moe_layers(model)
@@ -121,8 +137,12 @@ def main() -> int:
 
     stats = {key: statistics.median(v) for key, v in samples.items()}
     rows_per_token = {k: SHARED + GROUPS + GROUPS * k for k in (1, 2)}
-    print(f"\nprefill (seq {PREFILL_SEQ}), tok/s, median of {ROUNDS} alternating rounds:")
-    print("| k | batch | packed rows | intermediate GB | one N=2I | two N=I | two/one |")
+    # The gate/up output width is the stacked 2 x per-segment width, not 2 x the
+    # model's FFN width: conversion splits the FFN across shards and variants.
+    width = {k: moe_layers(models[k])[0]._fused._stacked()[0].shape[-1] for k in (1, 2)}
+    print(f"\ngate/up intermediate width: k1 {width[1]} k2 {width[2]} elements")
+    print(f"prefill (seq {PREFILL_SEQ}), tok/s, median of {ROUNDS} alternating rounds:")
+    print("| k | batch | packed rows | intermediate MB | one N=2I | two N=I | two/one |")
     print("|---|---|---|---|---|---|---|")
     ratios = {}
     for k in (1, 2):
@@ -130,7 +150,7 @@ def main() -> int:
             rows = batch * PREFILL_SEQ * rows_per_token[k]
             fused, split = stats[(k, batch, False)], stats[(k, batch, True)]
             ratios[(k, batch)] = split / fused
-            print(f"| {k} | {batch} | {rows} | {rows * 2 * 2 * 3072 / 1e9:.2f} | "
+            print(f"| {k} | {batch} | {rows} | {rows * width[k] * 2 / 1e6:.0f} | "
                   f"{fused:.0f} | {split:.0f} | {split / fused:.2f} |")
     print("\nk2/k1 per batch (one N=2I / two N=I): " + "  ".join(
         f"b{b} {stats[(2, b, False)] / stats[(1, b, False)]:.2f}/"

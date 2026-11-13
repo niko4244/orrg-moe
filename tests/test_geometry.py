@@ -549,6 +549,35 @@ def test_fused_dispatch_handles_large_token_counts():
     )
 
 
+@pytest.mark.parametrize("threshold", [0, 10**12])
+def test_fused_dispatch_gemm_structure_follows_intermediate_size(threshold, monkeypatch):
+    """The [M, 2I] size branch must switch structures without changing the result."""
+
+    import copy
+
+    import orrg.dispatch as dispatch
+
+    monkeypatch.setattr(dispatch, "SPLIT_ABOVE_BYTES", threshold)
+    ids = probe_ids(46, batch=8, seq=32)
+    base = build_model()
+    reference = copy.deepcopy(base)
+    fused = copy.deepcopy(base)
+    cfg = growth_cfg(top_residuals=2, residual_init="copy")
+    convert_model(reference, cfg, probe=ids)
+    converted, _ = convert_model(fused, replace(cfg, dispatch="fused"), probe=ids)
+    _randomise_routing(reference, 14)
+    _randomise_routing(converted, 14)
+    reference.eval()
+    converted.eval()
+    assert torch.allclose(
+        _logits(converted, ids), _logits(reference, ids), rtol=1e-4, atol=1e-4
+    )
+    took_split = any(
+        layer._fused._split is not None for layer in moe_layers(converted)
+    )
+    assert took_split is (threshold == 0), f"threshold {threshold}: split={took_split}"
+
+
 def test_fused_dispatch_handles_skeleton_only():
     """top_residuals=0 skips routing; the fused path must skip it too."""
 

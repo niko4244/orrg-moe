@@ -25,9 +25,7 @@ from pathlib import Path
 import torch
 import torch.nn.functional as F
 
-from experiments.harness import (
-    DEVICE, GROUPS, HIDDEN, VARIANTS, build_layer, timed_ms, timed_pair,
-)
+from experiments.harness import DEVICE, GROUPS, HIDDEN, build_layer, timed_ms, timed_pair
 from orrg.dispatch import grouped_mm
 
 TOKENS = (16, 64, 512, 2048, 4096, 8192)

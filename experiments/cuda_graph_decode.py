@@ -1,16 +1,15 @@
 """Can CUDA graphs close the b64 decode gap? Capture is blocked inside _grouped_mm.
 
-Three measurements on one MoE layer at a fixed decode shape:
-
 A. Try to capture the whole fused dispatch. torch 2.11's ``_grouped_mm`` copies
    ``offs`` to the host inside the call, which is illegal during capture; a CPU
-   ``offs`` is rejected by the op instead. So the dispatch as written cannot be
-   graphed at all.
-B. Capture everything a graph *can* cover: router, argsort, segment/row build,
-   counts, and the gather. This is the part Python and launch overhead live in.
+   ``offs`` is rejected by the op instead. So the dispatch cannot be graphed.
+B. Capture what a graph *can* cover — ``FusedDispatch._prepare`` (router, argsort,
+   counts, gather), the part Python and launch overhead live in — and leave the two
+   grouped GEMMs eager.
 C. Time ``_grouped_mm`` against rows-per-segment. If the cost is per-segment host
-   work rather than arithmetic, it is flat in rows and a graph cannot remove it
-   even if capture were legal.
+   work rather than arithmetic it is flat in rows, and a graph cannot remove it.
+D. Layer budget at the decode shape.
+E. End-to-end decode throughput: eager, prologue-graphed, and dense-at-active.
 
     PYTHONPATH=. python experiments/cuda_graph_decode.py
 """
@@ -23,13 +22,14 @@ import time
 from pathlib import Path
 
 import torch
+import torch.nn.functional as F
 
 from experiments.harness import (
     DEVICE, HIDDEN, INTER, LAYERS, VOCAB, build_layer, build_model, moe_layers,
 )
 from orrg import MoEConfig, convert_model
+from orrg.dispatch import grouped_mm
 
-DEVICE = torch.device("cuda")
 TOKENS = (64, 512)
 BATCHES = (8, 64)
 DECODE_STEPS = 24
@@ -67,50 +67,25 @@ def capture(fn, static_in):
     return graph, out
 
 
-def prologue(layer, flat):
-    """Everything in the fused forward except the two grouped GEMMs."""
+def finish(state, packed, offs, rows, scales, tokens):
+    """The two grouped GEMMs and the epilogue, on an already-prepared prologue."""
 
-    state = layer._fused
-    tokens = flat.shape[0]
-    route = layer.router(flat)
-    slots = state.k * state.groups
-    offsets = torch.arange(state.groups, device=flat.device).repeat_interleave(state.k)
-    segment = (route.index.reshape(tokens, -1) + offsets * (state.variants - 1)).reshape(-1)
-    rows = torch.arange(tokens, device=flat.device).repeat_interleave(slots)
-    scales = route.weight.to(torch.float32).reshape(-1)
-    order = torch.argsort(segment, stable=True)
-    segment_sorted = segment[order]
+    gate_up_w, down_w = state._stacked()
+    gate_up = grouped_mm(packed, gate_up_w, offs)
+    gate, up = gate_up.chunk(2, dim=-1)
+    out = grouped_mm(F.silu(gate) * up, down_w, offs)
+
     n_shards = len(state.shards)
-    counts = torch.zeros(state.groups * (state.variants - 1), dtype=torch.long, device=flat.device)
-    counts.scatter_add_(0, segment_sorted, torch.ones_like(segment_sorted))
-    ends = torch.cat([
-        torch.full((n_shards,), tokens, device=flat.device, dtype=torch.long), counts,
-    ]).cumsum(0).to(torch.int32)
-    packed = torch.cat([flat.repeat(n_shards, 1), flat[rows[order]]])
-    return packed, ends, rows[order], scales[order]
+    skeleton = out[: n_shards * tokens].view(n_shards, tokens, -1).sum(0).float()
+    contribution = torch.zeros_like(skeleton)
+    contribution.index_add_(0, rows, out[n_shards * tokens :].float() * scales.unsqueeze(-1))
+    return (skeleton + contribution).to(packed.dtype)
 
 
-def build_llama(inter: int) -> LlamaForCausalLM:
-    cfg = LlamaConfig(
-        vocab_size=VOCAB, hidden_size=HIDDEN, intermediate_size=inter,
-        num_hidden_layers=LAYERS, num_attention_heads=8, num_key_value_heads=8,
-        tie_word_embeddings=True, max_position_embeddings=128, hidden_act="silu",
-    )
-    model = LlamaForCausalLM(cfg).to(device=DEVICE, dtype=torch.bfloat16).eval()
-    for param in model.parameters():
-        param.requires_grad_(False)
-    return model
+def graphed_forward(state):
+    """Drop-in forward whose prologue is a replayed graph, GEMMs left eager."""
 
-
-def moe_layers(model):
-    return [m for m in model.modules() if getattr(m, "is_orrg_moe", False)]
-
-
-def partial_forward_factory(layer):
-    """Graph the prologue, keep the two grouped GEMMs eager (uncapturable)."""
-
-    cache, state = {}, layer._fused
-    import torch.nn.functional as F
+    cache = {}
 
     def forward(flat):
         key = tuple(flat.shape)
@@ -118,21 +93,13 @@ def partial_forward_factory(layer):
         if entry is None:
             static_in = torch.zeros_like(flat)
             static_in.copy_(flat)
-            graph, inner = capture(lambda t: prologue(layer, t), static_in)
+            graph, inner = capture(lambda t: state._prepare(t), static_in)
             entry = (static_in, graph) + tuple(inner)
             cache[key] = entry
-        static_in, graph, packed, ends, rows, scales = entry
+        static_in, graph, packed, offs, rows, scales = entry
         static_in.copy_(flat)
         graph.replay()
-        gate_up_w, down_w = state._stacked()
-        gate_up = torch._grouped_mm(packed, gate_up_w, offs=ends)
-        gate, up = gate_up.chunk(2, dim=-1)
-        out = torch._grouped_mm(F.silu(gate) * up, down_w, offs=ends)
-        tokens, n_shards = flat.shape[0], len(state.shards)
-        skeleton = out[: n_shards * tokens].view(n_shards, tokens, -1).sum(0).to(torch.float32)
-        contribution = torch.zeros_like(skeleton)
-        contribution.index_add_(0, rows, out[n_shards * tokens :].float() * scales.unsqueeze(-1))
-        return (skeleton + contribution).to(flat.dtype)
+        return finish(state, packed, offs, rows, scales, flat.shape[0])
 
     return forward
 
@@ -157,21 +124,16 @@ def decode_tps(model, batch: int, steps: int = DECODE_STEPS, reps: int = 2) -> f
 
 def main() -> int:
     layer, report = build_layer(1)
-    with torch.no_grad():
-        layer(torch.randn(64, HIDDEN, device=DEVICE, dtype=torch.bfloat16))  # builds the stacks
     state = layer._fused
     n_shards = len(state.shards)
     segments = n_shards + state.groups * (state.variants - 1)
     print(f"RTX 5060 Ti | torch {torch.__version__} | {segments} segments/layer "
           f"({n_shards} shards + {segments - n_shards} residual), "
           f"active {report.active_params()/1e6:.1f}M", flush=True)
-
     results = {"segments": segments, "capture": {}, "prologue": {}, "grouped": {}}
 
-    # A. whole dispatch
     with torch.no_grad():
         x = torch.randn(64, HIDDEN, device=DEVICE, dtype=torch.bfloat16)
-        layer(x)
         try:
             capture(lambda t: layer(t), x)
             results["capture"]["dispatch"] = "OK"
@@ -180,24 +142,25 @@ def main() -> int:
             results["capture"]["dispatch"] = f"{type(exc).__name__}: {exc}"
             print(f"A. capture whole dispatch: {type(exc).__name__}: {str(exc)[:120]}")
 
-        # B. the prologue that a graph can cover
-        print("\nB. prologue (router, argsort, counts, gather) eager vs graphed:")
+        # B. the prologue a graph can cover
+        print("\nB. prologue (_prepare) eager vs graphed:")
         print("| tokens | eager | graphed | saved |")
         print("|---|---|---|---|")
         for tokens in TOKENS:
-            x = torch.randn(tokens, HIDDEN, device=DEVICE, dtype=torch.bfloat16)
-            eager = timed(lambda: prologue(layer, x))
+            flat = torch.randn(tokens, HIDDEN, device=DEVICE, dtype=torch.bfloat16)
+            eager = timed(lambda: state._prepare(flat))
             try:
-                graph, out = capture(lambda t: prologue(layer, t), x)
+                graph, _ = capture(lambda t: state._prepare(t), flat)
                 graphed = timed(graph.replay)
             except Exception as exc:  # noqa: BLE001
                 results["prologue"][tokens] = {"error": str(exc)[:200]}
-                print(f"| {tokens} | {eager:.3f} | capture failed | {str(exc)[:60]} |")
+                print(f"| {tokens} | {eager:.3f} | capture failed | {str(exc)[:50]} |")
                 continue
             results["prologue"][tokens] = {"eager_ms": eager, "graphed_ms": graphed}
-            print(f"| {tokens} | {eager:.3f} ms | {graphed:.3f} ms | {100*(1-graphed/eager):.1f}% |")
+            print(f"| {tokens} | {eager:.3f} ms | {graphed:.3f} ms | "
+                  f"{100*(1-graphed/eager):.1f}% |")
 
-        # C. is the grouped GEMM arithmetic- or schedule-bound?
+        # C. arithmetic or schedule bound?
         print("\nC. one _grouped_mm, 56 segments, varying rows per segment:")
         print("| rows/segment | total rows | grouped_mm | plain GEMM | ratio |")
         print("|---|---|---|---|---|")
@@ -206,31 +169,24 @@ def main() -> int:
             counts = torch.full((56,), capacity, dtype=torch.long)
             offs = counts.cumsum(0).to(torch.int32).to(DEVICE)
             flat = torch.randn(56 * capacity, HIDDEN, device=DEVICE, dtype=torch.bfloat16)
-            grouped = timed(lambda: torch._grouped_mm(flat, weight, offs=offs))
+            grouped = timed(lambda: grouped_mm(flat, weight, offs))
             plain = timed(lambda: flat @ weight[0])
             results["grouped"][capacity] = {"grouped_ms": grouped, "plain_ms": plain}
             print(f"| {capacity} | {56*capacity} | {grouped:.3f} ms | {plain:.3f} ms | "
                   f"{grouped/plain:.1f}x |")
 
         # D. layer budget at the decode shape
-        x = torch.randn(64, HIDDEN, device=DEVICE, dtype=torch.bfloat16)
-        layer_total = timed(lambda: layer(x))
-        pro = timed(lambda: prologue(layer, x))
-        packed, ends, rows, scales = prologue(layer, x)
-        gate_up_w, down_w = state._stacked()
+        flat = torch.randn(64, HIDDEN, device=DEVICE, dtype=torch.bfloat16)
+        layer_ms = timed(lambda: layer(flat))
+        prologue_ms = timed(lambda: state._prepare(flat))
+        packed, offs, rows, scales = state._prepare(flat)
+        gemms_ms = timed(lambda: finish(state, packed, offs, rows, scales, 64))
+        print(f"\nD. layer budget at 64 tokens: total {layer_ms:.3f} ms | "
+              f"prologue {prologue_ms:.3f} ms | GEMMs+epilogue {gemms_ms:.3f} ms")
+        results["budget_64"] = {"layer_ms": layer_ms, "prologue_ms": prologue_ms,
+                                "gemms_ms": gemms_ms}
 
-        def gemms():
-            gate_up = torch._grouped_mm(packed, gate_up_w, offs=ends)
-            gate, up = gate_up.chunk(2, dim=-1)
-            return torch._grouped_mm(torch.nn.functional.silu(gate) * up, down_w, offs=ends)
-
-        gemm_ms = timed(gemms)
-        print(f"\nD. layer budget at 64 tokens: total {layer_total:.3f} ms | "
-              f"prologue {pro:.3f} ms | two _grouped_mm {gemm_ms:.3f} ms | "
-              f"rest {layer_total - pro - gemm_ms:.3f} ms")
-        results["budget_64"] = {"layer_ms": layer_total, "prologue_ms": pro, "gemms_ms": gemm_ms}
-
-        # E. end-to-end: graph what is capturable, leave the grouped GEMMs eager
+        # E. end-to-end
         torch.manual_seed(0)
         cfg = MoEConfig(shared=4, groups=4, variants=14, top_residuals=1,
                         hidden_size=HIDDEN, dispatch="fused")
@@ -239,7 +195,7 @@ def main() -> int:
         inter_active = max(64, round((report.active_params() - fixed) / (LAYERS * 3 * HIDDEN)))
         torch.manual_seed(0)
         dense = build_model(inter_active)
-        print(f"\nE. decode throughput (tok/s), active {report.active_params()/1e6:.1f}M "
+        print(f"\nE. decode tok/s, active {report.active_params()/1e6:.1f}M "
               f"dense {sum(p.numel() for p in dense.parameters())/1e6:.1f}M:")
         print("| batch | eager | prologue-graphed | dense | graph/eager | graph/dense |")
         print("|---|---|---|---|---|---|")
@@ -248,7 +204,7 @@ def main() -> int:
             layers = moe_layers(model)
             saved = [(lay, lay._fused.forward) for lay in layers]
             for lay in layers:
-                lay._fused.forward = partial_forward_factory(lay)
+                lay._fused.forward = graphed_forward(lay._fused)
             graphed = decode_tps(model, batch)
             for lay, fwd in saved:
                 lay._fused.forward = fwd

@@ -122,8 +122,11 @@ against each other at the same batch, the k2/k1 prefill b64 ratio is **0.72 with
 the fused N=2I path and 0.87 with two N=I GEMMs**; the historical 0.82 came from
 the three-GEMM path. Row arithmetic alone predicts 1/1.33 = 0.75, so the split
 arm clears it (more rows per segment tile better) and the fused arm misses it by
-15 points because its `[M, 2I]` intermediate is 1.6 GB at 131k rows. b8 is
-unchanged (0.90) and b1 slightly better (0.91).
+15 points because its `[M, 2I]` intermediate is 201 MB at 131k rows. b8 is
+unchanged (0.90) and b1 slightly better (0.91). The table predates the size branch
+of §1d: with the branch shipped, k=2 prefill b64 takes the split structure and
+measures 53.2k against 51.4k tok/s forced-fused (+3.5%), so the shipped ratio is
+~0.75 rather than 0.72. The seven-model sweep has not been re-run.
 
 Absolute: fused k=2 reaches 0.51× of dense-at-active at b64 prefill (k=1: 0.53×)
 and 1.41× of dense-at-total (k=1: 1.79×). Fused ÷ python at k=2 is 5.8× / 6.8× /
@@ -138,37 +141,41 @@ real model's k=2 throughput is not measured.
 The reference path still loses 45–65%, because doubling the slots doubles its host
 syncs and per-segment launches. 12 segments per layer at k=1, 16 at k=2.
 
-### 1d. The crossover is real: the split wins above ~1.2 GB of intermediate
+### 1d. The crossover is real: the split wins above ~150-200 MB of intermediate
 
 The layer probe below measures **k=1 only**, and its largest shape (98k rows) has a
-1.21 GB `[M, 2I]` intermediate — exactly at the knee, which is why it read as "the
-fused form always wins". `experiments/prefill_structure.py` measures both
+151 MB `[M, 2I]` intermediate — just short of the knee, which is why it read as
+"the fused form always wins". The width is the stacked 2 x per-segment width (768
+here), not 2 x the model's FFN width: conversion splits the FFN across shards and
+variants. `experiments/prefill_structure.py` measures both
 structures in the full model at both k, with the arms alternated and the split arm
 asserted equal to the library (identical logits, max|diff| 0):
 
 | k | batch | packed rows | intermediate | one N=2I | two N=I | two ÷ one |
 |---|---|---|---|---|---|---|
-| 1 | 16 | 24,576 | 0.30 GB | 30,705 | 26,107 | 0.85 |
-| 1 | 32 | 49,152 | 0.60 GB | 60,889 | 48,435 | 0.80 |
-| 1 | 48 | 73,728 | 0.91 GB | 72,409 | 58,881 | 0.81 |
-| 1 | 64 | 98,304 | 1.21 GB | 73,746 | 66,272 | 0.90 |
-| 1 | 96 | 147,456 | 1.81 GB | 70,193 | 71,601 | **1.02** |
-| 2 | 16 | 32,768 | 0.40 GB | 31,753 | 25,114 | 0.79 |
-| 2 | 32 | 65,536 | 0.81 GB | 53,427 | 46,362 | 0.87 |
-| 2 | 48 | 98,304 | 1.21 GB | 54,396 | 55,616 | **1.02** |
-| 2 | 64 | 131,072 | 1.61 GB | 52,854 | 57,485 | **1.09** |
-| 2 | 96 | 196,608 | 2.42 GB | 59,039 | 60,166 | **1.02** |
+| 1 | 16 | 24,576 | 38 MB | 26,613 | 23,739 | 0.89 |
+| 1 | 32 | 49,152 | 75 MB | 55,726 | 44,483 | 0.80 |
+| 1 | 48 | 73,728 | 113 MB | 69,223 | 57,017 | 0.82 |
+| 1 | 64 | 98,304 | 151 MB | 71,472 | 65,822 | 0.92 |
+| 1 | 96 | 147,456 | 226 MB | 68,211 | 69,206 | **1.01** |
+| 2 | 16 | 32,768 | 50 MB | 26,740 | 21,445 | 0.80 |
+| 2 | 32 | 65,536 | 101 MB | 47,225 | 40,771 | 0.86 |
+| 2 | 48 | 98,304 | 151 MB | 51,532 | 53,078 | **1.03** |
+| 2 | 64 | 131,072 | 201 MB | 51,509 | 54,821 | **1.06** |
+| 2 | 96 | 196,608 | 302 MB | 57,238 | 58,297 | **1.02** |
 
 Both effects are real, and the k2/k1 column reconciles the history: fused path
-0.72 at b64, split path 0.87, against the 0.82 that the three-GEMM run measured.
-Below ~1.2 GB the fused form wins by 10–21%; above it the split wins by 1–9%, and
-its advantage peaks at 1.6 GB rather than growing monotonically.
+0.72 at b64, split path 0.83, against the 0.82 that the three-GEMM run measured.
+Below ~150 MB the fused form wins by 10–20%; from ~200 MB the split wins by 1–6%.
+The k=2 shapes turn over earlier than the k=1 ones (151 MB: 1.03 against 0.92),
+because they carry more segments, so the two curves do not share one threshold.
 
-**No branch is implemented.** It would be three lines keyed on
-`packed.shape[0] * gate_up.shape[-1] * itemsize > ~1.3 GB`, and the only shapes
-that gain are prefill batches larger than anything else measured; the cost of
-being wrong is a 10–21% loss at ordinary sizes. The library comment states where
-the knee is instead of claiming there is none.
+The branch in `orrg/dispatch.py` keys on `packed.shape[0] * gate_up.shape[-1] *
+itemsize > SPLIT_ABOVE_BYTES` with `SPLIT_ABOVE_BYTES = 190e6`. At that point
+every measured k=1 shape still prefers fused (151 MB reads 0.92) and the k=2
+shapes from 201 MB up prefer split (1.06); the cost of being wrong at the margin
+is the 3% that k=2 b48 gives up. `tests/test_geometry.py` forces both thresholds
+and asserts the logits are unchanged, so the branch cannot silently alter results.
 
 `experiments/dispatch_crossover.py` times a single MoE layer with the two gate/up
 GEMM structures interleaved, so ordering cannot bias either arm:
