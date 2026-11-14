@@ -1,0 +1,21 @@
+def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+    if sigspec is not None:
+        try:
+            return sigspec, True
+        except TypeError:
+            return None, False
+
+    try:
+        sig = inspect.signature(func)
+    except ValueError:
+        # No signature available for this callable.
+        try:
+            builtin_sig = builtin_func(*builtin_args)
+        except TypeError:
+            return None, False
+        return builtin_sig, True
+
+    try:
+        return sig, True
+    except TypeError:
+        return None, False

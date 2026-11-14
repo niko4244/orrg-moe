@@ -31,8 +31,9 @@ def render(system: str, messages: list[dict]) -> str:
         if isinstance(content, list):
             content = "".join(block.get("text", "") for block in content)
         parts.append({"role": message["role"], "content": content})
+    kwargs = {"enable_thinking": STATE["enable_thinking"]} if STATE.get("enable_thinking") is not None else {}
     return STATE["tokenizer"].apply_chat_template(
-        parts, tokenize=False, add_generation_prompt=True,
+        parts, tokenize=False, add_generation_prompt=True, **kwargs,
     )
 
 
@@ -94,13 +95,19 @@ def main() -> int:
     parser.add_argument("--model", default="cache/models/qwen3-4b")
     parser.add_argument("--adapter", default=None)
     parser.add_argument("--port", type=int, default=4010)
+    parser.add_argument("--trust-remote-code", action="store_true",
+                        help="needed for models that ship their own implementation (Spark)")
+    parser.add_argument("--no-thinking", action="store_true",
+                        help="render the chat template with thinking disabled")
+    parser.add_argument("--dtype", default="bfloat16", choices=["bfloat16", "float16"])
     args = parser.parse_args()
 
     tokenizer = AutoTokenizer.from_pretrained(args.model)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(
-        args.model, torch_dtype=torch.bfloat16, device_map={"": 0},
+        args.model, torch_dtype=getattr(torch, args.dtype), device_map={"": 0},
+        trust_remote_code=args.trust_remote_code,
     )
     if args.adapter:
         from peft import PeftModel
@@ -108,7 +115,8 @@ def main() -> int:
         model = PeftModel.from_pretrained(model, args.adapter)
         model = model.merge_and_unload()
     model.eval()
-    STATE.update(model=model, tokenizer=tokenizer, name=args.adapter or args.model)
+    STATE.update(model=model, tokenizer=tokenizer, name=args.adapter or args.model,
+                 enable_thinking=False if args.no_thinking else None)
     print(f"serving {STATE['name']} on :{args.port}", flush=True)
     ThreadingHTTPServer(("127.0.0.1", args.port), Handler).serve_forever()
     return 0

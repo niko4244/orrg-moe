@@ -75,6 +75,11 @@ def main() -> int:
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--max-len", type=int, default=1536)
     parser.add_argument("--rank", type=int, default=16)
+    parser.add_argument("--trust-remote-code", action="store_true",
+                        help="models that ship their own implementation (Spark) need this")
+    parser.add_argument("--target-modules", default="q_proj,k_proj,v_proj,o_proj,gate_proj,up_proj,down_proj")
+    parser.add_argument("--attn-impl", default="sdpa", choices=["sdpa", "eager", "flash_attention_2"],
+                        help="Spark's implementation only provides eager attention")
     parser.add_argument("--4bit", dest="four_bit", action="store_true", default=True)
     parser.add_argument("--no-4bit", dest="four_bit", action="store_false")
     args = parser.parse_args()
@@ -86,7 +91,7 @@ def main() -> int:
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    kwargs: dict = {"torch_dtype": torch.bfloat16, "attn_implementation": "sdpa"}
+    kwargs: dict = {"torch_dtype": torch.bfloat16, "attn_implementation": args.attn_impl}
     if args.four_bit:
         from transformers import BitsAndBytesConfig
 
@@ -98,7 +103,9 @@ def main() -> int:
         )
         kwargs["device_map"] = {"": 0}
 
-    model = AutoModelForCausalLM.from_pretrained(args.model, **kwargs)
+    model = AutoModelForCausalLM.from_pretrained(
+        args.model, trust_remote_code=args.trust_remote_code, **kwargs,
+    )
     if args.four_bit:
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=True)
     model.gradient_checkpointing_enable()
@@ -110,8 +117,7 @@ def main() -> int:
         lora_dropout=0.05,
         bias="none",
         task_type="CAUSAL_LM",
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj",
-                        "gate_proj", "up_proj", "down_proj"],
+        target_modules=[name.strip() for name in args.target_modules.split(",") if name.strip()],
     )
     model = get_peft_model(model, lora)
     model.print_trainable_parameters()

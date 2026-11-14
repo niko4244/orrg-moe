@@ -1,0 +1,74 @@
+{
+  "base": "reports\\final_suite\\spark_x26_base_oneshot",
+  "adapter": "reports\\final_suite\\spark_x26_repair_oneshot",
+  "base_total": 29,
+  "adapter_total": 24,
+  "cases": 50,
+  "both_pass": 23,
+  "base_only": [
+    "boltons:frac_6_digits_000001",
+    "boltons:isoformat_default",
+    "boltons:isoformat_microseconds",
+    "boltons:tz_aware_isoformat_roundtrip",
+    "boltons:tz_offset_with_fraction",
+    "more-itertools:tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+  ],
+  "adapter_only": [
+    "toolz:toolz/tests/test_inspect_args.py::test_is_valid_curry"
+  ],
+  "neither": 20,
+  "p_case": 0.125,
+  "p_task": 1.0,
+  "identical_prompts": true,
+  "identical_config": true,
+  "tasks": {
+    "boltons": {
+      "cases": 17,
+      "base": 9,
+      "adapter": 4,
+      "delta": -5,
+      "flips_up": [],
+      "flips_down": [
+        "frac_6_digits_000001",
+        "isoformat_default",
+        "isoformat_microseconds",
+        "tz_aware_isoformat_roundtrip",
+        "tz_offset_with_fraction"
+      ]
+    },
+    "more-itertools": {
+      "cases": 16,
+      "base": 16,
+      "adapter": 15,
+      "delta": -1,
+      "flips_up": [],
+      "flips_down": [
+        "tests/test_more.py::SplitIntoTests::test_invalid_in_sizes"
+      ]
+    },
+    "toolz": {
+      "cases": 17,
+      "base": 4,
+      "adapter": 5,
+      "delta": 1,
+      "flips_up": [
+        "toolz/tests/test_inspect_args.py::test_is_valid_curry"
+      ],
+      "flips_down": []
+    }
+  },
+  "base_config": {
+    "model": "spark-x2.6-4b-hf",
+    "thinking": "disabled",
+    "temperature": 0.0,
+    "max_tokens": 3000,
+    "max_attempts_per_task": 1
+  },
+  "adapter_config": {
+    "model": "spark-x2.6-4b-hf",
+    "thinking": "disabled",
+    "temperature": 0.0,
+    "max_tokens": 3000,
+    "max_attempts_per_task": 1
+  }
+}
