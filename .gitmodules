@@ -1,0 +1,111 @@
+# Vendored checkouts used by the final-suite runs. The suite edits files inside
+# them (boltons/timeutils.py, toolz/functoolz.py, more_itertools/more.py), so
+# their worktrees are expected to be dirty: `ignore = dirty` keeps that dirt out
+# of the parent's status in every clone, without committing inside them.
+[submodule "reports/final_suite/final_run1/boltons"]
+	path = reports/final_suite/final_run1/boltons
+	ignore = dirty
+
+[submodule "reports/final_suite/final_run1/more-itertools"]
+	path = reports/final_suite/final_run1/more-itertools
+	ignore = dirty
+
+[submodule "reports/final_suite/final_run1/toolz"]
+	path = reports/final_suite/final_run1/toolz
+	ignore = dirty
+
+[submodule "reports/final_suite/final_run2/boltons"]
+	path = reports/final_suite/final_run2/boltons
+	ignore = dirty
+
+[submodule "reports/final_suite/final_run2/more-itertools"]
+	path = reports/final_suite/final_run2/more-itertools
+	ignore = dirty
+
+[submodule "reports/final_suite/final_run2/toolz"]
+	path = reports/final_suite/final_run2/toolz
+	ignore = dirty
+
+[submodule "reports/final_suite/hintfree_run1/boltons"]
+	path = reports/final_suite/hintfree_run1/boltons
+	ignore = dirty
+
+[submodule "reports/final_suite/hintfree_run1/more-itertools"]
+	path = reports/final_suite/hintfree_run1/more-itertools
+	ignore = dirty
+
+[submodule "reports/final_suite/hintfree_run1/toolz"]
+	path = reports/final_suite/hintfree_run1/toolz
+	ignore = dirty
+
+[submodule "reports/final_suite/oneshot_restore_check/boltons"]
+	path = reports/final_suite/oneshot_restore_check/boltons
+	ignore = dirty
+
+[submodule "reports/final_suite/oneshot_restore_check/more-itertools"]
+	path = reports/final_suite/oneshot_restore_check/more-itertools
+	ignore = dirty
+
+[submodule "reports/final_suite/oneshot_restore_check/toolz"]
+	path = reports/final_suite/oneshot_restore_check/toolz
+	ignore = dirty
+
+[submodule "reports/final_suite/run1/boltons"]
+	path = reports/final_suite/run1/boltons
+	ignore = dirty
+
+[submodule "reports/final_suite/run1/more-itertools"]
+	path = reports/final_suite/run1/more-itertools
+	ignore = dirty
+
+[submodule "reports/final_suite/run1/toolz"]
+	path = reports/final_suite/run1/toolz
+	ignore = dirty
+
+[submodule "reports/final_suite/run1_invalid_protocol/boltons"]
+	path = reports/final_suite/run1_invalid_protocol/boltons
+	ignore = dirty
+
+[submodule "reports/final_suite/run1_invalid_protocol/more-itertools"]
+	path = reports/final_suite/run1_invalid_protocol/more-itertools
+	ignore = dirty
+
+[submodule "reports/final_suite/run1_invalid_protocol/toolz"]
+	path = reports/final_suite/run1_invalid_protocol/toolz
+	ignore = dirty
+
+[submodule "reports/final_suite/run1_invalid_protocol2/boltons"]
+	path = reports/final_suite/run1_invalid_protocol2/boltons
+	ignore = dirty
+
+[submodule "reports/final_suite/run1_invalid_protocol2/more-itertools"]
+	path = reports/final_suite/run1_invalid_protocol2/more-itertools
+	ignore = dirty
+
+[submodule "reports/final_suite/run1_invalid_protocol2/toolz"]
+	path = reports/final_suite/run1_invalid_protocol2/toolz
+	ignore = dirty
+
+[submodule "reports/final_suite/run2/boltons"]
+	path = reports/final_suite/run2/boltons
+	ignore = dirty
+
+[submodule "reports/final_suite/run2/more-itertools"]
+	path = reports/final_suite/run2/more-itertools
+	ignore = dirty
+
+[submodule "reports/final_suite/run2/toolz"]
+	path = reports/final_suite/run2/toolz
+	ignore = dirty
+
+[submodule "reports/final_suite/run2_invalid_protocol2/boltons"]
+	path = reports/final_suite/run2_invalid_protocol2/boltons
+	ignore = dirty
+
+[submodule "reports/final_suite/run2_invalid_protocol2/more-itertools"]
+	path = reports/final_suite/run2_invalid_protocol2/more-itertools
+	ignore = dirty
+
+[submodule "reports/final_suite/run2_invalid_protocol2/toolz"]
+	path = reports/final_suite/run2_invalid_protocol2/toolz
+	ignore = dirty

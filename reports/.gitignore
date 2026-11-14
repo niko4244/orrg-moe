@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+# Run logs from the final-suite harness are machine-local; the tables and JSON beside
+# them are the committed evidence.
+*.log

@@ -170,35 +170,40 @@ def main() -> int:
         f"(+{extra/1e6:.1f}M, +{100*extra/active[1]:.1f}%)", flush=True,
     )
 
-    # Every fused arm is also measured with the batched small-row path disabled, so
-    # the report can compare both dispatches on identical weights. The threshold is
-    # read from the library at call time, so a temporary override is enough.
+    # Every fused shape is measured on a real batched arm and a real grouped arm, on the
+    # same weights, inside the same repeat and the same batch: a clock ramp, an
+    # allocator stall or another process pausing the card then hits both arms instead of
+    # biasing one. The shipped arm stays so the tables can show what serving actually
+    # does with the gate.
     shipped = orrg_dispatch.BATCHED_BELOW_ROWS
-    # Every fused shape is measured on a real batched arm and a real grouped arm, on
-    # the same weights, next to each other: arm order is the sweep's main bias (clock
-    # ramp, allocator state), and adjacent arms see nearly the same conditions. The
-    # shipped arm stays so the tables can show what serving actually does.
-    arms = []
+    fused_names = [n for n in models if n.startswith("fused_")]
+    all_names = list(models) + [f"{n}_{p}" for n in fused_names for p in ("batched", "grouped")]
+
+    def sweep_pair(model) -> tuple[dict[str, float], dict[str, float]]:
+        batched, grouped = {}, {}
+        for batch in BATCHES:
+            for path, acc in (("batched", batched), ("grouped", grouped)):
+                with orrg_dispatch.force_path(path):
+                    acc[f"prefill_b{batch}"] = prefill_tps(model, batch)
+                    acc[f"decode_b{batch}"] = decode_tps(model, batch)
+        return batched, grouped
+
+    # Discard one full pass: the first arm touched on each shape otherwise measures the
+    # GPU clock ramp.
     for name, model in models.items():
-        arms.append((name, model, None))
         if name.startswith("fused_"):
-            arms.append((f"{name}_batched", model, "batched"))
-            arms.append((f"{name}_grouped", model, "grouped"))
-
-    def sweep_arm(model, forced):
-        with orrg_dispatch.force_path(forced):
-            return sweep(model)
-
-    # Discard one full sweep: the first arm touched on each shape otherwise measures
-    # the GPU clock ramp.
-    for _, model, threshold in arms:
-        sweep_arm(model, threshold)
+            sweep_pair(model)
+        sweep(model)
     print("warm-up sweep done", flush=True)
 
-    samples: dict[str, list[dict[str, float]]] = {name: [] for name, _, _ in arms}
+    samples: dict[str, list[dict[str, float]]] = {name: [] for name in all_names}
     for repeat in range(REPEATS):
-        for name, model, threshold in arms:
-            samples[name].append(sweep_arm(model, threshold))
+        for name, model in models.items():
+            samples[name].append(sweep(model))
+            if name.startswith("fused_"):
+                batched, grouped = sweep_pair(model)
+                samples[f"{name}_batched"].append(batched)
+                samples[f"{name}_grouped"].append(grouped)
             torch.cuda.empty_cache()
         print(f"repeat {repeat + 1}/{REPEATS} done", flush=True)
 
@@ -215,7 +220,7 @@ def main() -> int:
             for key in keys
         }
 
-    names = [name for name, _, _ in arms]
+    names = all_names
     print("\n| metric | " + " | ".join(names) + " |")
     print("|---" * (len(names) + 1) + "|")
     for key in keys:

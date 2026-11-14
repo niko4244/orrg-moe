@@ -24,24 +24,23 @@ import torch
 import torch.nn.functional as F
 
 
-# ``_grouped_mm`` costs ~30 us per segment whatever the rows, so a decode step
-# pays for ~1,000 segment launches. Below this many packed rows the dispatch is
-# instead two batched matmuls (shards uniform, residual segments padded to a fixed
-# capacity), which is 0.48-0.93x the time up to ~25k rows and 1.4-1.9x above it as
-# the padding waste grows (reports/T3-FOUR-PROBES.md 1f).
-# Measured, not derived: the layer probe puts the batched path ahead to ~24.6k rows,
-# but on the full harness model prefill b8 (12,288 rows at k=1, 16,384 at k=2) already
-# loses 12% and 45% to the grouped path, while every decode shape and prefill b1
-# (<=2,048 rows) wins. The threshold is therefore set from model-level data, just
-# above the largest shape that wins.
+# ``_grouped_mm`` costs ~30 us per segment whatever the rows, so a decode step pays
+# for ~1,000 segment launches. Below this many packed rows the dispatch is instead two
+# batched matmuls (shards uniform, residual segments padded to a fixed capacity). That
+# padding is `segments / groups` = 13x the real rows and grows with `tokens * k`, which
+# is what bounds the win. Measured across the crossing band
+# (`experiments/gate_band.py`): 0.57-0.97x of grouped up to 8,192 rows, 1.26-1.59x from
+# 10,240 rows up. Rows is a proxy for that capacity, so k=2 crosses at a lower row count
+# than k=1; 8,192 is the largest row count where both k measure no loss.
+#
 # Which path a packed size takes: the single source of truth for the gate, so a
 # measurement can force a path without reproducing the decision.
 _FORCE_PATH: str | None = None
 
 
-BATCHED_BELOW_ROWS = 4_096
-# ...and not below this either: decode b1 packs 12-16 rows, where the gather/scatter
-# prologue costs more than the launches it removes (0.86x end to end).
+BATCHED_BELOW_ROWS = 8_192
+# ...and not below this either: decode b1 packs 12-16 rows and measures a tie
+# (1.03-1.05x, inside the floor), so the cheaper path stays.
 MIN_BATCHED_ROWS = 64
 
 

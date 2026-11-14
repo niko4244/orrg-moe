@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+# Run logs are machine-local; the JSON artifacts beside them are committed and are
+# what render_report.py reads.
+results/*.log

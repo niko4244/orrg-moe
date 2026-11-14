@@ -77,7 +77,8 @@ def serving_tables(data: dict) -> tuple[str, list[str], float]:
     # Per-shape dispatch comparison. "serving" says which of the two the gate picks.
     lines += [
         "",
-        "| metric | k=1 batched ÷ grouped | k=1 serving | k=2 batched ÷ grouped | k=2 serving |",
+        "| metric | k=1 batched ÷ grouped (throughput, >1 = batched faster) | k=1 serving "
+        "| k=2 batched ÷ grouped (throughput) | k=2 serving |",
         "|---|---|---|---|---|",
     ]
     gate_rows: dict[tuple[str, int], int] = {}
@@ -137,15 +138,20 @@ def serving_tables(data: dict) -> tuple[str, list[str], float]:
             med = statistics.median(values)
             rows = gate_rows[(metric, k)]
             gate = dispatch.path_for(rows)
+            # These are throughput ratios (batched / grouped): above 1 the batched path
+            # is faster. Shapes below MIN_BATCHED_ROWS are decided by the lower bound,
+            # which the report discusses separately as a measured tie.
+            if rows < dispatch.MIN_BATCHED_ROWS:
+                continue
             if gate == "batched" and med < 1.0 - allowance:
                 problems.append(
                     f"gate too permissive: k={k} {metric} ({rows:,} rows) dispatches "
-                    f"batched but measures {med:.2f}x vs grouped"
+                    f"batched but measures {med:.2f}x throughput of grouped"
                 )
             if gate == "grouped" and med > 1.0 + allowance:
                 problems.append(
                     f"gate too tight: k={k} {metric} ({rows:,} rows) dispatches grouped "
-                    f"but measures {med:.2f}x vs grouped"
+                    f"but measures {med:.2f}x throughput of grouped"
                 )
     return "\n".join(lines), problems, allowance
 
@@ -172,6 +178,49 @@ def crossover_table(data: dict) -> tuple[str, list[str]]:
     return "\n".join(lines), problems
 
 
+def band_table(data: dict, floor: float) -> tuple[str, list[str]]:
+    """Model-level measurements across the band that brackets the gate edge."""
+
+    lines = [
+        "Full model, one sequence of `tokens` for each row count; `force_path` pins each",
+        "arm on the same weights, three repeats with the order flipped every other",
+        "repeat, warm-up discarded. `capacity` is the padded block the batched path",
+        "allocates per segment — the quantity that actually bounds the win.",
+        "",
+        "| k | tokens | packed rows | capacity | grouped ms | batched ms | batched ÷ grouped (time, <1 = batched faster) | serving |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    by_rows: dict[int, dict[int, dict]] = {}
+    for rec in sorted(data["records"], key=lambda r: (r["k"], r["tokens"])):
+        grouped = statistics.median(rec["grouped_ms"])
+        batched = statistics.median(rec["batched_ms"])
+        ratio = batched / grouped
+        gate = dispatch.path_for(rec["rows"])
+        lines.append(
+            f"| {rec['k']} | {rec['tokens']} | {rec['rows']:,} | "
+            f"{rec['tokens'] * rec['k']:,} | {grouped:.1f} | {batched:.1f} | "
+            f"{ratio:.2f} | {gate} |"
+        )
+        by_rows.setdefault(rec["rows"], {})[rec["k"]] = rec
+
+    # The bound is one row count for every k, so it is judged where both k are
+    # measured: a row count only one of them reaches cannot decide a k-agnostic bound.
+    problems = []
+    for rows, recs in sorted(by_rows.items()):
+        if len(recs) < 2:
+            continue
+        worst = max(statistics.median(r["batched_ms"]) / statistics.median(r["grouped_ms"])
+                    for r in recs.values())
+        gate = dispatch.path_for(rows)
+        if gate == "batched" and worst > 1.0 + floor:
+            problems.append(f"band {rows:,} rows (both k) dispatches batched but the worst "
+                            f"k measures {worst:.2f}x")
+        if gate == "grouped" and worst < 1.0 - floor:
+            problems.append(f"band {rows:,} rows (both k) dispatches grouped but the worst "
+                            f"k measures {worst:.2f}x")
+    return "\n".join(lines), problems
+
+
 def splice(text: str, name: str, body: str) -> str:
     begin, end = f"<!-- BEGIN {name} -->", f"<!-- END {name} -->"
     start = text.index(begin) + len(begin)
@@ -186,30 +235,35 @@ def main() -> int:
 
     serving = json.loads((RESULTS / "serving_throughput.json").read_text())
     crossover = json.loads((RESULTS / "batched_dispatch.json").read_text())
+    band = json.loads((RESULTS / "gate_band.json").read_text())
 
     # A stale artifact must not be rendered: the gate it recorded has to be the gate
     # in the code, or the "serving" column would describe a build that no longer exists.
-    for field, live in (("batched_below_rows", dispatch.BATCHED_BELOW_ROWS),
-                        ("min_batched_rows", dispatch.MIN_BATCHED_ROWS)):
-        if serving[field] != live:
-            raise SystemExit(
-                f"artifact {field}={serving[field]} but code has {live}: re-run the sweep"
-            )
+    for name, data in (("serving_throughput", serving), ("gate_band", band)):
+        for field, live in (("batched_below_rows", dispatch.BATCHED_BELOW_ROWS),
+                            ("min_batched_rows", dispatch.MIN_BATCHED_ROWS)):
+            if data[field] != live:
+                raise SystemExit(
+                    f"{name} artifact {field}={data[field]} but code has {live}: re-run it"
+                )
 
-    serving_body, serving_problems, _ = serving_tables(serving)
+    serving_body, serving_problems, allowance = serving_tables(serving)
     crossover_body, crossover_problems = crossover_table(crossover)
+    band_body, band_problems = band_table(band, allowance)
 
     if not args.check_only:
         text = REPORT.read_text(encoding="utf-8")
         text = splice(text, "serving-table", serving_body)
         text = splice(text, "crossover-table", crossover_body)
+        text = splice(text, "gate-band", band_body)
         REPORT.write_text(text, encoding="utf-8")
         print(f"updated {REPORT}")
 
     print(f"\ncrossover:\n{crossover_body}\n")
-    for problem in serving_problems + crossover_problems:
+    problems = serving_problems + crossover_problems + band_problems
+    for problem in problems:
         print(f"FAIL: {problem}")
-    return 1 if serving_problems + crossover_problems else 0
+    return 1 if problems else 0
 
 
 if __name__ == "__main__":
