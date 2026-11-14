@@ -80,6 +80,7 @@ def main() -> int:
         "repeats": REPEATS,
         "min_batched_rows": dispatch.MIN_BATCHED_ROWS,
         "batched_below_rows": dispatch.BATCHED_BELOW_ROWS,
+        "batched_row_budget": dispatch.BATCHED_ROW_BUDGET,
         "records": records,
     }, indent=2))
     print(f"wrote {out}")

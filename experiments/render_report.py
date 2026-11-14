@@ -209,15 +209,18 @@ def band_table(data: dict, floor: float) -> tuple[str, list[str]]:
     for rows, recs in sorted(by_rows.items()):
         if len(recs) < 2:
             continue
-        worst = max(statistics.median(r["batched_ms"]) / statistics.median(r["grouped_ms"])
-                    for r in recs.values())
+        measured = [statistics.median(r["batched_ms"]) / statistics.median(r["grouped_ms"])
+                    for r in recs.values()]
         gate = dispatch.path_for(rows)
-        if gate == "batched" and worst > 1.0 + floor:
+        # Conservative in both directions: a batched region must not lose at *any* k, and
+        # a grouped region must not be won by *any* k. Using max for both let a losing k
+        # mask a winning one, so the grouped check passed vacuously.
+        if gate == "batched" and max(measured) > 1.0 + floor:
             problems.append(f"band {rows:,} rows (both k) dispatches batched but the worst "
-                            f"k measures {worst:.2f}x")
-        if gate == "grouped" and worst < 1.0 - floor:
-            problems.append(f"band {rows:,} rows (both k) dispatches grouped but the worst "
-                            f"k measures {worst:.2f}x")
+                            f"k measures {max(measured):.2f}x")
+        if gate == "grouped" and min(measured) < 1.0 - floor:
+            problems.append(f"band {rows:,} rows (both k) dispatches grouped but the best "
+                            f"k measures {min(measured):.2f}x")
     return "\n".join(lines), problems
 
 
@@ -241,7 +244,8 @@ def main() -> int:
     # in the code, or the "serving" column would describe a build that no longer exists.
     for name, data in (("serving_throughput", serving), ("gate_band", band)):
         for field, live in (("batched_below_rows", dispatch.BATCHED_BELOW_ROWS),
-                            ("min_batched_rows", dispatch.MIN_BATCHED_ROWS)):
+                            ("min_batched_rows", dispatch.MIN_BATCHED_ROWS),
+                            ("batched_row_budget", dispatch.BATCHED_ROW_BUDGET)):
             if data[field] != live:
                 raise SystemExit(
                     f"{name} artifact {field}={data[field]} but code has {live}: re-run it"

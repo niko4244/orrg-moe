@@ -13,7 +13,7 @@ from dataclasses import replace
 import pytest
 import torch
 
-from orrg import MoEConfig, RouterConfig, convert_model, discover_ffn_modules
+from orrg import MoEConfig, RouterConfig, convert_model
 from orrg.scale import ModelShape, converted_scale
 from orrg.shard import shard_widths
 
@@ -549,8 +549,8 @@ def test_fused_dispatch_handles_large_token_counts():
     )
 
 
-@pytest.mark.parametrize("threshold", [0, 10**9])
-def test_fused_dispatch_batched_and_grouped_paths_agree(threshold, monkeypatch):
+@pytest.mark.parametrize("threshold,budget", [(0, 8_192), (10**9, 8_192), (10**9, 24)])
+def test_fused_dispatch_batched_and_grouped_paths_agree(threshold, budget, monkeypatch):
     """The small-batch batched path and the grouped path must compute the same thing."""
 
     import copy
@@ -558,6 +558,9 @@ def test_fused_dispatch_batched_and_grouped_paths_agree(threshold, monkeypatch):
     import orrg.dispatch as dispatch
 
     monkeypatch.setattr(dispatch, "BATCHED_BELOW_ROWS", threshold)
+    # A tiny budget forces the residual block through many pieces, which is the path
+    # the default budget only reaches at large token counts.
+    monkeypatch.setattr(dispatch, "BATCHED_ROW_BUDGET", budget)
     ids = probe_ids(47)
     base = build_model()
     reference = copy.deepcopy(base)
@@ -578,6 +581,24 @@ def test_fused_dispatch_batched_and_grouped_paths_agree(threshold, monkeypatch):
     )
     took_batched = any(layer._fused._halves is not None for layer in moe_layers(converted))
     assert took_batched is (threshold > 0), f"threshold {threshold}: batched={took_batched}"
+
+
+def test_batched_block_is_bounded_by_the_row_budget():
+    """No padded block may exceed the budget, whatever the capacity is."""
+
+    from orrg.dispatch import chunk_plan
+
+    budget = 1_024
+    for capacity in (1, 7, 64, 1_024, 4_096, 16_384):
+        lane_chunk, segment_chunk = chunk_plan(capacity, budget)
+        assert lane_chunk <= budget, (capacity, lane_chunk)
+        assert lane_chunk * segment_chunk <= budget, (capacity, lane_chunk, segment_chunk)
+        # Together the pieces must cover every lane and every segment exactly once.
+        lanes = range(0, capacity, lane_chunk)
+        assert sum(1 for _ in lanes) * lane_chunk >= capacity
+        assert segment_chunk >= 1
+    # The default plan is the one the library uses.
+    assert chunk_plan(8_192) == chunk_plan(8_192, 8_192)
 
 
 def test_fused_dispatch_handles_skeleton_only():

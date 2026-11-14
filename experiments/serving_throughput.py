@@ -256,6 +256,7 @@ def main() -> int:
         "repeats": REPEATS,
         "batched_below_rows": shipped,
         "min_batched_rows": orrg_dispatch.MIN_BATCHED_ROWS,
+        "batched_row_budget": orrg_dispatch.BATCHED_ROW_BUDGET,
         "prefill_seq": PREFILL_SEQ,
         "stats": stats,
         "ratios": {f"{a}_over_{b}": ratio(a, b) for a, b in pairs},

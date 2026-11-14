@@ -39,9 +39,29 @@ _FORCE_PATH: str | None = None
 
 
 BATCHED_BELOW_ROWS = 8_192
+# The padded residual block is `segments x capacity` rows, and capacity is the worst
+# case `tokens * k` — 13x the rows that exist. Materialising it whole is what made the
+# path lose at large token counts, so the block is walked in pieces bounded by this row
+# budget. Peak padded extent is therefore <= BATCHED_ROW_BUDGET rows, whatever `tokens`
+# is; a single segment longer than the budget is itself tiled along its lanes.
+BATCHED_ROW_BUDGET = 8_192
 # ...and not below this either: decode b1 packs 12-16 rows and measures a tie
 # (1.03-1.05x, inside the floor), so the cheaper path stays.
 MIN_BATCHED_ROWS = 64
+
+
+def chunk_plan(capacity: int, budget: int | None = None) -> tuple[int, int]:
+    """Lanes per block and segment batch for one padded block of `capacity` rows.
+
+    Returns ``(lane_chunk, segment_chunk)`` such that a block never exceeds the row
+    budget, so peak padded extent is bounded independently of the token count. A
+    single segment longer than the budget is tiled along its lanes, which is why the
+    lane count can be smaller than the capacity.
+    """
+
+    budget = BATCHED_ROW_BUDGET if budget is None else budget
+    lane_chunk = max(1, min(capacity, budget))
+    return lane_chunk, max(1, budget // lane_chunk)
 
 
 def path_for(rows: int) -> str:
@@ -252,23 +272,35 @@ class FusedDispatch:
             starts = torch.cat([
                 torch.zeros(1, dtype=torch.long, device=packed.device), ends[:-1],
             ])
-            lanes = torch.arange(residual_capacity(tokens, self.k),
-                                 device=packed.device)
-            positions = (starts.unsqueeze(1) + lanes.unsqueeze(0)).clamp(
-                0, residual_rows.shape[0] - 1,
-            )
-            valid = lanes.unsqueeze(0) < (ends - starts).clamp(min=0).unsqueeze(1)
+            capacity = residual_capacity(tokens, self.k)
+            counts = (ends - starts).clamp(min=0)
+            n_residual = gate_w.shape[0] - n_shards
+            zero = torch.zeros((), dtype=acc, device=packed.device)
+            # Walk the padded block in pieces no larger than the budget. `chunk`
+            # segments of `lane_chunk` lanes never exceed it, so peak padded extent is
+            # bounded by BATCHED_ROW_BUDGET no matter how many tokens were routed.
+            lane_chunk, chunk = chunk_plan(capacity)
+            for lane_start in range(0, capacity, lane_chunk):
+                lanes = torch.arange(
+                    lane_start, min(lane_start + lane_chunk, capacity), device=packed.device,
+                )
+                for lo in range(0, n_residual, chunk):
+                    hi = min(lo + chunk, n_residual)
+                    positions = (starts[lo:hi].unsqueeze(1) + lanes.unsqueeze(0)).clamp(
+                        0, residual_rows.shape[0] - 1,
+                    )
+                    valid = lanes.unsqueeze(0) < counts[lo:hi].unsqueeze(1)
 
-            gathered = residual_rows[positions]
-            gate = torch.bmm(gathered, gate_w[n_shards:])
-            up = torch.bmm(gathered, up_w[n_shards:])
-            out = torch.bmm(F.silu(gate) * up, down_w[n_shards:])
-            weight = torch.where(valid, scales_sorted[positions],
-                                 torch.zeros((), dtype=acc, device=packed.device))
-            contribution.index_add_(
-                0, rows_sorted[positions].reshape(-1),
-                (out.to(acc) * weight.unsqueeze(-1)).reshape(-1, contribution.shape[-1]),
-            )
+                    gathered = residual_rows[positions]
+                    gate = torch.bmm(gathered, gate_w[n_shards + lo : n_shards + hi])
+                    up = torch.bmm(gathered, up_w[n_shards + lo : n_shards + hi])
+                    out = torch.bmm(F.silu(gate) * up, down_w[n_shards + lo : n_shards + hi])
+                    weight = torch.where(valid, scales_sorted[positions], zero)
+                    contribution.index_add_(
+                        0, rows_sorted[positions].reshape(-1),
+                        (out.to(acc) * weight.unsqueeze(-1)).reshape(
+                            -1, contribution.shape[-1]),
+                    )
         return (skeleton + contribution).to(packed.dtype)
 
     def _grouped(self, tokens, packed, offs, rows_sorted, scales_sorted):
