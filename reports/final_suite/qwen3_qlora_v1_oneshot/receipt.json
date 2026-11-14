@@ -1,0 +1,162 @@
+{
+  "run": "qwen3_qlora_v1_oneshot",
+  "model": "v1",
+  "thinking": "disabled",
+  "temperature": 0.0,
+  "max_tokens": 3000,
+  "protocol": "function-replacement + bounded self-repair",
+  "max_attempts_per_task": 1,
+  "feedback_limit_chars": 5000,
+  "contract": "You are fixing one bug in a real repository.\nRules:\n1. Read the issue and the file excerpt; change only what the issue requires.\n2. Preserve public behavior unrelated to the bug.\n3. Return a complete, syntactically valid replacement for the target function.\n4. Every branch of a conditional that computes a value must assign that value.\n5. Keep the function's public signature and documented behavior.",
+  "contract_sha256": "59ae47551fd8584b8e9fc3aa8351a7b0f9c96b24d4f05fc17583124e1208b523",
+  "system": "You are a senior Python engineer fixing a bug in a real open-source repository. Return the complete replacement function in one ```python code block. Do not include prose or explanation.",
+  "system_sha256": "a27b8c0187460571d65608283c8e213152343dd2e5abc3bede518e33eed95171",
+  "per_repo": {
+    "boltons": {
+      "passed": 1,
+      "cases": 17,
+      "failed": [
+        "basic_epoch",
+        "dt_to_timestamp_fraction",
+        "frac_1_digit_5",
+        "frac_2_digits_05",
+        "frac_3_digits_851",
+        "frac_4_digits_0001",
+        "frac_6_digits_000001",
+        "frac_leading_zero_051",
+        "frac_overprecise_truncates",
+        "isoformat_default",
+        "isoformat_microseconds",
+        "isoformat_milliseconds",
+        "tz_aware_isoformat_roundtrip",
+        "tz_offset_plus_0530",
+        "tz_offset_with_fraction",
+        "tz_zulu"
+      ],
+      "apply_ok": true,
+      "touched": [
+        "isoparse"
+      ],
+      "attempts": 1,
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "passed": 1,
+          "failed": [
+            "basic_epoch",
+            "dt_to_timestamp_fraction",
+            "frac_1_digit_5",
+            "frac_2_digits_05",
+            "frac_3_digits_851",
+            "frac_4_digits_0001",
+            "frac_6_digits_000001",
+            "frac_leading_zero_051",
+            "frac_overprecise_truncates",
+            "isoformat_default",
+            "isoformat_microseconds",
+            "isoformat_milliseconds",
+            "tz_aware_isoformat_roundtrip",
+            "tz_offset_plus_0530",
+            "tz_offset_with_fraction",
+            "tz_zulu"
+          ],
+          "apply_ok": true
+        }
+      ]
+    },
+    "toolz": {
+      "passed": 3,
+      "cases": 17,
+      "failed": [
+        "toolz/tests/test_inspect_args.py::test_func_keyword",
+        "toolz/tests/test_inspect_args.py::test_has_keywords",
+        "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+        "toolz/tests/test_inspect_args.py::test_has_varargs",
+        "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_py3",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_is_arity",
+        "toolz/tests/test_inspect_args.py::test_is_partial",
+        "toolz/tests/test_inspect_args.py::test_is_valid",
+        "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+        "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+        "toolz/tests/test_inspect_args.py::test_num_required_args"
+      ],
+      "apply_ok": true,
+      "touched": [
+        "_check_sigspec"
+      ],
+      "attempts": 1,
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "passed": 3,
+          "failed": [
+            "toolz/tests/test_inspect_args.py::test_func_keyword",
+            "toolz/tests/test_inspect_args.py::test_has_keywords",
+            "toolz/tests/test_inspect_args.py::test_has_unknown_args",
+            "toolz/tests/test_inspect_args.py::test_has_varargs",
+            "toolz/tests/test_inspect_args.py::test_inspect_signature_property",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_py3",
+            "toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_is_arity",
+            "toolz/tests/test_inspect_args.py::test_is_partial",
+            "toolz/tests/test_inspect_args.py::test_is_valid",
+            "toolz/tests/test_inspect_args.py::test_is_valid_curry",
+            "toolz/tests/test_inspect_args.py::test_is_valid_py3",
+            "toolz/tests/test_inspect_args.py::test_num_required_args"
+          ],
+          "apply_ok": true
+        }
+      ]
+    },
+    "more-itertools": {
+      "passed": 16,
+      "cases": 16,
+      "failed": [],
+      "apply_ok": true,
+      "touched": [
+        "split_into"
+      ],
+      "attempts": 1,
+      "attempt_history": [
+        {
+          "attempt": 1,
+          "passed": 16,
+          "failed": [],
+          "apply_ok": true
+        }
+      ]
+    }
+  },
+  "total_passed": 20,
+  "total_cases": 50,
+  "initial_prompt_sha256": {
+    "boltons": "fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9",
+    "toolz": "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60",
+    "more-itertools": "be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad"
+  },
+  "initial_prompt_bytes": {
+    "boltons": 3657,
+    "toolz": 1810,
+    "more-itertools": 3282
+  },
+  "function_sha256": {
+    "boltons": "2994ac6ae681269fe4f0c79d1ddbe277f5418e3e716b8ca5b80715a5c47ae854",
+    "toolz": "ec4bcd38dd798aa11cbd6687304d1115f952c318ee76c41b48ee2556e2526594",
+    "more-itertools": "1a761a957e64ca872a425724e6a89ff2cca6cebda0b5b60df8366cd5bcbbcaa6"
+  },
+  "attempt_prompt_sha256": {
+    "boltons": [
+      "fa87ba6f3431d954b08760636a947fc3118b55988670beffd5dcfe9d2770d9a9"
+    ],
+    "toolz": [
+      "e694cd740f76a26560b43a834c1e06acf788e587163da0036f0b4783f3643a60"
+    ],
+    "more-itertools": [
+      "be6cb522b7a6dbe7b52abc650fa42bda0aa33db38715094f25f706b511e995ad"
+    ]
+  }
+}
