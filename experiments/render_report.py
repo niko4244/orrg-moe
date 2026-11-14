@@ -64,8 +64,9 @@ def serving_tables(data: dict) -> tuple[str, list[str], float]:
         "Same weights, both dispatches: `*_batched` forces the batched path and",
         "`*_grouped` forces grouped, so every cell below is a real comparison. The",
         "shipped arm (`fused_k1`, `fused_k2`) runs the gate and is what serving does;",
-        f"`MIN_BATCHED_ROWS = {data['min_batched_rows']}`, "
-        f"`BATCHED_BELOW_ROWS = {data['batched_below_rows']:,}`.",
+        f"`MIN_BATCHED_ROWS = {dispatch.MIN_BATCHED_ROWS}` and `BATCHED_BELOW_ROWS` = "
+        + ", ".join(f"k={k}: {dispatch.batched_limit(k):,}" for k in (1, 2))
+        + " packed rows, measured per k (§1f).",
         "",
         "| metric | " + " | ".join(shipped) + " |",
         "|---" * (len(shipped) + 1) + "|",
@@ -90,7 +91,7 @@ def serving_tables(data: dict) -> tuple[str, list[str], float]:
             values = ratios_of(data, f"fused_k{k}_batched", f"fused_k{k}_grouped", metric)
             cells.append(f"{statistics.median(values):.2f} "
                          f"[{min(values):.2f}–{max(values):.2f}]")
-            cells.append(f"{dispatch.path_for(rows)} ({rows:,} rows)")
+            cells.append(f"{dispatch.path_for(rows, k)} ({rows:,} rows)")
         lines.append(f"| {metric} | " + " | ".join(cells) + " |")
 
     columns = [
@@ -137,7 +138,7 @@ def serving_tables(data: dict) -> tuple[str, list[str], float]:
             values = ratios_of(data, f"fused_k{k}_batched", f"fused_k{k}_grouped", metric)
             med = statistics.median(values)
             rows = gate_rows[(metric, k)]
-            gate = dispatch.path_for(rows)
+            gate = dispatch.path_for(rows, k)
             # These are throughput ratios (batched / grouped): above 1 the batched path
             # is faster. Shapes below MIN_BATCHED_ROWS are decided by the lower bound,
             # which the report discusses separately as a measured tie.
@@ -195,7 +196,7 @@ def band_table(data: dict, floor: float) -> tuple[str, list[str]]:
         grouped = statistics.median(rec["grouped_ms"])
         batched = statistics.median(rec["batched_ms"])
         ratio = batched / grouped
-        gate = dispatch.path_for(rec["rows"])
+        gate = dispatch.path_for(rec["rows"], rec["k"])
         lines.append(
             f"| {rec['k']} | {rec['tokens']} | {rec['rows']:,} | "
             f"{rec['tokens'] * rec['k']:,} | {grouped:.1f} | {batched:.1f} | "
@@ -203,24 +204,26 @@ def band_table(data: dict, floor: float) -> tuple[str, list[str]]:
         )
         by_rows.setdefault(rec["rows"], {})[rec["k"]] = rec
 
-    # The bound is one row count for every k, so it is judged where both k are
-    # measured: a row count only one of them reaches cannot decide a k-agnostic bound.
+    # The bound is stored per k, so every cell decides its own k. A batched cell may
+    # never lose, judged on the median with no stability exemption: a routed loss is the
+    # failure that matters. A grouped cell is only challenged when *every* repeat agrees
+    # it is a win, because a cell whose repeats straddle the floor cannot decide a bound
+    # — the table prints those as ranges instead.
     problems = []
-    for rows, recs in sorted(by_rows.items()):
-        if len(recs) < 2:
+    for rec in data["records"]:
+        rows = rec["rows"]
+        if rows < dispatch.MIN_BATCHED_ROWS:
             continue
-        measured = [statistics.median(r["batched_ms"]) / statistics.median(r["grouped_ms"])
-                    for r in recs.values()]
-        gate = dispatch.path_for(rows)
-        # Conservative in both directions: a batched region must not lose at *any* k, and
-        # a grouped region must not be won by *any* k. Using max for both let a losing k
-        # mask a winning one, so the grouped check passed vacuously.
-        if gate == "batched" and max(measured) > 1.0 + floor:
-            problems.append(f"band {rows:,} rows (both k) dispatches batched but the worst "
-                            f"k measures {max(measured):.2f}x")
-        if gate == "grouped" and min(measured) < 1.0 - floor:
-            problems.append(f"band {rows:,} rows (both k) dispatches grouped but the best "
-                            f"k measures {min(measured):.2f}x")
+        repeats = [b / g for b, g in zip(rec["batched_ms"], rec["grouped_ms"])]
+        median = statistics.median(repeats)
+        gate = dispatch.path_for(rows, rec["k"])
+        if gate == "batched" and median > 1.0 + floor:
+            problems.append(f"band k={rec['k']} {rows:,} rows dispatches batched but "
+                            f"measures {median:.2f}x")
+        if gate == "grouped" and max(repeats) < 1.0 - floor:
+            problems.append(f"band k={rec['k']} {rows:,} rows dispatches grouped but "
+                            f"measures {median:.2f}x with every repeat below the floor")
+    del by_rows
     return "\n".join(lines), problems
 
 
@@ -242,10 +245,15 @@ def main() -> int:
 
     # A stale artifact must not be rendered: the gate it recorded has to be the gate
     # in the code, or the "serving" column would describe a build that no longer exists.
+    # Only the kernel constants are checked against the artifacts: the band pins both arms
+    # with force_path, so its measurements do not depend on the gate, and every gate column
+    # is computed live rather than read from a file.
     for name, data in (("serving_throughput", serving), ("gate_band", band)):
-        for field, live in (("batched_below_rows", dispatch.BATCHED_BELOW_ROWS),
-                            ("min_batched_rows", dispatch.MIN_BATCHED_ROWS),
-                            ("batched_row_budget", dispatch.BATCHED_ROW_BUDGET)):
+        stale = {"min_batched_rows": dispatch.MIN_BATCHED_ROWS,
+                 "batched_row_budget": dispatch.BATCHED_ROW_BUDGET}
+        if name == "serving_throughput":
+            stale["batched_below_rows"] = {str(k): dispatch.batched_limit(k) for k in (1, 2)}
+        for field, live in stale.items():
             if data[field] != live:
                 raise SystemExit(
                     f"{name} artifact {field}={data[field]} but code has {live}: re-run it"

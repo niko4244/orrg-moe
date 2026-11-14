@@ -583,6 +583,21 @@ def test_fused_dispatch_batched_and_grouped_paths_agree(threshold, budget, monke
     assert took_batched is (threshold > 0), f"threshold {threshold}: batched={took_batched}"
 
 
+def test_the_batched_bound_is_measured_per_k():
+    """The two k share no knee, so the shipped bound must differ between them."""
+
+    import orrg.dispatch as dispatch
+
+    k1, k2 = dispatch.batched_limit(1), dispatch.batched_limit(2)
+    assert k1 != k2, f"both k share the bound {k1}; the band measures different knees"
+    # The row counts the band measures on opposite sides of the two bounds.
+    assert dispatch.path_for(k2 + 1, 2) == "grouped"
+    assert dispatch.path_for(k2 + 1, 1) == "batched"
+    assert dispatch.path_for(k1, 1) == "batched"
+    assert dispatch.path_for(k1 + 1, 1) == "grouped"
+    assert dispatch.path_for(dispatch.MIN_BATCHED_ROWS - 1, 1) == "grouped"
+
+
 def test_batched_block_is_bounded_by_the_row_budget():
     """No padded block may exceed the budget, whatever the capacity is."""
 

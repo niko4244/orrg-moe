@@ -254,7 +254,7 @@ def main() -> int:
         "params": params,
         "active": {str(k): v for k, v in active.items()},
         "repeats": REPEATS,
-        "batched_below_rows": shipped,
+        "batched_below_rows": {str(key): value for key, value in shipped.items()},
         "min_batched_rows": orrg_dispatch.MIN_BATCHED_ROWS,
         "batched_row_budget": orrg_dispatch.BATCHED_ROW_BUDGET,
         "prefill_seq": PREFILL_SEQ,

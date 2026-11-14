@@ -38,7 +38,17 @@ import torch.nn.functional as F
 _FORCE_PATH: str | None = None
 
 
-BATCHED_BELOW_ROWS = 8_192
+# Measured per k, because the batched block's cost tracks the padded capacity `tokens*k`
+# rather than the packed rows. On the complete band the two k share no single knee: at
+# 7,680 rows the k=2 arm loses 1.15x while k=1 wins 0.90x at the same count, and at 9,984
+# k=1 wins 0.91x while k=2 loses 1.22x. One number cannot be right for both, and the
+# 8,192 it replaced was wrong in both directions — too permissive for k=2 (7,680 and
+# 8,448 measure 1.15x and 1.13x) and too tight for k=1 (9,984 and 10,752 measure 0.91x
+# and 0.83x). k=2 stops at 6,912, the last count before the 7,680 loss. k=1 stops at
+# 10,752, its last measured win: 11,520 and 12,288 are ties (1.05x, inside the floor) so
+# they buy nothing, 13,056 reads 0.91x with repeats spanning 0.80-1.33 (straddling the
+# floor, which the audit refuses to decide), and 13,824 is the first clean loss (1.12x).
+BATCHED_BELOW_ROWS = {1: 10_752, 2: 6_912}
 # The padded residual block is `segments x capacity` rows, and capacity is the worst
 # case `tokens * k` — 13x the rows that exist. Materialising it whole is what made the
 # path lose at large token counts, so the block is walked in pieces bounded by this row
@@ -64,12 +74,20 @@ def chunk_plan(capacity: int, budget: int | None = None) -> tuple[int, int]:
     return lane_chunk, max(1, budget // lane_chunk)
 
 
-def path_for(rows: int) -> str:
+def batched_limit(k: int = 1) -> int:
+    """Largest packed row count the batched path takes with `k` residual experts."""
+
+    if isinstance(BATCHED_BELOW_ROWS, int):  # a test may pin one scalar for every k
+        return BATCHED_BELOW_ROWS
+    return BATCHED_BELOW_ROWS.get(k, min(BATCHED_BELOW_ROWS.values()))
+
+
+def path_for(rows: int, k: int = 1) -> str:
     """The dispatch path a packed row count takes in the shipped build."""
 
     if _FORCE_PATH is not None:
         return _FORCE_PATH
-    return "batched" if MIN_BATCHED_ROWS <= rows <= BATCHED_BELOW_ROWS else "grouped"
+    return "batched" if MIN_BATCHED_ROWS <= rows <= batched_limit(k) else "grouped"
 
 
 @contextlib.contextmanager
@@ -245,7 +263,7 @@ class FusedDispatch:
     def forward(self, flat: torch.Tensor) -> torch.Tensor:
         tokens = flat.shape[0]
         packed, offs, rows_sorted, scales_sorted = self._prepare(flat)
-        if path_for(packed.shape[0]) == "batched":
+        if path_for(packed.shape[0], self.k) == "batched":
             return self._batched(tokens, packed, offs, rows_sorted, scales_sorted)
         return self._grouped(tokens, packed, offs, rows_sorted, scales_sorted)
 

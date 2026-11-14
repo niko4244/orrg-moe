@@ -8,6 +8,12 @@ the same weights, batched and grouped adjacent per repeat, warm-up discarded, th
 repeats stored, and the order flipped every other repeat so neither arm inherits the
 clock ramp.
 
+Every row count is measured at **both** k, because the bound is k-agnostic: a grid
+where 10,240 rows exists only at k=2 cannot decide a threshold that applies to both.
+The grid is a list of row counts, and the token count is derived per k (`rows / (shards
++ 4k)`), so all entries are multiples of 48 — the least common multiple of 12 and 16
+rows/token. It steps by 768 rows and by 384 through the 7,680-9,216 knee.
+
 Each row count is reached with one sequence of that many tokens, so both arms see the
 same attention work; only the MoE dispatch changes.
 
@@ -27,8 +33,14 @@ import orrg.dispatch as dispatch
 from experiments.probe_vs_model import build
 from experiments.harness import DEVICE, VOCAB
 
-# k=1 packs 12 rows/token, k=2 packs 16, so these bracket 4,096 on both sides.
-TOKENS = (128, 192, 256, 320, 384, 512, 576, 640, 704, 768, 896)
+# Row counts, not token counts: the token count per k follows from the packed rows a
+# token produces, so every entry is measured at both k. Multiples of 48 keep both token
+# counts integral (12 rows/token at k=1, 16 at k=2).
+ROWS = (
+    1_536, 2_304, 3_072, 3_840, 4_608, 5_376, 6_144, 6_912,
+    7_680, 8_064, 8_448, 8_832, 9_216,
+    9_984, 10_752, 11_520, 12_288, 13_056, 13_824, 14_400,
+)
 REPEATS = 3
 SHARDS = 8
 GROUPS = 4
@@ -45,14 +57,16 @@ def time_once(model, ids) -> float:
 
 
 def main() -> int:
-    print(f"{torch.cuda.get_device_name(0)}; gate {dispatch.MIN_BATCHED_ROWS}-"
-          f"{dispatch.BATCHED_BELOW_ROWS} rows")
+    limits = "/".join(f"k{k}:{dispatch.batched_limit(k):,}" for k in KS)
+    print(f"{torch.cuda.get_device_name(0)}; gate {dispatch.MIN_BATCHED_ROWS}-{limits} rows")
     records = []
     for k in KS:
         model, _ = build(k)
-        for tokens in TOKENS:
+        per_token = SHARDS + k * GROUPS
+        for rows in ROWS:
+            tokens, remainder = divmod(rows, per_token)
+            assert remainder == 0, f"{rows} rows is not reachable at k={k}"
             ids = torch.randint(0, VOCAB, (1, tokens), device=DEVICE)
-            rows = tokens * (SHARDS + k * GROUPS)
             samples = {"batched": [], "grouped": []}
             for path in ("batched", "grouped"):  # discarded warm-up
                 with dispatch.force_path(path):
@@ -66,7 +80,7 @@ def main() -> int:
             records.append({"k": k, "tokens": tokens, "rows": rows,
                             "batched_ms": samples["batched"],
                             "grouped_ms": samples["grouped"], "ratio": ratio})
-            print(f"| {k} | {tokens} | {rows} | {dispatch.path_for(rows)} | "
+            print(f"| {k} | {tokens} | {rows} | {dispatch.path_for(rows, k)} | "
                   + " | ".join(f"{v:.1f}" for v in samples["grouped"])
                   + " | " + " | ".join(f"{v:.1f}" for v in samples["batched"])
                   + f" | {ratio:.2f} |")
@@ -79,7 +93,8 @@ def main() -> int:
         "device": torch.cuda.get_device_name(0),
         "repeats": REPEATS,
         "min_batched_rows": dispatch.MIN_BATCHED_ROWS,
-        "batched_below_rows": dispatch.BATCHED_BELOW_ROWS,
+        "batched_below_rows": {str(key): value
+                                for key, value in dispatch.BATCHED_BELOW_ROWS.items()},
         "batched_row_budget": dispatch.BATCHED_ROW_BUDGET,
         "records": records,
     }, indent=2))
