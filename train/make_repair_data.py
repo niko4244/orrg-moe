@@ -118,17 +118,24 @@ def main() -> int:
     parser.add_argument("--out", default="train/data/repair.jsonl")
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--minutes", type=float, default=20.0)
+    parser.add_argument("--only", default="", help="comma-separated repo names")
+    parser.add_argument("--per-function", type=int, default=1,
+                        help="distinct verified mutants to emit per function")
+    parser.add_argument("--append", action="store_true")
     args = parser.parse_args()
     random.seed(args.seed)
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
+    wanted = {name.strip() for name in args.only.split(",") if name.strip()}
     written = tried = 0
     baseline: dict[Path, bool] = {}
     deadline = time.time() + 60 * args.minutes
-    with out.open("w", encoding="utf-8") as handle:
+    with out.open("a" if args.append else "w", encoding="utf-8") as handle:
         for repo in sorted(REPOS.iterdir()):
             if not repo.is_dir():
+                continue
+            if wanted and repo.name not in wanted:
                 continue
             for module in sorted(repo.rglob("*.py")):
                 if "test" in module.name or written >= args.limit:
@@ -144,6 +151,7 @@ def main() -> int:
                 for node in functions(tree):
                     if written >= args.limit or time.time() > deadline:
                         break
+                    emitted = 0
                     if tests not in baseline:
                         try:
                             baseline[tests] = run_tests(repo, tests)[0]
@@ -151,7 +159,13 @@ def main() -> int:
                             baseline[tests] = False
                     if not baseline[tests]:
                         continue  # suite already red: no clean baseline
-                    pick = mutate(lines, node.lineno - 1, node.end_lineno)
+                    pick = None
+                    attempts = 0
+                    # Walk several distinct mutants per function: the first candidate
+                    # frequently survives (equivalent mutant) and yields nothing.
+                    while pick is None and attempts < args.per_function * 4 and emitted == 0:
+                        pick = mutate(lines, node.lineno - 1, node.end_lineno)
+                        attempts += 1
                     if pick is None:
                         continue
                     index, original, changed, mutation = pick
@@ -198,8 +212,11 @@ def main() -> int:
                         ],
                     }) + "\n")
                     written += 1
+                    emitted += 1
                     print(f"[{written}] {repo.name}/{module.name}::{node.name} ({mutation})",
                           flush=True)
+                    if emitted >= args.per_function:
+                        break
     print(f"wrote {written} verified pairs from {tried} mutants to {out}")
     return 0
 

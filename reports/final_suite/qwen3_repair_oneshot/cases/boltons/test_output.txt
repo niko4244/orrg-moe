@@ -1,0 +1,127 @@
+[{"case": "basic_epoch", "status": "PASSED", "detail": ""}, {"case": "frac_3_digits_851", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "frac_leading_zero_051", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "frac_6_digits_000001", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "frac_overprecise_truncates", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "frac_1_digit_5", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "frac_2_digits_05", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "frac_4_digits_0001", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "isoformat_milliseconds", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "isoformat_microseconds", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "isoformat_default", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "tz_zulu", "status": "PASSED", "detail": ""}, {"case": "tz_offset_plus_0530", "status": "PASSED", "detail": ""}, {"case": "tz_offset_with_fraction", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "tz_aware_isoformat_roundtrip", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}, {"case": "tz_invalid_offset_raises", "status": "PASSED", "detail": ""}, {"case": "dt_to_timestamp_fraction", "status": "FAILED", "detail": "TypeError: argument for function given by name ('tzinfo') and position (8)"}]
+
+
+
+--- diagnostic pytest of the 17 oracle cases ---
+.FFFFFFFFFF..FF.F                                                        [100%]
+================================== FAILURES ===================================
+__________________________ test_01_frac_3_digits_851 __________________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:8: in test_01_frac_3_digits_851
+    assert isoparse('1970-01-01T00:00:00.851').microsecond == 851000
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+________________________ test_02_frac_leading_zero_051 ________________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:11: in test_02_frac_leading_zero_051
+    assert isoparse('2020-01-02T03:04:05.051').microsecond == 51000
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+________________________ test_03_frac_6_digits_000001 _________________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:14: in test_03_frac_6_digits_000001
+    assert isoparse('2020-01-02T03:04:05.000001').microsecond == 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+_____________________ test_04_frac_overprecise_truncates ______________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:17: in test_04_frac_overprecise_truncates
+    assert isoparse('2020-01-01T00:00:00.123456789').microsecond == 123456
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+___________________________ test_05_frac_1_digit_5 ____________________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:20: in test_05_frac_1_digit_5
+    assert isoparse('2020-01-02T03:04:05.5').microsecond == 500000
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+__________________________ test_06_frac_2_digits_05 ___________________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:23: in test_06_frac_2_digits_05
+    assert isoparse('2020-01-02T03:04:05.05').microsecond == 50000
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+_________________________ test_07_frac_4_digits_0001 __________________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:26: in test_07_frac_4_digits_0001
+    assert isoparse('2020-01-02T03:04:05.0001').microsecond == 100
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+_______________________ test_08_isoformat_milliseconds ________________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:29: in test_08_isoformat_milliseconds
+    dt=datetime(2020,1,2,3,4,5,851000); assert isoparse(dt.isoformat(timespec='milliseconds')) == dt
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+_______________________ test_09_isoformat_microseconds ________________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:32: in test_09_isoformat_microseconds
+    dt=datetime(2020,1,2,3,4,5,851000); assert isoparse(dt.isoformat(timespec='microseconds')) == dt
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+__________________________ test_10_isoformat_default __________________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:35: in test_10_isoformat_default
+    dt=datetime(2020,1,2,3,4,5,851000); assert isoparse(dt.isoformat()) == dt
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+_______________________ test_13_tz_offset_with_fraction _______________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:44: in test_13_tz_offset_with_fraction
+    assert isoparse('2020-01-02T03:04:05.250-0800').utcoffset() == timedelta(hours=-8)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+____________________ test_14_tz_aware_isoformat_roundtrip _____________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:47: in test_14_tz_aware_isoformat_roundtrip
+    dt=datetime(2020,1,2,3,4,5,6,tzinfo=timezone(timedelta(hours=-3,minutes=-30))); assert isoparse(dt.isoformat()) == dt
+                                                                                           ^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+______________________ test_16_dt_to_timestamp_fraction _______________________
+..\attempts\boltons\attempt_1\test_oracle_feedback.py:55: in test_16_dt_to_timestamp_fraction
+    assert abs(dt_to_timestamp(isoparse('1970-01-01T00:00:00.851')) - 0.851) < 1e-9
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+boltons\timeutils.py:155: in isoparse
+    return datetime(*dt_args, tzinfo=tzinfo)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: argument for function given by name ('tzinfo') and position (8)
+=========================== short test summary info ===========================
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_01_frac_3_digits_851
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_02_frac_leading_zero_051
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_03_frac_6_digits_000001
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_04_frac_overprecise_truncates
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_05_frac_1_digit_5
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_06_frac_2_digits_05
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_07_frac_4_digits_0001
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_08_isoformat_milliseconds
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_09_isoformat_microseconds
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_10_isoformat_default
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_13_tz_offset_with_fraction
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_14_tz_aware_isoformat_roundtrip
+FAILED ..\attempts\boltons\attempt_1\test_oracle_feedback.py::test_16_dt_to_timestamp_fraction
+13 failed, 4 passed in 0.38s
+

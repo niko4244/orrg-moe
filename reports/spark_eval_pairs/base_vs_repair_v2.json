@@ -1,0 +1,61 @@
+{
+  "base": "reports\\final_suite\\qwen3_base_oneshot",
+  "adapter": "reports\\final_suite\\qwen3_repair2_oneshot",
+  "base_total": 29,
+  "adapter_total": 27,
+  "cases": 50,
+  "both_pass": 27,
+  "base_only": [
+    "toolz:toolz/tests/test_inspect_args.py::test_introspect_builtin_modules",
+    "toolz:toolz/tests/test_inspect_args.py::test_introspect_curry_py3"
+  ],
+  "adapter_only": [],
+  "neither": 21,
+  "p_case": 0.5,
+  "p_task": 1.0,
+  "identical_prompts": true,
+  "identical_config": true,
+  "tasks": {
+    "boltons": {
+      "cases": 17,
+      "base": 9,
+      "adapter": 9,
+      "delta": 0,
+      "flips_up": [],
+      "flips_down": []
+    },
+    "more-itertools": {
+      "cases": 16,
+      "base": 16,
+      "adapter": 16,
+      "delta": 0,
+      "flips_up": [],
+      "flips_down": []
+    },
+    "toolz": {
+      "cases": 17,
+      "base": 4,
+      "adapter": 2,
+      "delta": -2,
+      "flips_up": [],
+      "flips_down": [
+        "toolz/tests/test_inspect_args.py::test_introspect_builtin_modules",
+        "toolz/tests/test_inspect_args.py::test_introspect_curry_py3"
+      ]
+    }
+  },
+  "base_config": {
+    "model": "qwen3-4b",
+    "thinking": "disabled",
+    "temperature": 0.0,
+    "max_tokens": 3000,
+    "max_attempts_per_task": 1
+  },
+  "adapter_config": {
+    "model": "qwen3-4b",
+    "thinking": "disabled",
+    "temperature": 0.0,
+    "max_tokens": 3000,
+    "max_attempts_per_task": 1
+  }
+}

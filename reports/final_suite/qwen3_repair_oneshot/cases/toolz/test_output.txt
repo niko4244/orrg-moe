@@ -1,0 +1,266 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\nikma\AppData\Local\Programs\Python\Python311\python.exe
+rootdir: I:\.freebuff\reports\final_suite\qwen3_repair_oneshot\toolz
+configfile: pyproject.toml
+plugins: anyio-4.12.1, langsmith-0.4.32, libtmux-0.62.0, asyncio-0.26.0, typeguard-4.4.3
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 17 items
+
+toolz/tests/test_inspect_args.py::test_make_func PASSED                  [  5%]
+toolz/tests/test_inspect_args.py::test_is_valid FAILED                   [ 11%]
+toolz/tests/test_inspect_args.py::test_is_valid_py3 FAILED               [ 17%]
+toolz/tests/test_inspect_args.py::test_is_partial FAILED                 [ 23%]
+toolz/tests/test_inspect_args.py::test_is_valid_curry FAILED             [ 29%]
+toolz/tests/test_inspect_args.py::test_func_keyword FAILED               [ 35%]
+toolz/tests/test_inspect_args.py::test_has_unknown_args FAILED           [ 41%]
+toolz/tests/test_inspect_args.py::test_num_required_args FAILED          [ 47%]
+toolz/tests/test_inspect_args.py::test_has_keywords FAILED               [ 52%]
+toolz/tests/test_inspect_args.py::test_has_varargs FAILED                [ 58%]
+toolz/tests/test_inspect_args.py::test_is_arity FAILED                   [ 64%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3 FAILED [ 70%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3 FAILED [ 76%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_py3 PASSED       [ 82%]
+toolz/tests/test_inspect_args.py::test_introspect_builtin_modules FAILED [ 88%]
+toolz/tests/test_inspect_args.py::test_inspect_signature_property FAILED [ 94%]
+toolz/tests/test_inspect_args.py::test_inspect_wrapped_property FAILED   [100%]
+
+================================== FAILURES ===================================
+________________________________ test_is_valid ________________________________
+toolz\tests\test_inspect_args.py:55: in test_is_valid
+    assert check_valid(f)
+E   assert None
+E    +  where None = <function test_is_valid.<locals>.<lambda> at 0x0000023EDDF91120>(<function func at 0x0000023EDDF91440>)
+______________________________ test_is_valid_py3 ______________________________
+toolz\tests\test_inspect_args.py:122: in test_is_valid_py3
+    assert check_valid(f) is incomplete
+E   assert None is False
+E    +  where None = <function test_is_valid_py3.<locals>.<lambda> at 0x0000023EDE5C3240>(<function func at 0x0000023EDE5C3380>)
+_______________________________ test_is_partial _______________________________
+toolz\functoolz.py:954: in _check_sigspec
+    sigspec = func.__signature__
+              ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'function' object has no attribute '__signature__'
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:204: in test_is_partial
+    test_is_valid(check_valid=is_partial_args, incomplete=True)
+toolz\tests\test_inspect_args.py:55: in test_is_valid
+    assert check_valid(f)
+           ^^^^^^^^^^^^^^
+toolz\tests\test_inspect_args.py:52: in <lambda>
+    check_valid = lambda func, *args, **kwargs: orig_check_valid(func, args, kwargs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:1015: in is_partial_args
+    sigspec, rv = _check_sigspec(sigspec, func, _sigs._is_partial_args,
+toolz\functoolz.py:957: in _check_sigspec
+    sigspec = Signature.from_args(func(*builtin_args))
+              ^^^^^^^^^
+E   NameError: name 'Signature' is not defined
+_____________________________ test_is_valid_curry _____________________________
+toolz\functoolz.py:305: in __call__
+    return self._partial(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: func() missing 2 required positional arguments: 'a' and 'b'
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:225: in test_is_valid_curry
+    test_is_valid_py3(check_valid=check_valid, incomplete=True)
+toolz\tests\test_inspect_args.py:190: in test_is_valid_py3
+    assert check_valid(f) is False
+           ^^^^^^^^^^^^^^
+toolz\tests\test_inspect_args.py:119: in <lambda>
+    check_valid = lambda func, *args, **kwargs: orig_check_valid(func, args, kwargs)
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\tests\test_inspect_args.py:211: in check_curry
+    curry(func)(*args, **kwargs)
+toolz\functoolz.py:307: in __call__
+    if self._should_curry(args, kwargs, exc):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:318: in _should_curry
+    self._has_unknown_args = has_varargs(func, sigspec) is not False
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:997: in has_varargs
+    for p in sigspec.parameters.values())
+             ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'int' object has no attribute 'parameters'
+______________________________ test_func_keyword ______________________________
+toolz\tests\test_inspect_args.py:235: in test_func_keyword
+    assert is_valid_args(f, (), {})
+E   assert None
+E    +  where None = is_valid_args(<function test_func_keyword.<locals>.f at 0x0000023EDE6440E0>, (), {})
+____________________________ test_has_unknown_args ____________________________
+toolz\functoolz.py:954: in _check_sigspec
+    sigspec = func.__signature__
+              ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'int' object has no attribute '__signature__'
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:246: in test_has_unknown_args
+    assert has_varargs(1) is False
+           ^^^^^^^^^^^^^^
+toolz\functoolz.py:993: in has_varargs
+    sigspec, rv = _check_sigspec(sigspec, func, _sigs._has_varargs, func)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:957: in _check_sigspec
+    sigspec = Signature.from_args(func(*builtin_args))
+              ^^^^^^^^^
+E   NameError: name 'Signature' is not defined
+___________________________ test_num_required_args ____________________________
+toolz\functoolz.py:954: in _check_sigspec
+    sigspec = func.__signature__
+              ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'function' object has no attribute '__signature__'
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:272: in test_num_required_args
+    assert num_required_args(lambda: None) == 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:983: in num_required_args
+    sigspec, rv = _check_sigspec(sigspec, func, _sigs._num_required_args,
+toolz\functoolz.py:957: in _check_sigspec
+    sigspec = Signature.from_args(func(*builtin_args))
+              ^^^^^^^^^
+E   NameError: name 'Signature' is not defined
+______________________________ test_has_keywords ______________________________
+toolz\functoolz.py:954: in _check_sigspec
+    sigspec = func.__signature__
+              ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'function' object has no attribute '__signature__'
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:282: in test_has_keywords
+    assert has_keywords(lambda: None) is False
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:1001: in has_keywords
+    sigspec, rv = _check_sigspec(sigspec, func, _sigs._has_keywords, func)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:957: in _check_sigspec
+    sigspec = Signature.from_args(func(*builtin_args))
+              ^^^^^^^^^
+E   NameError: name 'Signature' is not defined
+______________________________ test_has_varargs _______________________________
+toolz\functoolz.py:954: in _check_sigspec
+    sigspec = func.__signature__
+              ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'function' object has no attribute '__signature__'
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:295: in test_has_varargs
+    assert has_varargs(lambda: None) is False
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:993: in has_varargs
+    sigspec, rv = _check_sigspec(sigspec, func, _sigs._has_varargs, func)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:957: in _check_sigspec
+    sigspec = Signature.from_args(func(*builtin_args))
+              ^^^^^^^^^
+E   NameError: name 'Signature' is not defined
+________________________________ test_is_arity ________________________________
+toolz\functoolz.py:954: in _check_sigspec
+    sigspec = func.__signature__
+              ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'function' object has no attribute '__signature__'
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:303: in test_is_arity
+    assert is_arity(0, lambda: None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:1041: in is_arity
+    sigspec, rv = _check_sigspec(sigspec, func, _sigs._is_arity, n, func)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:957: in _check_sigspec
+    sigspec = Signature.from_args(func(*builtin_args))
+              ^^^^^^^^^
+E   NameError: name 'Signature' is not defined
+_______________________ test_introspect_curry_valid_py3 _______________________
+toolz\tests\test_inspect_args.py:319: in test_introspect_curry_valid_py3
+    assert check_valid(f)
+E   assert None
+E    +  where None = <function test_introspect_curry_valid_py3.<locals>.<lambda> at 0x0000023EDDEDCB80>(<function func at 0x0000023EDDEDC9A0>)
+______________________ test_introspect_curry_partial_py3 ______________________
+toolz\functoolz.py:954: in _check_sigspec
+    sigspec = func.__signature__
+              ^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:162: in __get__
+    return property.__get__(self, obj, type)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:241: in __signature__
+    raise TypeError('curry object has incorrect arguments')
+E   TypeError: curry object has incorrect arguments
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:355: in test_introspect_curry_partial_py3
+    test_introspect_curry_valid_py3(check_valid=is_partial_args, incomplete=True)
+toolz\tests\test_inspect_args.py:338: in test_introspect_curry_valid_py3
+    assert check_valid(f) is False
+           ^^^^^^^^^^^^^^
+toolz\tests\test_inspect_args.py:316: in <lambda>
+    check_valid = lambda _func, *args, **kwargs: orig_check_valid(_func, args, kwargs)
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:1015: in is_partial_args
+    sigspec, rv = _check_sigspec(sigspec, func, _sigs._is_partial_args,
+toolz\functoolz.py:957: in _check_sigspec
+    sigspec = Signature.from_args(func(*builtin_args))
+              ^^^^^^^^^
+E   NameError: name 'Signature' is not defined
+_______________________ test_introspect_builtin_modules _______________________
+toolz\functoolz.py:954: in _check_sigspec
+    sigspec = func.__signature__
+              ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'builtin_function_or_method' object has no attribute '__signature__'
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:425: in test_introspect_builtin_modules
+    if is_missing(modname, name, func):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\tests\test_inspect_args.py:416: in is_missing
+    and is_partial_args(func, (), {}) is not True
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:1015: in is_partial_args
+    sigspec, rv = _check_sigspec(sigspec, func, _sigs._is_partial_args,
+toolz\functoolz.py:957: in _check_sigspec
+    sigspec = Signature.from_args(func(*builtin_args))
+              ^^^^^^^^^
+E   NameError: name 'Signature' is not defined
+_______________________ test_inspect_signature_property _______________________
+toolz\tests\test_inspect_args.py:465: in test_inspect_signature_property
+    assert num_required_args(AddX) is False
+           ^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:987: in num_required_args
+    return sum(1 for p in sigspec.parameters.values()
+                          ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'property' object has no attribute 'parameters'
+________________________ test_inspect_wrapped_property ________________________
+toolz\functoolz.py:954: in _check_sigspec
+    sigspec = func.__signature__
+              ^^^^^^^^^^^^^^^^^^
+E   AttributeError: type object 'Wrapped' has no attribute '__signature__'
+
+During handling of the above exception, another exception occurred:
+toolz\tests\test_inspect_args.py:504: in test_inspect_wrapped_property
+    assert num_required_args(Wrapped) == 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:983: in num_required_args
+    sigspec, rv = _check_sigspec(sigspec, func, _sigs._num_required_args,
+toolz\functoolz.py:957: in _check_sigspec
+    sigspec = Signature.from_args(func(*builtin_args))
+              ^^^^^^^^^
+E   NameError: name 'Signature' is not defined
+=========================== short test summary info ===========================
+FAILED toolz/tests/test_inspect_args.py::test_is_valid - assert None
+FAILED toolz/tests/test_inspect_args.py::test_is_valid_py3 - assert None is F...
+FAILED toolz/tests/test_inspect_args.py::test_is_partial - NameError: name 'S...
+FAILED toolz/tests/test_inspect_args.py::test_is_valid_curry - AttributeError...
+FAILED toolz/tests/test_inspect_args.py::test_func_keyword - assert None
+FAILED toolz/tests/test_inspect_args.py::test_has_unknown_args - NameError: n...
+FAILED toolz/tests/test_inspect_args.py::test_num_required_args - NameError: ...
+FAILED toolz/tests/test_inspect_args.py::test_has_keywords - NameError: name ...
+FAILED toolz/tests/test_inspect_args.py::test_has_varargs - NameError: name '...
+FAILED toolz/tests/test_inspect_args.py::test_is_arity - NameError: name 'Sig...
+FAILED toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3 - as...
+FAILED toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3 - ...
+FAILED toolz/tests/test_inspect_args.py::test_introspect_builtin_modules - Na...
+FAILED toolz/tests/test_inspect_args.py::test_inspect_signature_property - At...
+FAILED toolz/tests/test_inspect_args.py::test_inspect_wrapped_property - Name...
+======================== 15 failed, 2 passed in 0.77s =========================
+

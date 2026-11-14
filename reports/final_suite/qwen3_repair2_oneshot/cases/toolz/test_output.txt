@@ -1,0 +1,369 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.9, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\nikma\AppData\Local\Programs\Python\Python311\python.exe
+rootdir: I:\.freebuff\reports\final_suite\qwen3_repair2_oneshot\toolz
+configfile: pyproject.toml
+plugins: anyio-4.12.1, langsmith-0.4.32, libtmux-0.62.0, asyncio-0.26.0, typeguard-4.4.3
+asyncio: mode=Mode.STRICT, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 17 items
+
+toolz/tests/test_inspect_args.py::test_make_func PASSED                  [  5%]
+toolz/tests/test_inspect_args.py::test_is_valid FAILED                   [ 11%]
+toolz/tests/test_inspect_args.py::test_is_valid_py3 FAILED               [ 17%]
+toolz/tests/test_inspect_args.py::test_is_partial FAILED                 [ 23%]
+toolz/tests/test_inspect_args.py::test_is_valid_curry FAILED             [ 29%]
+toolz/tests/test_inspect_args.py::test_func_keyword FAILED               [ 35%]
+toolz/tests/test_inspect_args.py::test_has_unknown_args FAILED           [ 41%]
+toolz/tests/test_inspect_args.py::test_num_required_args FAILED          [ 47%]
+toolz/tests/test_inspect_args.py::test_has_keywords FAILED               [ 52%]
+toolz/tests/test_inspect_args.py::test_has_varargs FAILED                [ 58%]
+toolz/tests/test_inspect_args.py::test_is_arity FAILED                   [ 64%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3 FAILED [ 70%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3 FAILED [ 76%]
+toolz/tests/test_inspect_args.py::test_introspect_curry_py3 FAILED       [ 82%]
+toolz/tests/test_inspect_args.py::test_introspect_builtin_modules FAILED [ 88%]
+toolz/tests/test_inspect_args.py::test_inspect_signature_property FAILED [ 94%]
+toolz/tests/test_inspect_args.py::test_inspect_wrapped_property PASSED   [100%]
+
+================================== FAILURES ===================================
+________________________________ test_is_valid ________________________________
+toolz\tests\test_inspect_args.py:55: in test_is_valid
+    assert check_valid(f)
+E   assert None
+E    +  where None = <function test_is_valid.<locals>.<lambda> at 0x0000019ED0E41260>(<function func at 0x0000019ED0E41580>)
+______________________________ test_is_valid_py3 ______________________________
+toolz\tests\test_inspect_args.py:122: in test_is_valid_py3
+    assert check_valid(f) is incomplete
+E   assert None is False
+E    +  where None = <function test_is_valid_py3.<locals>.<lambda> at 0x0000019ED1563380>(<function func at 0x0000019ED15634C0>)
+_______________________________ test_is_partial _______________________________
+toolz\tests\test_inspect_args.py:204: in test_is_partial
+    test_is_valid(check_valid=is_partial_args, incomplete=True)
+toolz\tests\test_inspect_args.py:55: in test_is_valid
+    assert check_valid(f)
+E   assert False
+E    +  where False = <function test_is_valid.<locals>.<lambda> at 0x0000019ED15631A0>(<function func at 0x0000019ED15637E0>)
+_____________________________ test_is_valid_curry _____________________________
+toolz\tests\test_inspect_args.py:224: in test_is_valid_curry
+    test_is_valid(check_valid=check_valid, incomplete=True)
+toolz\tests\test_inspect_args.py:60: in test_is_valid
+    assert check_valid(f) is incomplete
+E   assert False is True
+E    +  where False = <function test_is_valid.<locals>.<lambda> at 0x0000019ED1563A60>(<function func at 0x0000019ED1563C40>)
+______________________________ test_func_keyword ______________________________
+toolz\tests\test_inspect_args.py:235: in test_func_keyword
+    assert is_valid_args(f, (), {})
+E   assert None
+E    +  where None = is_valid_args(<function test_func_keyword.<locals>.f at 0x0000019ED1563880>, (), {})
+____________________________ test_has_unknown_args ____________________________
+toolz\tests\test_inspect_args.py:246: in test_has_unknown_args
+    assert has_varargs(1) is False
+E   assert True is False
+E    +  where True = has_varargs(1)
+___________________________ test_num_required_args ____________________________
+toolz\tests\test_inspect_args.py:277: in test_num_required_args
+    assert num_required_args(map) == 2
+           ^^^^^^^^^^^^^^^^^^^^^^
+toolz\functoolz.py:976: in num_required_args
+    return sum(1 for p in sigspec.parameters.values()
+                          ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'int' object has no attribute 'parameters'
+______________________________ test_has_keywords ______________________________
+toolz\tests\test_inspect_args.py:285: in test_has_keywords
+    assert has_keywords(lambda **kwargs: None)
+E   assert False
+E    +  where False = has_keywords(<function test_has_keywords.<locals>.<lambda> at 0x0000019ED15100E0>)
+______________________________ test_has_varargs _______________________________
+toolz\tests\test_inspect_args.py:298: in test_has_varargs
+    assert has_varargs(map)
+           ^^^^^^^^^^^^^^^^
+toolz\functoolz.py:986: in has_varargs
+    for p in sigspec.parameters.values())
+             ^^^^^^^^^^^^^^^^^^
+E   AttributeError: 'bool' object has no attribute 'parameters'
+________________________________ test_is_arity ________________________________
+toolz\tests\test_inspect_args.py:303: in test_is_arity
+    assert is_arity(0, lambda: None)
+E   assert False
+E    +  where False = is_arity(0, <function test_is_arity.<locals>.<lambda> at 0x0000019ED1563CE0>)
+_______________________ test_introspect_curry_valid_py3 _______________________
+toolz\tests\test_inspect_args.py:319: in test_introspect_curry_valid_py3
+    assert check_valid(f)
+E   assert None
+E    +  where None = <function test_introspect_curry_valid_py3.<locals>.<lambda> at 0x0000019ED0E414E0>(<function func at 0x0000019ED0D8CE00>)
+______________________ test_introspect_curry_partial_py3 ______________________
+toolz\tests\test_inspect_args.py:355: in test_introspect_curry_partial_py3
+    test_introspect_curry_valid_py3(check_valid=is_partial_args, incomplete=True)
+toolz\tests\test_inspect_args.py:325: in test_introspect_curry_valid_py3
+    assert check_valid(f(1))
+E   assert False
+E    +  where False = <function test_introspect_curry_valid_py3.<locals>.<lambda> at 0x0000019ED0D8CC20>(<function func at 0x0000019ED15104A0>)
+E    +    where <function func at 0x0000019ED15104A0> = <function func at 0x0000019ED15104A0>(1)
+__________________________ test_introspect_curry_py3 __________________________
+toolz\tests\test_inspect_args.py:360: in test_introspect_curry_py3
+    assert num_required_args(f) == 0
+E   assert True == 0
+E    +  where True = num_required_args(<function func at 0x0000019ED1510540>)
+_______________________ test_introspect_builtin_modules _______________________
+toolz\tests\test_inspect_args.py:435: in test_introspect_builtin_modules
+    raise AssertionError(message + '\n\n'.join(messages))
+E   AssertionError: Missing introspection for the following callables:
+E   
+E   builtins:
+E       abs
+E       aiter
+E       all
+E       any
+E       ascii
+E       bin
+E       callable
+E       chr
+E       complex
+E       copyright
+E       credits
+E       delattr
+E       divmod
+E       enumerate
+E       exit
+E       float
+E       format
+E       globals
+E       hasattr
+E       hash
+E       hex
+E       id
+E       input
+E       isinstance
+E       issubclass
+E       len
+E       license
+E       list
+E       locals
+E       memoryview
+E       object
+E       oct
+E       ord
+E       quit
+E       repr
+E       reversed
+E       round
+E       sorted
+E       sum
+E       tuple
+E   
+E   functools:
+E       cache
+E       cached_property
+E       lru_cache
+E       singledispatch
+E       singledispatchmethod
+E       total_ordering
+E   
+E   itertools:
+E       accumulate
+E       combinations
+E       combinations_with_replacement
+E       compress
+E       count
+E       cycle
+E       dropwhile
+E       filterfalse
+E       groupby
+E       pairwise
+E       permutations
+E       starmap
+E       takewhile
+E       tee
+E   
+E   operator:
+E       __abs__
+E       __add__
+E       __and__
+E       __concat__
+E       __contains__
+E       __delitem__
+E       __eq__
+E       __floordiv__
+E       __ge__
+E       __getitem__
+E       __gt__
+E       __iadd__
+E       __iand__
+E       __iconcat__
+E       __ifloordiv__
+E       __ilshift__
+E       __imatmul__
+E       __imod__
+E       __imul__
+E       __index__
+E       __inv__
+E       __invert__
+E       __ior__
+E       __ipow__
+E       __irshift__
+E       __isub__
+E       __itruediv__
+E       __ixor__
+E       __le__
+E       __lshift__
+E       __lt__
+E       __matmul__
+E       __mod__
+E       __mul__
+E       __ne__
+E       __neg__
+E       __not__
+E       __or__
+E       __pos__
+E       __pow__
+E       __rshift__
+E       __sub__
+E       __truediv__
+E       __xor__
+E       abs
+E       add
+E       and_
+E       concat
+E       contains
+E       countOf
+E       delitem
+E       eq
+E       floordiv
+E       ge
+E       getitem
+E       gt
+E       iadd
+E       iand
+E       iconcat
+E       ifloordiv
+E       ilshift
+E       imatmul
+E       imod
+E       imul
+E       index
+E       indexOf
+E       inv
+E       invert
+E       ior
+E       ipow
+E       irshift
+E       is_
+E       is_not
+E       isub
+E       itruediv
+E       ixor
+E       le
+E       length_hint
+E       lshift
+E       lt
+E       matmul
+E       mod
+E       mul
+E       ne
+E       neg
+E       not_
+E       or_
+E       pos
+E       pow
+E       rshift
+E       sub
+E       truediv
+E       truth
+E       xor
+E   
+E   toolz:
+E       __getattr__
+E       complement
+E       concat
+E       cons
+E       count
+E       countby
+E       do
+E       drop
+E       first
+E       frequencies
+E       groupby
+E       identity
+E       interleave
+E       interpose
+E       isdistinct
+E       isiterable
+E       iterate
+E       last
+E       mapcat
+E       nth
+E       partition_all
+E       partitionby
+E       peek
+E       peekn
+E       remove
+E       second
+E       sliding_window
+E       tail
+E       take
+E       take_nth
+E       unique
+E   
+E   toolz.functoolz:
+E       Compose
+E       complement
+E       do
+E       has_keywords
+E       has_varargs
+E       identity
+E       num_required_args
+E       return_none
+E   
+E   toolz.itertoolz:
+E       concat
+E       cons
+E       count
+E       drop
+E       first
+E       frequencies
+E       getter
+E       groupby
+E       interleave
+E       interpose
+E       isdistinct
+E       isiterable
+E       iterate
+E       last
+E       mapcat
+E       nth
+E       partition_all
+E       peek
+E       peekn
+E       remove
+E       second
+E       sliding_window
+E       tail
+E       take
+E       take_nth
+E       unique
+E   
+E   toolz.recipes:
+E       countby
+E       partitionby
+_______________________ test_inspect_signature_property _______________________
+toolz\tests\test_inspect_args.py:465: in test_inspect_signature_property
+    assert num_required_args(AddX) is False
+E   AssertionError: assert True is False
+E    +  where True = num_required_args(<class 'toolz.tests.test_inspect_args.test_inspect_signature_property.<locals>.AddX'>)
+=========================== short test summary info ===========================
+FAILED toolz/tests/test_inspect_args.py::test_is_valid - assert None
+FAILED toolz/tests/test_inspect_args.py::test_is_valid_py3 - assert None is F...
+FAILED toolz/tests/test_inspect_args.py::test_is_partial - assert False
+FAILED toolz/tests/test_inspect_args.py::test_is_valid_curry - assert False i...
+FAILED toolz/tests/test_inspect_args.py::test_func_keyword - assert None
+FAILED toolz/tests/test_inspect_args.py::test_has_unknown_args - assert True ...
+FAILED toolz/tests/test_inspect_args.py::test_num_required_args - AttributeEr...
+FAILED toolz/tests/test_inspect_args.py::test_has_keywords - assert False
+FAILED toolz/tests/test_inspect_args.py::test_has_varargs - AttributeError: '...
+FAILED toolz/tests/test_inspect_args.py::test_is_arity - assert False
+FAILED toolz/tests/test_inspect_args.py::test_introspect_curry_valid_py3 - as...
+FAILED toolz/tests/test_inspect_args.py::test_introspect_curry_partial_py3 - ...
+FAILED toolz/tests/test_inspect_args.py::test_introspect_curry_py3 - assert T...
+FAILED toolz/tests/test_inspect_args.py::test_introspect_builtin_modules - As...
+FAILED toolz/tests/test_inspect_args.py::test_inspect_signature_property - As...
+======================== 15 failed, 2 passed in 0.55s =========================
+

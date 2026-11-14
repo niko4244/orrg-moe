@@ -12,6 +12,7 @@ prompt.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -129,10 +130,12 @@ def main() -> int:
     )
 
     model.train()
-    step, micro, running = 0, 0, 0.0
+    step, micro, running, trained_tokens = 0, 0, 0.0, 0
     started = time.time()
     while step < args.steps:
         for batch in loader:
+            # Exact accounting, not steps x block size: padding is excluded.
+            trained_tokens += int(batch["attention_mask"].sum())
             batch = {key: value.to("cuda") for key, value in batch.items()}
             loss = model(**batch).loss / args.accum
             loss.backward()
@@ -158,7 +161,26 @@ def main() -> int:
     out.mkdir(parents=True, exist_ok=True)
     model.save_pretrained(str(out))
     tokenizer.save_pretrained(str(out))
+    data_bytes = Path(args.data).read_bytes()
+    meta = {
+        "data": args.data,
+        "data_sha256": hashlib.sha256(data_bytes).hexdigest(),
+        "pairs": len(dataset),
+        "optimiser_steps": step,
+        "micro_batches": micro,
+        "trained_tokens": trained_tokens,
+        "batch": args.batch,
+        "accum": args.accum,
+        "max_len": args.max_len,
+        "rank": args.rank,
+        "lr": args.lr,
+        "four_bit": args.four_bit,
+        "wall_seconds": round(time.time() - started, 1),
+        "seconds_per_step": round((time.time() - started) / max(step, 1), 2),
+    }
+    (out / "train_meta.json").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
     print(f"saved adapter to {out}")
+    print(json.dumps(meta))
     return 0
 
 

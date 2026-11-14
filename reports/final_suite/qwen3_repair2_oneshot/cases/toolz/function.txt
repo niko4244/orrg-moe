@@ -1,0 +1,33 @@
+def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+    """Check if a callable's signature is valid.
+
+    Args:
+        sigspec: A signature specification, either a callable or a
+            :class:`inspect.Signature` object.
+        func: The callable whose signature is being checked.
+        builtin_func: A callable that returns a signature for a builtin
+            function.
+        *builtin_args: Arguments to pass to builtin_func.
+
+    Returns:
+        A tuple of ``(signature, valid)``, where ``signature`` is the
+        resolved signature and ``valid`` is a boolean indicating whether
+        the signature is valid.
+
+    """
+    try:
+        if isinstance(sigspec, inspect.Signature):
+            sig = sigspec
+        else:
+            sig = inspect.signature(func)
+    except (TypeError, ValueError, AttributeError):
+        try:
+            sig = builtin_func(*builtin_args)
+        except (TypeError, ValueError, AttributeError):
+            return None, False
+    else:
+        try:
+            sig.bind_partial(*builtin_args)
+        except (TypeError, ValueError, AttributeError):
+            return None, False
+    return sig, True

@@ -1,0 +1,44 @@
+def _check_sigspec(sigspec, func, builtin_func, *builtin_args):
+    """Check whether *sigspec* is a valid signature specification for *func*.
+    Returns a tuple of ``(signature, valid)``
+    """
+    try:
+        if not isinstance(sigspec, (type(None), Signature)):
+            sigspec = Signature.from_args(**sigspec)
+        if func is not None and sigspec == MISSING:
+            try:
+                sigspec = func.__signature__
+            except (AttributeError, TypeError):
+                sigspec = None
+        if sigspec is not None:
+            try:
+                sigspec.bind(func)
+            except (ValueError, TypeError) as e:
+                if 'mismatched' in str(e):
+                    # this is expected when the function's signature
+                    # and the given signature differ on a non-argument
+                    # attribute, e.g., classmethods and staticmethods
+                    pass
+                else:
+                    raise
+    except (ValueError, TypeError) as e:
+        if 'takes' in str(e):
+            # this is expected when the function's signature and the
+            # given signature differ on a non-argument attribute,
+            # e.g., classmethods and staticmethods
+            pass
+        else:
+            raise
+    except Exception:
+        # raises when the function's signature is not built-in
+        # or is built-in but not on the current stack
+        pass
+    if sigspec is None:
+        try:
+            sigspec = func.__signature__
+        except (AttributeError, TypeError):
+            try:
+                sigspec = Signature.from_args(func(*builtin_args))
+            except TypeError:
+                sigspec = None
+    return sigspec, sigspec is not None
